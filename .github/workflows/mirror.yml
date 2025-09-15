@@ -1,14 +1,16 @@
-name: Chocolatine
+name: Mirror
 
 on:
   push:
-    branches-ignore:
-      - 'ga-ignore-*'
+    branches:
+      - main
   pull_request:
     branches-ignore:
       - 'ga-ignore-*'
+
 env:
   MIRROR_URL: "git@github.com:EpitechPGE3-2025/G-DEV-500-NCY-5-1-bsarea-11.git"
+
 jobs:
   push_to_mirror:
     runs-on: ubuntu-latest
