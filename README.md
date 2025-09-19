@@ -9,57 +9,59 @@ The AREA Web Platform is an automation tool inspired by IFTTT and Zapier, design
 
 The platform’s data is stored in a MariaDB relational database, ensuring reliable management of users, workflows, and their relationships.
 
+```mermaid
 erDiagram
-    USERS {
-      bigint id PK
-      varchar email "UNIQUE"
-      varchar password_hash
-      varchar profile_image_url
-      enum role "'user'|'admin'"
-      datetime created_at
-      datetime updated_at
-    }
+  USERS {
+    bigint id PK
+    string email
+    string password_hash
+    string profile_image_url
+    enum role
+    datetime created_at
+    datetime updated_at
+  }
 
-    WORKFLOWS {
-      bigint id PK
-      bigint user_id FK
-      varchar name
-      text description
-      enum visibility "'public'|'private'|'friend_only'"
-      datetime created_at
-      datetime updated_at
-    }
+  WORKFLOWS {
+    bigint id PK
+    bigint user_id FK
+    string name
+    string description
+    enum visibility
+    datetime created_at
+    datetime updated_at
+  }
 
-    WORKFLOW_STEPS {
-      bigint id PK
-      bigint workflow_id FK
-      int step_order
-      enum type "'action'|'reaction'|'transformation'"
-      varchar service
-      varchar event
-      json params
-      datetime created_at
-    }
+  WORKFLOW_STEPS {
+    bigint id PK
+    bigint workflow_id FK
+    int step_order
+    enum type
+    string service
+    string event
+    json params
+    datetime created_at
+  }
 
-    USER_FAVORITE_WORKFLOWS {
-      bigint user_id PK,FK
-      bigint workflow_id PK,FK
-      datetime added_at
-    }
+  USER_FAVORITE_WORKFLOWS {
+    bigint user_id PK,FK
+    bigint workflow_id PK,FK
+    datetime added_at
+  }
 
-    FRIENDS {
-      bigint user_id PK,FK
-      bigint friend_id PK,FK
-      enum status "'pending'|'accepted'"
-      datetime created_at
-    }
+  FRIENDS {
+    bigint user_id PK,FK
+    bigint friend_id PK,FK
+    enum status
+    datetime created_at
+  }
 
-    USERS ||--o{ WORKFLOWS : "owns"
-    WORKFLOWS ||--o{ WORKFLOW_STEPS : "has steps"
-    USERS ||--o{ USER_FAVORITE_WORKFLOWS : "favorites"
-    WORKFLOWS ||--o{ USER_FAVORITE_WORKFLOWS : "favorited by"
-    USERS ||--o{ FRIENDS : "is friend with"
-    USERS ||--o{ FRIENDS : "is friend of"
+  USERS ||--o{ WORKFLOWS : owns
+  WORKFLOWS ||--o{ WORKFLOW_STEPS : has_steps
+  USERS ||--o{ USER_FAVORITE_WORKFLOWS : favorites
+  WORKFLOWS ||--o{ USER_FAVORITE_WORKFLOWS : favorited_by
+  USERS ||--o{ FRIENDS : is_friend_with
+  USERS ||--o{ FRIENDS : is_friend_of
+```
 
 ## Authors
 
