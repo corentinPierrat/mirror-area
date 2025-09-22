@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   db:
     image: mariadb:11.8.3
@@ -28,6 +30,14 @@ services:
     build: ./mobile
     volumes:
       - shared-bundle:/shared
+    ports:
+      - "19000:19000"
+    environment:
+      - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
+      - EXPO_DEV_SERVER_ORIGIN=http://localhost:19000
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
 
   frontend:
     build: ./frontend
@@ -35,7 +45,6 @@ services:
       - "8081:8081"
     depends_on:
       - backend
-      - mobile
     volumes:
       - shared-bundle:/shared
 
