@@ -1,0 +1,155 @@
+.weather-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100vw;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+.weather-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(270deg, #87CEFA, #f39c12, #2c3e50);
+  background-size: 600% 600%;
+  animation: skyAnimation 30s ease infinite;
+  z-index: -1;
+}
+
+
+.cloud {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: cloudMove linear infinite;
+}
+
+.cloud::before,
+.cloud::after {
+  content: "";
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+}
+
+.cloud-small {
+  width: 100px;
+  height: 60px;
+  top: 20%;
+  left: -150px;
+  animation-duration: 60s;
+}
+.cloud-small::before {
+  width: 60px;
+  height: 60px;
+  top: -20px;
+  left: 20px;
+}
+.cloud-small::after {
+  width: 80px;
+  height: 80px;
+  top: -30px;
+  left: 40px;
+}
+
+@keyframes skyAnimation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes cloudMove {
+  0% { transform: translateX(-200px); }
+  100% { transform: translateX(120vw); }
+}
+
+.weather-card {
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 2rem 3rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  z-index: 10;
+  color: black;
+}
+
+.weather-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
+}
+
+.weather-card h1 {
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+  color: #2c3e50;
+}
+.temperature,
+.windspeed,
+.winddirection,
+.time,
+.weathercode {
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
+}
+.reaction {
+  margin-top: 1rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #34495e;
+}
+
+.weather-card button {
+  margin-top: 1.5rem;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 0.8rem;
+  cursor: pointer;
+  background-color: #3498db;
+  color: white;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.weather-card button:hover {
+  background-color: #2980b9;
+  transform: scale(1.05);
+}
+
+.error {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+@media (max-width: 450px) {
+  .weather-card {
+    padding: 1.5rem 2rem;
+  }
+  .weather-card h1 {
+    font-size: 1.5rem;
+  }
+  .temperature,
+  .windspeed,
+  .winddirection,
+  .time,
+  .weathercode,
+  .reaction {
+    font-size: 1rem;
+  }
+  .weather-card button {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+}
