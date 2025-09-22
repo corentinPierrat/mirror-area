@@ -15,7 +15,7 @@ function Weather() {
 
   const fetchWeather = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/get_weather");
+      const response = await fetch("http://localhost:8080/get_weather");
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
       const data = await response.json();
       setWeather({
