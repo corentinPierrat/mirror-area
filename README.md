@@ -55,12 +55,26 @@ erDiagram
     datetime created_at
   }
 
+  USER_SERVICES {
+    bigint id PK
+    bigint user_id FK
+    string service_key
+    varbinary token_ciphertext
+    varbinary token_iv
+    varbinary token_tag
+    datetime token_expires_at
+    datetime created_at
+    datetime updated_at
+  }
+
   USERS ||--o{ WORKFLOWS : owns
   WORKFLOWS ||--o{ WORKFLOW_STEPS : has_steps
   USERS ||--o{ USER_FAVORITE_WORKFLOWS : favorites
   WORKFLOWS ||--o{ USER_FAVORITE_WORKFLOWS : favorited_by
   USERS ||--o{ FRIENDS : is_friend_with
   USERS ||--o{ FRIENDS : is_friend_of
+  USERS ||--o{ USER_SERVICES : connects
+
 ```
 
 ## Authors
