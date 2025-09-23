@@ -3,6 +3,10 @@ import { View, Text, StyleSheet } from 'react-native';
 import OAuthButton from '../components/OauthButton';
 import { LinearGradient } from 'expo-linear-gradient';
 import SpotifyLogo from '../../assets/Spotify.png';
+import FaceitLogo from '../../assets/faceit.png';
+import XLogo from '../../assets/X.png';
+import OutlookLogo from '../../assets/outlook.png';
+import SteamLogo from '../../assets/steam.jpeg';
 
 export default function ServiceScreen() {
   const [connected, setConnected] = useState(false);
@@ -21,7 +25,26 @@ export default function ServiceScreen() {
     >
       <OAuthButton
         logo={SpotifyLogo}
-        text={connected ? "Déconnecter Spotify" : "Connecter Spotify"}
+        onClick={handleOAuthClick}
+        connected={connected}
+      />
+      <OAuthButton
+        logo={FaceitLogo}
+        onClick={handleOAuthClick}
+        connected={connected}
+      />
+      <OAuthButton
+        logo={XLogo}
+        onClick={handleOAuthClick}
+        connected={connected}
+      />
+       <OAuthButton
+        logo={OutlookLogo}
+        onClick={handleOAuthClick}
+        connected={connected}
+      />
+      <OAuthButton
+        logo={SteamLogo}
         onClick={handleOAuthClick}
         connected={connected}
       />
@@ -31,9 +54,10 @@ export default function ServiceScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+    paddingTop: 50,
   },
   text: {
     fontSize: 20,
