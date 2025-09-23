@@ -23,31 +23,12 @@ export default function ServiceScreen() {
       end={{ x: 1, y: 1 }}
       style={styles.container}
     >
-      <OAuthButton
-        logo={SpotifyLogo}
-        onClick={handleOAuthClick}
-        connected={connected}
-      />
-      <OAuthButton
-        logo={FaceitLogo}
-        onClick={handleOAuthClick}
-        connected={connected}
-      />
-      <OAuthButton
-        logo={XLogo}
-        onClick={handleOAuthClick}
-        connected={connected}
-      />
-       <OAuthButton
-        logo={OutlookLogo}
-        onClick={handleOAuthClick}
-        connected={connected}
-      />
-      <OAuthButton
-        logo={SteamLogo}
-        onClick={handleOAuthClick}
-        connected={connected}
-      />
+      <Text style={[styles.text, { marginTop: 30, fontSize: 28}]}>Mes Services</Text>
+      <OAuthButton logo={SpotifyLogo} onClick={handleOAuthClick} connected={connected} />
+      <OAuthButton logo={FaceitLogo} onClick={handleOAuthClick} connected={connected} />
+      <OAuthButton logo={XLogo} onClick={handleOAuthClick} connected={connected} />
+      <OAuthButton logo={OutlookLogo} onClick={handleOAuthClick} connected={connected} />
+      <OAuthButton logo={SteamLogo} onClick={handleOAuthClick} connected={connected} />
     </LinearGradient>
   );
 }
