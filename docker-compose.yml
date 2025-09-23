@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  db:
+    image: mariadb:11.8.3
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: rootpwd
+      MARIADB_DATABASE: area
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./initDatabase:/docker-entrypoint-initdb.d
+
+  backend:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: area
+    depends_on:
+      - db
+    volumes:
+      - shared-bundle:/shared
+
+  mobile:
+    build: ./mobile
+    volumes:
+      - shared-bundle:/shared
+    ports:
+      - "19000:19000"
+    environment:
+      - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
+      - EXPO_DEV_SERVER_ORIGIN=http://localhost:19000
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8081:8081"
+    depends_on:
+      - backend
+    volumes:
+      - shared-bundle:/shared
+
+volumes:
+  db_data:
+  shared-bundle:
