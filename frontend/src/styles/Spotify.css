@@ -1,0 +1,242 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+:root {
+    --dark-blue: #0A0A1A;
+    --blue-glow: #007BFF;
+    --light-blue: #A0B0C0;
+    --white: #FFFFFF;
+}
+
+body {
+}
+
+.homepage-container-spotify {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--dark-blue);
+    color: var(--white);
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    padding: 0 20px;
+}
+
+.header-spotify {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    margin: 50px;
+}
+
+.home-headers-spotify {
+    background-color: #070b27;
+    border-radius: 20px;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.nav-links {
+    margin-top: 30px;
+    display: flex;
+    gap: 2rem;
+    color: var(--light-blue);
+}
+
+.auth-buttons {
+    margin-top: 30px;
+    display: flex;
+    gap: 1rem;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.3s, color 0.3s;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-sign-in {
+    color: var(--blue-glow);
+    background-color: transparent;
+    border: 1px solid var(--blue-glow);
+}
+
+.btn-sign-up {
+    background-color: var(--blue-glow);
+    color: var(--white);
+}
+
+.hero {
+    position: relative;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    padding: 100px 0;
+}
+
+.hero-content {
+    flex: 1;
+    margin-left: 50px;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 20px;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    color: var(--light-blue);
+    margin-bottom: 30px;
+}
+
+.hero-image {
+    width: 400px;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    right: 0;
+    opacity: 0.8;
+}
+
+.hero-image svg {
+    width: 100%;
+    margin-right: 50px;
+    height: auto;
+    filter: drop-shadow(0 0 10px rgba(0, 123, 255, 0.8)) drop-shadow(0 0 20px rgba(0, 123, 255, 0.5));
+}
+
+.how-it-works {
+    padding: 80px 0;
+    text-align: center;
+}
+
+.how-it-works h2 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.how-it-works .subtitle {
+    font-size: 1rem;
+    color: var(--light-blue);
+    margin-bottom: 50px;
+}
+
+.steps-container {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.step-card {
+    flex: 1;
+    min-width: 250px;
+    text-align: center;
+    background-color: #1a1a3a;
+    padding: 30px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.step-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 123, 255, 0.2);
+}
+
+.step-card .icon {
+    font-size: 2rem;
+    color: var(--blue-glow);
+    margin-bottom: 10px;
+}
+
+.step-card h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.step-card p {
+    font-size: 0.9rem;
+    color: var(--light-blue);
+}
+
+.custom-buttons-section {
+    padding: 50px 0;
+    text-align: center;
+}
+
+.custom-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.btn-spotify {
+    background-color: #1DB954;
+    color: var(--white);
+    padding: 15px 30px;
+    border-radius: 5px;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+.btn-spotify:hover {
+    background-color: #1ed760;
+}
+
+.btn-launch-area {
+    background-color: var(--blue-glow);
+    color: var(--white);
+    padding: 15px 30px;
+    border-radius: 5px;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+.btn-launch-area:hover {
+    background-color: #0056b3;
+}
+
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+    }
+    .hero {
+        flex-direction: column;
+        text-align: center;
+    }
+    .hero-image {
+        width: 250px;
+        margin-top: 40px;
+    }
+    .hero h1 {
+        font-size: 2rem;
+    }
+    .how-it-works h2 {
+        font-size: 1.5rem;
+    }
+    .steps-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    .step-card {
+        min-width: unset;
+        width: 100%;
+    }
+    .custom-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
