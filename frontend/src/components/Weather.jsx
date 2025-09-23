@@ -13,6 +13,30 @@ function Weather() {
     error: null,
   });
 
+  const WeatherCode = {
+    0: "☀️ Ciel dégagé",
+    1: "🌤️ Principalement dégagé",
+    2: "⛅ Partiellement nuageux",
+    3: "☁️ Couvert",
+    45: "🌫️ Brouillard",
+    48: "🌫️ Brouillard givrant",
+    51: "🌦️ Bruine légère",
+    53: "🌧️ Bruine modérée",
+    55: "🌧️ Bruine forte",
+    61: "🌦️ Pluie faible",
+    63: "🌧️ Pluie modérée",
+    65: "🌧️ Pluie forte",
+    71: "🌨️ Neige légère",
+    73: "❄️ Neige modérée",
+    75: "❄️❄️ Neige forte",
+    80: "🌧️ Averses faibles",
+    81: "🌧️🌧️ Averses modérées",
+    82: "🌧️🌧️🌧️ Averses violentes",
+    95: "⛈️ Orages",
+    96: "⛈️ Orages avec grêle légère",
+    99: "⛈️ Orages avec grêle forte",
+  };
+
   const fetchWeather = async () => {
     try {
       const response = await fetch("http://localhost:8080/get_weather");
@@ -53,15 +77,6 @@ function Weather() {
     return "🙂 La météo est agréable.";
   };
 
-  const getBackground = () => {
-    const { temperature, is_day } = weather;
-    if (weather.loading) return "#f0f0f0";
-    if (!is_day) return "#2c3e50";
-    if (temperature <= 10) return "#5dade2";
-    if (temperature >= 25) return "#f39c12";
-    return "#58d68d";
-  };
-
   const windCompass = (deg) => {
     const directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
     return directions[Math.round(deg / 45) % 8];
@@ -69,11 +84,6 @@ function Weather() {
 
 return (
   <div className="weather-wrapper">
-    <div className="cloud cloud-small"></div>
-    <div
-      className="cloud cloud-small"
-      style={{ top: "50%", animationDuration: "80s", left: "-200px" }}
-    ></div>
     <div className="weather-card">
       <h1>Météo actuelle</h1>
       {weather.loading ? (
@@ -89,7 +99,7 @@ return (
             ⏱️ Heure:{" "}
             {new Date(weather.time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
           </p>
-          <p className="weathercode">🌤️ Code météo: {weather.weathercode}</p>
+          <p className="weathercode">{WeatherCode[weather.weathercode]}</p>
           <p className="reaction">{renderReaction()}</p>
           <button onClick={fetchWeather}>🔄 Rafraîchir</button>
         </>
