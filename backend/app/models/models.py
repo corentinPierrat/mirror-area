@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Text, Enum, ForeignKey, JSON, DateTime, BigInteger, Integer
+from sqlalchemy import Column, String, Text, Enum, ForeignKey, JSON, DateTime, BigInteger, Integer, VARBINARY
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
@@ -16,6 +16,8 @@ class User(Base):
 
     workflows = relationship("Workflow", back_populates="user", cascade="all, delete-orphan")
     favorites = relationship("UserFavoriteWorkflow", back_populates="user", cascade="all, delete-orphan")
+    friends = relationship("Friend", foreign_keys="[Friend.user_id]", back_populates="user", cascade="all, delete-orphan")
+    services = relationship("UserService", back_populates="user", cascade="all, delete-orphan")
 
 
 class Workflow(Base):
@@ -58,3 +60,31 @@ class UserFavoriteWorkflow(Base):
 
     user = relationship("User", back_populates="favorites")
     workflow = relationship("Workflow", back_populates="favorites")
+
+
+class Friend(Base):
+    __tablename__ = "friends"
+
+    user_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    friend_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    status = Column(Enum("pending", "accepted", name="friend_status"), nullable=False, default="pending")
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    user = relationship("User", foreign_keys=[user_id], back_populates="friends")
+    friend = relationship("User", foreign_keys=[friend_id])
+
+
+class UserService(Base):
+    __tablename__ = "user_services"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    user_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    service_key = Column(String(64), nullable=False)
+    token_ciphertext = Column(VARBINARY(2048), nullable=False)
+    token_iv = Column(VARBINARY(16), nullable=False)
+    token_tag = Column(VARBINARY(16), nullable=False)
+    token_expires_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    user = relationship("User", back_populates="services")
