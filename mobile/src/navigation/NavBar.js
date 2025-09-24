@@ -3,10 +3,11 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { StyleSheet, Platform, View } from 'react-native';
-import ProfileScreen from '../screens/profils';
+import Profils from '../screens/profils';
 import CreateWorkflowScreen from '../screens/CreateWorflow';
 import MyWorkflowScreen from '../screens/MyWorflows';
 import ServiceScreen from '../screens/Services';
+import LoginScreen from '../screens/Login';
 
 const Tab = createBottomTabNavigator();
 
@@ -51,7 +52,7 @@ export default function TabNavigator() {
         tabBarIconStyle: styles.tabBarIcon,
       })}
     >
-      <Tab.Screen name="Profil" component={ProfileScreen} />
+      <Tab.Screen name="Profil" component={Profils} />
       <Tab.Screen name="Créer Workflow" component={CreateWorkflowScreen} />
       <Tab.Screen name="Mes Workflows" component={MyWorkflowScreen} />
       <Tab.Screen name="Services" component={ServiceScreen} />
