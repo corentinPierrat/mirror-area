@@ -11,6 +11,9 @@ class Settings:
     DB_PASSWORD: str = os.getenv("DB_PASSWORD")
     SPOTIFY_CLIENT_ID: str = os.getenv("SPOTIFY_CLIENT_ID")
     SPOTIFY_CLIENT_SECRET: str = os.getenv("SPOTIFY_CLIENT_SECRET")
+    SECRET_KEY: str = os.getenv("SECRET_KEY")
+    JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM")
+    JWT_EXPIRE_MINUTES: int = int(os.getenv("JWT_EXPIRE_MINUTES"))
 
     @property
     def DATABASE_URL(self) -> str:
