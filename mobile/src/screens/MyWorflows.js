@@ -5,16 +5,17 @@ import { View, Text, StyleSheet } from 'react-native';
 export default function MyWorkflowScreen() {
   return (
     <View style={styles.container}>
-      <SimpleFetch />
+
+      {/* <SimpleFetch /> */}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#87ceeb',
-    justifyContent: 'center',
-  },
+  // container: {
+  //   flex: 1,
+  //   alignItems: 'center',
+  //   backgroundColor: '#87ceeb',
+  //   justifyContent: 'center',
+  // },
 });
