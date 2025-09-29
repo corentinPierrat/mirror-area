@@ -41,7 +41,7 @@ const Workflows = ({ Name, Action, Reaction }) => {
         experimentalBlurMethod="dimezisBlurView"
       />
       <View style={styles.overlayContainer} />
-      
+
       <View style={styles.content}>
         <View style={styles.servicesRow}>
           {imageAction && (
@@ -51,11 +51,11 @@ const Workflows = ({ Name, Action, Reaction }) => {
               </View>
             </View>
           )}
-          
+
           <View style={styles.arrowContainer}>
             <Text style={styles.arrowText}>→</Text>
           </View>
-          
+
           {imageReaction && (
             <View style={styles.serviceContainer}>
               <View style={styles.logoContainer}>
@@ -65,10 +65,8 @@ const Workflows = ({ Name, Action, Reaction }) => {
           )}
         </View>
 
-        {/* Nom du workflow */}
         <Text style={styles.workflowName}>{Name}</Text>
 
-        {/* Section contrôles */}
         <View style={styles.controlsRow}>
           <View style={styles.statusContainer}>
             <View style={[styles.indicator, isEnabled ? styles.indicatorActive : styles.indicatorInactive]} />

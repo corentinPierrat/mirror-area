@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     paddingBottom: 125,
   },
   text: {
-    fontSize: 28,
+    fontSize: 26,
     color: '#fff',
     marginBottom: 20,
   },
