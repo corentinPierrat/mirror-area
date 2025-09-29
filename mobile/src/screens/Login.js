@@ -2,21 +2,52 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const API_URL = 'https://c17d73c5f8ea.ngrok-free.app';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
 
-  const handleLogin = () => {
-    Alert.alert('Login', `Email: ${email}\nPassword: ${password}`);
-  };
+   const handleLogin = async () => {
+    if (!email || !password) {
+      setMessage('Veuillez remplir tous les champs');
+      return;
+    }
+    setLoading(true);
+    setMessage('');
+    try {
+    const response = await axios.post(`${API_URL}/auth/login`, { email, password });
+
+    if (response.status === 200 && response.data.access_token) {
+      const token = response.data.access_token;
+      await AsyncStorage.setItem('userToken', token);
+      navigation.replace('Main');
+    }
+  } catch (error) {
+    console.log('Erreur login:', error.response?.data || error.message);
+    if (error.response?.status === 401) {
+      setMessage('Email ou mot de passe incorrect');
+    } else if (error.response?.status === 422) {
+      setMessage('Le mot de passe doit faire 8 caractères minimum');
+    } else {
+      setMessage('Erreur réseau');
+    }
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleRegister = () => {
-    Alert.alert('Register', 'Redirection vers la page d’inscription');
+    navigation.navigate('Register');
   };
 
   const handleForgotPassword = () => {
-    Alert.alert('Mot de passe oublié', 'Redirection vers la récupération du mot de passe');
+    navigation.navigate('ForgotPassword');
   };
 
   return (
@@ -26,10 +57,10 @@ const LoginScreen = ({ navigation }) => {
       end={{ x: 1, y: 1 }}
       style={styles.container}
     >
-
-    <TouchableOpacity style={styles.backButton} onPress={() => navigation.replace('Main')}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.replace('Main')}>
         <Ionicons name="arrow-back" size={28} color="#fff" />
-    </TouchableOpacity>
+      </TouchableOpacity>
+
       <Text style={styles.title}>Connexion</Text>
 
       <TextInput
@@ -50,27 +81,28 @@ const LoginScreen = ({ navigation }) => {
         onChangeText={setPassword}
         secureTextEntry
       />
-      <TouchableOpacity onPress={handleLogin} style={styles.button}>
-        <Text style={styles.buttonText}>Se connecter</Text>
+      {message ? (<Text style={styles.message}>{message}</Text>) : null}
+      <TouchableOpacity onPress={handleLogin} style={styles.button} disabled={loading}>
+        <Text style={styles.buttonText}>{loading ? 'Connexion...' : 'Se connecter'}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={handleForgotPassword}>
         <Text style={styles.link}>Mot de passe oublié ?</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+      <TouchableOpacity onPress={handleRegister}>
         <Text style={styles.link}>Créer un compte</Text>
-    </TouchableOpacity>
+      </TouchableOpacity>
     </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-    backButton: {
-      position: 'absolute',
-      top: 50,
-      left: 20,
-    },
+  backButton: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -83,6 +115,12 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     fontWeight: 'bold',
   },
+  message: {
+  marginBottom: 15,
+  textAlign: 'center',
+  fontSize: 14,
+  color: '#ff4d4d',
+},
   input: {
     width: '100%',
     backgroundColor: 'rgba(255,255,255,0.1)',
@@ -107,18 +145,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginBottom: 30,
     textDecorationLine: 'underline',
-  },
-  registerButton: {
-    borderColor: '#fff',
-    borderWidth: 1,
-    padding: 15,
-    borderRadius: 10,
-    width: '100%',
-    alignItems: 'center',
-  },
-  registerText: {
-    color: '#fff',
-    fontWeight: 'bold',
   },
 });
 
