@@ -7,6 +7,8 @@ import FaceitLogo from '../../assets/faceit.png';
 import XLogo from '../../assets/X.png';
 import OutlookLogo from '../../assets/outlook.png';
 import SteamLogo from '../../assets/steam.jpeg';
+import Discord from '../../assets/discord.png';
+
 
 export default function ServiceScreen() {
   const [connected, setConnected] = useState(false);
@@ -23,12 +25,12 @@ export default function ServiceScreen() {
       end={{ x: 1, y: 1 }}
       style={styles.container}
     >
-      <Text style={[styles.text, { marginTop: 30, fontSize: 28}]}>Mes Services</Text>
       <OAuthButton logo={SpotifyLogo} onClick={handleOAuthClick} connected={connected} />
       <OAuthButton logo={FaceitLogo} onClick={handleOAuthClick} connected={connected} />
       <OAuthButton logo={XLogo} onClick={handleOAuthClick} connected={connected} />
       <OAuthButton logo={OutlookLogo} onClick={handleOAuthClick} connected={connected} />
       <OAuthButton logo={SteamLogo} onClick={handleOAuthClick} connected={connected} />
+      <OAuthButton logo={Discord} onClick={handleOAuthClick} connected={connected} />
     </LinearGradient>
   );
 }
@@ -38,7 +40,7 @@ const styles = StyleSheet.create({
      flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingTop: 50,
+    paddingTop: 65,
   },
   text: {
     fontSize: 20,
