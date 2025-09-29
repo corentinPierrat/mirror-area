@@ -1,33 +1,64 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import axios from 'axios';
+
+const API_URL = 'https://c17d73c5f8ea.ngrok-free.app';
 
 const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleRegister = () => {
-    if (password !== confirmPassword) {
-      Alert.alert('Erreur', 'Les mots de passe ne correspondent pas');
+  const handleRegister = async () => {
+    if (!email || !password || !confirmPassword) {
+      setMessage('Veuillez remplir tous les champs');
       return;
     }
-    Alert.alert('Inscription réussie', `Email: ${email}`);
-    navigation.replace('Login');
+
+    if (password !== confirmPassword) {
+      setMessage('Les mots de passe ne correspondent pas');
+      return;
+    }
+
+    setLoading(true);
+    setMessage('');
+
+    try {
+      const response = await axios.post(`${API_URL}/auth/register`, { email, password });
+
+      if (response.status === 200) {
+        setTimeout(() => navigation.replace('Login'), 1500);
+      }
+    } catch (error) {
+      console.log('Erreur register:', error.response?.data || error.message);
+
+      if (error.response?.status === 422) {
+        setMessage('Le mot de passe doit faire 8 caractères minimum');
+      } else if (error.response?.status === 400) {
+        setMessage('Cet email est déjà utilisé');
+      } else {
+        setMessage('Erreur réseau, veuillez réessayer');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    
     <LinearGradient
       colors={['#171542', '#2f339e']}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.container}
     >
-    <TouchableOpacity style={styles.backButton} onPress={() => navigation.replace('Main')}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.replace('Main')}>
         <Ionicons name="arrow-back" size={28} color="#fff" />
-    </TouchableOpacity>
+      </TouchableOpacity>
+
       <Text style={styles.title}>Créer un compte</Text>
 
       <TextInput
@@ -58,8 +89,10 @@ const RegisterScreen = ({ navigation }) => {
         secureTextEntry
       />
 
-      <TouchableOpacity onPress={handleRegister} style={styles.button}>
-        <Text style={styles.buttonText}>S'inscrire</Text>
+      {message ? <Text style={styles.message}>{message}</Text> : null}
+
+      <TouchableOpacity onPress={handleRegister} style={styles.button} disabled={loading}>
+        <Text style={styles.buttonText}>{loading ? 'Inscription...' : "S'inscrire"}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -70,13 +103,54 @@ const RegisterScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  backButton: { position: 'absolute', top: 50, left: 20 },
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 30 },
-  title: { fontSize: 28, color: '#fff', marginBottom: 40, fontWeight: 'bold' },
-  input: { width: '100%', backgroundColor: 'rgba(255,255,255,0.1)', padding: 15, borderRadius: 10, marginBottom: 20, color: '#fff' },
-  button: { width: '100%', backgroundColor: '#fff', padding: 15, borderRadius: 10, alignItems: 'center', marginBottom: 15 },
-  buttonText: { color: '#2f339e', fontWeight: 'bold' },
-  link: { color: '#fff', marginTop: 10, textDecorationLine: 'underline' },
+  backButton: {
+    position: 'absolute',
+    top: 50,
+    left: 20
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 30
+  },
+  title: {
+    fontSize: 28,
+    color: '#fff',
+    marginBottom: 40,
+    fontWeight: 'bold'
+  },
+  input: {
+    width: '100%',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 20,
+    color: '#fff'
+  },
+  button: {
+    width: '100%',
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 15
+  },
+  buttonText: {
+    color: '#2f339e',
+    fontWeight: 'bold'
+  },
+  link: {
+    color: '#fff',
+    marginTop: 10,
+    textDecorationLine: 'underline'
+  },
+  message: {
+    marginBottom: 15,
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#ff4d4d' // rouge pour les erreurs ou messages
+  },
 });
 
 export default RegisterScreen;
