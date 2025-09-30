@@ -14,6 +14,8 @@ class Settings:
     SECRET_KEY: str = os.getenv("SECRET_KEY")
     JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM")
     JWT_EXPIRE_MINUTES: int = int(os.getenv("JWT_EXPIRE_MINUTES"))
+    USER_SMTP_EMAIL: str = os.getenv("USER_SMTP_EMAIL")
+    USER_SMTP_PASSWORD: str = os.getenv("USER_SMTP_PASSWORD")
 
     @property
     def DATABASE_URL(self) -> str:
