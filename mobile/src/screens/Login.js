@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'https://04ad3d20fb84.ngrok-free.app';
+const API_URL = 'https://ca332d54dc6a.ngrok-free.app';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -34,10 +34,21 @@ const LoginScreen = ({ navigation }) => {
       setMessage('Email ou mot de passe incorrect');
     } else if (error.response?.status === 422) {
       setMessage('Le mot de passe doit faire 8 caractères minimum');
+   } else if (error.response?.status === 403) {
+      try {
+        const response = await axios.post(`${API_URL}/auth/resend-verification`, { email });
+        if (response.status === 200)
+            setMessage('Code renvoyé !');
+            navigation.navigate('Verifcode', { email });
+        } catch (error) {
+        if (error?.response?.status === 422)
+            setMessage('Erreur lors de l\'envoi du code');
+    }
+      setMessage('Email non vérifié');
     } else {
       setMessage('Erreur réseau');
     }
-  } finally {
+    } finally {
     setLoading(false);
   }
 };

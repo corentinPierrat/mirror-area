@@ -4,31 +4,52 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import axios from 'axios';
 
-const API_URL = 'https://04ad3d20fb84.ngrok-free.app';
+const API_URL = 'https://ca332d54dc6a.ngrok-free.app';
 
-export default function Verifcode() {
-    const [code, setCode] = useState('');
-    const [message, setMessage] = useState('');
-    const [loading, setLoading] = useState(false);
+import { useNavigation } from '@react-navigation/native';
 
-const handleVerify = async () => {
-    if (code.length != 6) {
-        setMessage('Le code de vérification est trop court');
-        return;
+export default function Verifcode({ route }) {
+  const { email } = route.params;
+  const navigation = useNavigation();
+
+  const [code, setCode] = useState('');
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleVerify = async () => {
+    if (code.length !== 6) {
+      setMessage('Le code de vérification est trop court');
+      return;
     }
     setLoading(true);
     setMessage('');
     try {
-        const response = await axios.post(`${API_URL}/auth/verify`, { email, code });
+      const response = await axios.post(`${API_URL}/auth/verify`, { email, code });
+      if (response.status === 200) {
+        navigation.replace('Login');
+      }
+    } catch (error) {
+      if (error?.response?.status === 422 || error?.response?.status === 400) {
+        setMessage('Code invalide');
+      } else {
+        setMessage('Erreur serveur');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+const handleresendCode = async () => {
+    setMessage('');
+    try {
+        const response = await axios.post(`${API_URL}/auth/resend-verification`, { email });
         if (response.status === 200)
-            navigation.replace('Login');
+            setMessage('Code renvoyé !');
     } catch (error) {
         if (error?.response?.status === 422)
-            setMessage('Code invalide');
-    } finally {
-        setLoading(false);
+            setMessage('Erreur lors de l\'envoi du code');
     }
-};
+}
 
   return (
     <LinearGradient
@@ -76,12 +97,12 @@ const handleVerify = async () => {
             experimentalBlurMethod="dimezisBlurView"
           />
           <View style={styles.buttonOverlay} />
-          <View style={styles.buttonContent}>
+          <View style={styles.buttonContent} >
             <Text style={styles.buttonText}>{loading ? 'Vérification...' : 'Vérifier'}</Text>
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.resendButton}>
+        <TouchableOpacity style={styles.resendButton} onPress={handleresendCode}>
           <Text style={styles.resendText}>Renvoyer le code</Text>
         </TouchableOpacity>
       </View>

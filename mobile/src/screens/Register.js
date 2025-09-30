@@ -4,10 +4,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
 import Verifcode from './../screens/Verifcode';
 
-const API_URL = 'https://04ad3d20fb84.ngrok-free.app';
+const API_URL = 'https://ca332d54dc6a.ngrok-free.app';
 
 const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState('');
@@ -28,10 +29,10 @@ const RegisterScreen = ({ navigation }) => {
     setMessage('');
 
     try {
-      const response = await axios.post(`${API_URL}/auth/register`, { email, password });
+      const response = await axios.post(`${API_URL}/auth/register`, { username, email, password });
 
       if (response.status === 200) {
-        navigation.navigate('Verifcode');
+        navigation.navigate('Verifcode', { email });
       }
     } catch (error) {
       console.log('Erreur register:', error.response?.data || error.message);
@@ -56,6 +57,14 @@ const RegisterScreen = ({ navigation }) => {
       style={styles.container}
     >
       <Text style={styles.title}>Créer un compte</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Nom d'utilisateur"
+        placeholderTextColor="#ccc"
+        value={username}
+        onChangeText={setUsername}
+      />
 
       <TextInput
         style={styles.input}
