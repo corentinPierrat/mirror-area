@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Text, Enum, ForeignKey, JSON, DateTime, BigInteger, Integer, VARBINARY
+from sqlalchemy import Column, String, Text, Enum, ForeignKey, JSON, DateTime, BigInteger, Integer, VARBINARY, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
@@ -7,10 +7,14 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(BigInteger, primary_key=True, autoincrement=True)
-    email = Column(String(255), unique=True, nullable=False)
+    username = Column(String(50), unique=True, nullable=False)
+    email = Column(String(255), nullable=False)
     password_hash = Column(String(255), nullable=False)
     profile_image_url = Column(String(512), nullable=True)
     role = Column(Enum("user", "admin", name="user_roles"), nullable=False, default="user")
+    is_verified = Column(Boolean, default=False)
+    verification_token = Column(String(255), nullable=True)
+    verification_token_expires_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
