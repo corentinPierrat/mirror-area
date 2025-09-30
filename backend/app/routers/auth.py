@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 from app.services.auth import get_user_by_email, hash_password, create_jwt_token, verify_password, send_verification_email, get_current_user
 from app.database import get_db
 from app.models.models import User
-from app.schemas.auth import UserCreate, Token, VerificationResponse, UserInfo, UserLogin
+from app.schemas.auth import UserCreate, Token, VerificationResponse, UserInfo, UserLogin, ResendVerificationRequest
 
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
@@ -74,8 +74,8 @@ def verify_email(verification: VerificationResponse, db: Session = Depends(get_d
     return {"msg": "Email verified successfully"}
 
 @auth_router.post("/resend-verification")
-def resend_verification(email: str, db: Session = Depends(get_db)):
-    user = get_user_by_email(db, email)
+def resend_verification(request: ResendVerificationRequest, db: Session = Depends(get_db)):
+    user = get_user_by_email(db, request.email)
 
     if not user:
         raise HTTPException(status_code=404, detail="User not found")

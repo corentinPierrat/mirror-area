@@ -28,3 +28,6 @@ class UserInfo(BaseModel):
 
     class Config:
         from_attributes = True
+
+class ResendVerificationRequest(BaseModel):
+    email: EmailStr
