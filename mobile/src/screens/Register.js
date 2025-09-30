@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
+import Verifcode from './../screens/Verifcode';
 
-const API_URL = 'https://c17d73c5f8ea.ngrok-free.app';
+const API_URL = 'https://04ad3d20fb84.ngrok-free.app';
 
 const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -30,7 +31,7 @@ const RegisterScreen = ({ navigation }) => {
       const response = await axios.post(`${API_URL}/auth/register`, { email, password });
 
       if (response.status === 200) {
-        setTimeout(() => navigation.replace('Login'), 1500);
+        navigation.navigate('Verifcode');
       }
     } catch (error) {
       console.log('Erreur register:', error.response?.data || error.message);
