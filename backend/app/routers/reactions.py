@@ -1,8 +1,9 @@
 import httpx
-from typing import Dict, Any
+from typing import Dict, Any, List
 from fastapi import APIRouter, Request, Body
 from fastapi.responses import JSONResponse
 from app.routers.oauth import oauth, get_token
+from pydantic import BaseModel, EmailStr
 
 reactions_router = APIRouter(prefix="/reactions", tags=["reactions"])
 
@@ -50,3 +51,33 @@ async def twitter_tweet(request: Request, payload: Dict[str, Any] = Body(..., ex
         return JSONResponse(resp.json(), status_code=resp.status_code)
     else:
         return JSONResponse({"error": resp.json()}, status_code=resp.status_code)
+
+class MailPayload(BaseModel):
+    to: List[EmailStr]
+    subject: str
+    content: str
+    content_type: str = "HTML"
+
+@reactions_router.post("/microsoft/send_mail")
+async def send_mail(request: Request, payload: MailPayload = Body(...)):
+    token = get_token(request.session, "microsoft")
+    if not token:
+        return JSONResponse({"error": "Not logged in to Microsoft"}, status_code=401)
+    client = oauth.create_client("microsoft")
+    message = {
+        "message": {
+            "subject": payload.subject,
+            "body": {
+                "contentType": payload.content_type,
+                "content": payload.content
+            },
+            "toRecipients": [
+                {"emailAddress": {"address": addr}} for addr in payload.to
+            ]
+        },
+        "saveToSentItems": True
+    }
+    resp = await client.post("me/sendMail", json=message, token=token)
+    if resp.status_code in (202, 200):
+        return JSONResponse({"status": "Mail envoyé"})
+    return JSONResponse({"error": resp.text}, status_code=resp.status_code)

@@ -36,6 +36,35 @@ oauth.register(
     },
 )
 
+oauth.register(
+    name="discord",
+    client_id=settings.DISCORD_CLIENT_ID,
+    client_secret=settings.DISCORD_CLIENT_SECRET,
+    access_token_url="https://discord.com/api/oauth2/token",
+    authorize_url="https://discord.com/api/oauth2/authorize",
+    api_base_url="https://discord.com/api/",
+    client_kwargs={
+        "scope": "identify email guilds",
+    },
+)
+
+def update_ms_token(name, token, request):
+    save_token(request.session, name, token)
+
+oauth.register(
+    name="microsoft",
+    client_id=settings.MS_CLIENT_ID,
+    client_secret=settings.MS_CLIENT_SECRET,
+    authorize_url="https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+    access_token_url="https://login.microsoftonline.com/common/oauth2/v2.0/token",
+    api_base_url="https://graph.microsoft.com/v1.0/",
+    client_kwargs={
+        "scope": "openid profile email offline_access User.Read Mail.Read Mail.Send",
+        "code_challenge_method": "S256",
+    },
+    update_token=update_ms_token,
+)
+
 def get_token_store(session) -> Dict[str, Any]:
     if "oauth_tokens" not in session:
         session["oauth_tokens"] = {}
@@ -53,7 +82,10 @@ def get_token(session, provider: str) -> Dict[str, Any] | None:
 async def oauth_login(provider: str, request: Request):
     if provider not in oauth._clients:
         return JSONResponse({"error": "Provider inconnu"}, status_code=400)
-    redirect_uri = f"http://127.0.0.1:8080/oauth/{provider}/callback"
+    if provider == "microsoft":
+        redirect_uri = f"http://localhost:8080/oauth/{provider}/callback"
+    else:
+        redirect_uri = f"http://127.0.0.1:8080/oauth/{provider}/callback"
     return await oauth.create_client(provider).authorize_redirect(request, redirect_uri)
 
 @oauth_router.get("/{provider}/callback")

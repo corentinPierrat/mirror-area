@@ -19,6 +19,11 @@ class Settings:
         self.JWT_EXPIRE_MINUTES: int = int(os.getenv("JWT_EXPIRE_MINUTES", "30"))
         self.USER_SMTP_EMAIL: str = os.getenv("USER_SMTP_EMAIL")
         self.USER_SMTP_PASSWORD: str = os.getenv("USER_SMTP_PASSWORD")
+        self.MS_CLIENT_ID: str = os.getenv("MS_CLIENT_ID")
+        self.MS_CLIENT_SECRET: str = os.getenv("MS_CLIENT_SECRET")
+        self.DISCORD_CLIENT_ID: str = os.getenv("DISCORD_CLIENT_ID")
+        self.DISCORD_CLIENT_SECRET: str = os.getenv("DISCORD_CLIENT_SECRET")
+        self.FACEIT_API_KEY: str = os.getenv("FACEIT_API_KEY")
 
     @property
     def DATABASE_URL(self) -> str:
