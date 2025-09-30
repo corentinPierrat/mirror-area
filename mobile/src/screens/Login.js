@@ -57,9 +57,6 @@ const LoginScreen = ({ navigation }) => {
       end={{ x: 1, y: 1 }}
       style={styles.container}
     >
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.replace('Main')}>
-        <Ionicons name="arrow-back" size={28} color="#fff" />
-      </TouchableOpacity>
 
       <Text style={styles.title}>Connexion</Text>
 
@@ -98,11 +95,6 @@ const LoginScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  backButton: {
-    position: 'absolute',
-    top: 50,
-    left: 20,
-  },
   container: {
     flex: 1,
     justifyContent: 'center',

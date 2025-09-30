@@ -2,10 +2,15 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { navigation } from '@react-navigation/native';
+import axios from 'axios';
 
-const ProfileDashboard = () => {
+
+const ProfileDashboard = ({ navigation }) => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [message, setMessage] = useState('');
 
   const handleChangePassword = () => {
     if (!currentPassword || !newPassword) {
@@ -21,15 +26,13 @@ const ProfileDashboard = () => {
     setNewPassword('');
   };
 
-  const handleLogout = () => {
-    Alert.alert(
-      'Déconnexion',
-      'Êtes-vous sûr de vouloir vous déconnecter ?',
-      [
-        { text: 'Annuler', style: 'cancel' },
-        { text: 'Déconnexion', onPress: () => console.log('Déconnexion') }
-      ]
-    );
+ const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('userToken');
+      navigation.replace('Login');
+    } catch (error) {
+      setMessage('Erreur lors de la déconnexion');
+    }
   };
 
   return (
@@ -47,10 +50,9 @@ const ProfileDashboard = () => {
         style={styles.profileCard}
       >
         <View style={styles.profileContent}>
-          <Text style={styles.welcomeText}>Welcome back,</Text>
+          <Text style={styles.welcomeText}>Bienvenue,</Text>
           <Text style={styles.userName}>Mark Johnson</Text>
-          <Text style={styles.subText}>Glad to see you again!</Text>
-          <Text style={styles.subText}>Ask me anything.</Text>
+          <Text style={styles.subText}>Ravi de vous: revoir !</Text>
         </View>
 
         <View style={styles.glowContainer}>
@@ -102,6 +104,7 @@ const ProfileDashboard = () => {
         <Ionicons name="log-out-outline" size={20} color="#ef4444" />
         <Text style={styles.logoutButtonText}>Déconnexion</Text>
       </TouchableOpacity>
+      {message ? <Text style={styles.message}>{message}</Text> : null}
     </ScrollView>
       </LinearGradient>
   );
@@ -233,6 +236,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginLeft: 8,
   },
+  message: {
+  marginBottom: 15,
+  textAlign: 'center',
+  fontSize: 16,
+  color: '#ff4d4d'
+},
 });
 
 export default ProfileDashboard;

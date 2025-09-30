@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 
 const API_URL = 'https://c17d73c5f8ea.ngrok-free.app';
@@ -55,10 +54,6 @@ const RegisterScreen = ({ navigation }) => {
       end={{ x: 1, y: 1 }}
       style={styles.container}
     >
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.replace('Main')}>
-        <Ionicons name="arrow-back" size={28} color="#fff" />
-      </TouchableOpacity>
-
       <Text style={styles.title}>Créer un compte</Text>
 
       <TextInput
@@ -96,18 +91,13 @@ const RegisterScreen = ({ navigation }) => {
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text style={styles.link}>Retour à la connexion</Text>
+        <Text styltokene={styles.link}>Retour à la connexion</Text>
       </TouchableOpacity>
     </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  backButton: {
-    position: 'absolute',
-    top: 50,
-    left: 20
-  },
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -149,7 +139,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'center',
     fontSize: 16,
-    color: '#ff4d4d' // rouge pour les erreurs ou messages
+    color: '#ff4d4d'
   },
 });
 
