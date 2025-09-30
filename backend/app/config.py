@@ -4,16 +4,19 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Settings:
-    DB_HOST: str = os.getenv("DB_HOST")
-    DB_PORT: str = os.getenv("DB_PORT")
-    DB_NAME: str = os.getenv("DB_NAME")
-    DB_USER: str = os.getenv("DB_USER")
-    DB_PASSWORD: str = os.getenv("DB_PASSWORD")
-    SPOTIFY_CLIENT_ID: str = os.getenv("SPOTIFY_CLIENT_ID")
-    SPOTIFY_CLIENT_SECRET: str = os.getenv("SPOTIFY_CLIENT_SECRET")
-    SECRET_KEY: str = os.getenv("SECRET_KEY")
-    JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM")
-    JWT_EXPIRE_MINUTES: int = int(os.getenv("JWT_EXPIRE_MINUTES"))
+    def __init__(self):
+        self.DB_HOST: str = os.getenv("DB_HOST")
+        self.DB_PORT: str = os.getenv("DB_PORT")
+        self.DB_NAME: str = os.getenv("DB_NAME")
+        self.DB_USER: str = os.getenv("DB_USER")
+        self.DB_PASSWORD: str = os.getenv("DB_PASSWORD")
+        self.SPOTIFY_CLIENT_ID: str = os.getenv("SPOTIFY_CLIENT_ID")
+        self.SPOTIFY_CLIENT_SECRET: str = os.getenv("SPOTIFY_CLIENT_SECRET")
+        self.TWITTER_CLIENT_ID: str = os.getenv("TWITTER_CLIENT_ID")
+        self.TWITTER_CLIENT_SECRET: str = os.getenv("TWITTER_CLIENT_SECRET")
+        self.SECRET_KEY: str = os.getenv("SECRET_KEY")
+        self.JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
+        self.JWT_EXPIRE_MINUTES: int = int(os.getenv("JWT_EXPIRE_MINUTES", "30"))
 
     @property
     def DATABASE_URL(self) -> str:
