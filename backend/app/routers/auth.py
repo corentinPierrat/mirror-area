@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 from app.services.auth import get_user_by_email, hash_password, create_jwt_token, verify_password, send_verification_email, get_current_user
 from app.database import get_db
 from app.models.models import User
-from app.schemas.auth import UserCreate, Token, VerificationResponse, UserInfo
+from app.schemas.auth import UserCreate, Token, VerificationResponse, UserInfo, UserLogin
 
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
@@ -36,8 +36,9 @@ def register_user(form_data: UserCreate, db: Session = Depends(get_db)):
     return {"msg": "User registered, verification code sent by email"}
 
 @auth_router.post("/login", response_model=Token)
-def login_user(form_data: UserCreate, db: Session = Depends(get_db)):
+def login_user(form_data: UserLogin, db: Session = Depends(get_db)):
     user = get_user_by_email(db, form_data.email)
+
     if not user or not verify_password(form_data.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     if not user.is_verified:
