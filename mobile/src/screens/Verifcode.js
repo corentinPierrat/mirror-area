@@ -2,9 +2,33 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
+import axios from 'axios';
+
+const API_URL = 'https://04ad3d20fb84.ngrok-free.app';
 
 export default function Verifcode() {
-  const [code, setCode] = useState('');
+    const [code, setCode] = useState('');
+    const [message, setMessage] = useState('');
+    const [loading, setLoading] = useState(false);
+
+const handleVerify = async () => {
+    if (code.length != 6) {
+        setMessage('Le code de vérification est trop court');
+        return;
+    }
+    setLoading(true);
+    setMessage('');
+    try {
+        const response = await axios.post(`${API_URL}/auth/verify`, { email, code });
+        if (response.status === 200)
+            navigation.replace('Login');
+    } catch (error) {
+        if (error?.response?.status === 422)
+            setMessage('Code invalide');
+    } finally {
+        setLoading(false);
+    }
+};
 
   return (
     <LinearGradient
@@ -38,9 +62,12 @@ export default function Verifcode() {
           />
         </View>
 
+        {message ? (<Text style={styles.message}>{message}</Text>) : null}
+
         <TouchableOpacity
-          activeOpacity={0.2}
-          style={styles.buttonWrapper}
+            activeOpacity={0.2}
+            style={styles.buttonWrapper}
+            onPress={handleVerify}
         >
           <BlurView
             style={styles.blurContainer}
@@ -50,7 +77,7 @@ export default function Verifcode() {
           />
           <View style={styles.buttonOverlay} />
           <View style={styles.buttonContent}>
-            <Text style={styles.buttonText}>Vérifier</Text>
+            <Text style={styles.buttonText}>{loading ? 'Vérification...' : 'Vérifier'}</Text>
           </View>
         </TouchableOpacity>
 
@@ -108,6 +135,12 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     borderRadius: 18,
   },
+    message: {
+    marginBottom: 15,
+    textAlign: 'center',
+    fontSize: 14,
+    color: '#ff4d4d',
+    },
   overlayContainer: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(255,255,255,0.05)',
