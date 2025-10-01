@@ -14,7 +14,6 @@ function HomePage() {
           <HowItWorks />
           <HowItWorks />
           <HowItWorks />
-          <HowItWorks />
           <Footer />
         </div>
       </main>

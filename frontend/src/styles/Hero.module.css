@@ -1,11 +1,23 @@
 /* Hero.css */
 
 .hero-section {
-  margin-top: 40px;
-  padding: 30px;
+  position: sticky;
+  top: 20px;
+  width: 100%;
+  margin: auto;
+  max-width: 98%;
   background-color: #070b27;
-  border-radius: 40px;
-  transition: all 0.4s ease;
+  overflow: visible;
+  z-index: 1000;
+  transition: height 0.3s ease, border-radius 0.3s ease, padding 0.3s ease;
+}
+
+.hero-main {
+  display: grid;
+  align-items: center;
+  gap: 4rem;
+  position: relative;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .scrolled {
@@ -19,21 +31,11 @@
   z-index: 1000;
 }
 
-
-.hero-main {
-  display: grid;
-  align-items: center;
-  gap: 4rem;
-  margin-top: 4rem;
-  position: relative;
-  margin-left: 150px;
-  padding-bottom: 10px;
-}
-
 .hero-arrow {
   position: absolute;
   right: -40rem;
-  bottom: -17rem;
+  bottom: 0;
+  transform: translateY(40%);
   pointer-events: none;
 }
 
@@ -42,6 +44,7 @@
   height: auto;
   animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
 
   .hero-content {
     text-align: center;
