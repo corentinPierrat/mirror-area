@@ -23,7 +23,9 @@ class Settings:
         self.MS_CLIENT_SECRET: str = os.getenv("MS_CLIENT_SECRET")
         self.DISCORD_CLIENT_ID: str = os.getenv("DISCORD_CLIENT_ID")
         self.DISCORD_CLIENT_SECRET: str = os.getenv("DISCORD_CLIENT_SECRET")
-        self.FACEIT_API_KEY: str = os.getenv("FACEIT_API_KEY")
+        self.FACEIT_CLIENT_ID: str = os.getenv("FACEIT_CLIENT_ID")
+        self.FACEIT_CLIENT_SECRET: str = os.getenv("FACEIT_CLIENT_SECRET")
+        self.STEAM_WEB_API_KEY: str = os.getenv("STEAM_WEB_API_KEY")
 
     @property
     def DATABASE_URL(self) -> str:

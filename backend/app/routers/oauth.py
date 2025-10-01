@@ -65,6 +65,19 @@ oauth.register(
     update_token=update_ms_token,
 )
 
+oauth.register(
+    name="faceit",
+    client_id=settings.FACEIT_CLIENT_ID,
+    client_secret=settings.FACEIT_CLIENT_SECRET,
+    authorize_url="https://accounts.faceit.com/resources/oauth/authorize",
+    access_token_url="https://api.faceit.com/auth/v1/oauth/token",
+    api_base_url="https://open.faceit.com/data/v4/",
+    client_kwargs={
+        "scope": "openid email profile membership",
+        "code_challenge_method": "S256",
+    },
+)
+
 def get_token_store(session) -> Dict[str, Any]:
     if "oauth_tokens" not in session:
         session["oauth_tokens"] = {}
@@ -84,6 +97,8 @@ async def oauth_login(provider: str, request: Request):
         return JSONResponse({"error": "Provider inconnu"}, status_code=400)
     if provider == "microsoft":
         redirect_uri = f"http://localhost:8080/oauth/{provider}/callback"
+    elif provider == "faceit":
+        redirect_uri = f"https://b107b2467506.ngrok-free.app/oauth/{provider}/callback"
     else:
         redirect_uri = f"http://127.0.0.1:8080/oauth/{provider}/callback"
     return await oauth.create_client(provider).authorize_redirect(request, redirect_uri)
@@ -96,3 +111,10 @@ async def oauth_callback(provider: str, request: Request):
     token = await client.authorize_access_token(request, grant_type="authorization_code")
     save_token(request.session, provider, token)
     return RedirectResponse("http://127.0.0.1:5173")
+
+@oauth_router.get("/{provider}/status")
+async def oauth_status(provider: str, request: Request):
+    token = get_token(request.session, provider)
+    if not token:
+        return JSONResponse({"logged_in": False})
+    return JSONResponse({"logged_in": True, "token": token})
