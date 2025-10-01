@@ -1,0 +1,19 @@
+/* HomePage.module.css */
+body {
+  margin: 0;
+  background-color: #02061a;
+  color: white;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+.container {
+  /* width: 200%; */
+  /* max-width: 1280px; */
+  /* margin-top: 10px; */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  box-sizing: border-box;
+}
