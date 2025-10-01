@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'https://ca332d54dc6a.ngrok-free.app';
+const API_URL = 'https://b107b2467506.ngrok-free.app';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -57,10 +57,6 @@ const LoginScreen = ({ navigation }) => {
     navigation.navigate('Register');
   };
 
-  const handleForgotPassword = () => {
-    navigation.navigate('ForgotPassword');
-  };
-
   return (
     <LinearGradient
       colors={['#171542', '#2f339e']}
@@ -92,10 +88,6 @@ const LoginScreen = ({ navigation }) => {
       {message ? (<Text style={styles.message}>{message}</Text>) : null}
       <TouchableOpacity onPress={handleLogin} style={styles.button} disabled={loading}>
         <Text style={styles.buttonText}>{loading ? 'Connexion...' : 'Se connecter'}</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={handleForgotPassword}>
-        <Text style={styles.link}>Mot de passe oublié ?</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={handleRegister}>

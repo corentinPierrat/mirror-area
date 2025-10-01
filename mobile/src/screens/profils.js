@@ -3,31 +3,55 @@ import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert 
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { navigation } from '@react-navigation/native';
 import axios from 'axios';
 
-const API_URL = 'https://ca332d54dc6a.ngrok-free.app';
+const API_URL = 'https://b107b2467506.ngrok-free.app';
 
 const ProfileDashboard = ({ navigation }) => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [message, setMessage] = useState('');
   const [userData, setUserData] = useState(null);
+  const [isError, setIsError] = useState(false);
 
-
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) {
+      navigation.replace('Login');
+      return;
+    }
+    setMessage('');
     if (!currentPassword || !newPassword) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs');
+      setIsError(true);
+      setMessage('Veuillez remplir tous les champs');
       return;
     }
-    if (newPassword.length < 6) {
-      Alert.alert('Erreur', 'Le nouveau mot de passe doit contenir au moins 6 caractères');
+    if (newPassword.length < 8) {
+      setIsError(true);
+      setMessage('Le nouveau mot de passe doit contenir au moins 8 caractères');
       return;
     }
-    Alert.alert('Succès', 'Mot de passe modifié avec succès');
-    setCurrentPassword('');
-    setNewPassword('');
-  };
+    try {
+      const response = await axios.patch(`${API_URL}/auth/change-password`, { old_password: currentPassword, new_password: newPassword }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.status !== 200) {
+        setIsError(true);
+        setMessage('Erreur lors du changement de mot de passe');
+        return;
+      } else {
+        setIsError(false);
+        setMessage('Mot de passe modifié avec succès');
+      }
+      setCurrentPassword('');
+      setNewPassword('');
+    } catch (error) {
+      setIsError(true);
+      setMessage('Erreur lors du changement de mot de passe');
+    }
+};
 
  const handleLogout = async () => {
     try {
@@ -126,12 +150,11 @@ const ProfileDashboard = ({ navigation }) => {
           <Text style={styles.changePasswordButtonText}>Modifier le mot de passe</Text>
         </TouchableOpacity>
       </View>
-
+     {message ? (<Text style={[styles.message, { color: isError ? '#ff4d4d' : '#63f614ff' }]}>{message}</Text>) : null}
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Ionicons name="log-out-outline" size={20} color="#ef4444" />
         <Text style={styles.logoutButtonText}>Déconnexion</Text>
       </TouchableOpacity>
-      {message ? <Text style={styles.message}>{message}</Text> : null}
     </ScrollView>
       </LinearGradient>
   );
@@ -264,10 +287,10 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   message: {
-  marginBottom: 15,
+  marginTop: -10,
+  marginBottom: 10,
   textAlign: 'center',
-  fontSize: 16,
-  color: '#ff4d4d'
+  fontSize: 14,
 },
 });
 

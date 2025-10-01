@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import axios from 'axios';
 
-const API_URL = 'https://ca332d54dc6a.ngrok-free.app';
+const API_URL = 'https://b107b2467506.ngrok-free.app';
 
 import { useNavigation } from '@react-navigation/native';
 

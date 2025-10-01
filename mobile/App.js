@@ -7,6 +7,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import TabNavigator from './src/navigation/NavBar';
 import LoginScreen from './src/screens/Login';
 import RegisterScreen from './src/screens/Register';
+import Verifcode from './src/screens/Verifcode';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -33,15 +36,18 @@ export default function App() {
   if (!initialRoute) return null;
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName={initialRoute}
-        screenOptions={{ headerShown: false }}
-      >
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="Main" component={TabNavigator} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName={initialRoute}
+          screenOptions={{ headerShown: false }}
+        >
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Register" component={RegisterScreen} />
+          <Stack.Screen name="Main" component={TabNavigator} />
+          <Stack.Screen name="Verifcode" component={Verifcode} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
 }

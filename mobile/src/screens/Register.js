@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
 import Verifcode from './../screens/Verifcode';
 
-const API_URL = 'https://ca332d54dc6a.ngrok-free.app';
+const API_URL = 'https://b107b2467506.ngrok-free.app';
 
 const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
