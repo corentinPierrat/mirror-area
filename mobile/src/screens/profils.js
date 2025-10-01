@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,11 +6,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { navigation } from '@react-navigation/native';
 import axios from 'axios';
 
+const API_URL = 'https://ca332d54dc6a.ngrok-free.app';
 
 const ProfileDashboard = ({ navigation }) => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [userData, setUserData] = useState(null);
+
 
   const handleChangePassword = () => {
     if (!currentPassword || !newPassword) {
@@ -35,6 +38,30 @@ const ProfileDashboard = ({ navigation }) => {
     }
   };
 
+  const handleUpdateProfile = async () => {
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) {
+      navigation.replace('Login');
+      return;
+    }
+    try {
+      const response = await axios.get(`${API_URL}/auth/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.status === 200) {
+        setUserData(response.data);
+      }
+    } catch (error) {
+      setMessage('Erreur lors de la mise à jour du profil');
+    }
+  };
+
+  useEffect(() => {
+    handleUpdateProfile();
+  }, []);
+
   return (
 
     <LinearGradient
@@ -51,8 +78,8 @@ const ProfileDashboard = ({ navigation }) => {
       >
         <View style={styles.profileContent}>
           <Text style={styles.welcomeText}>Bienvenue,</Text>
-          <Text style={styles.userName}>Mark Johnson</Text>
-          <Text style={styles.subText}>Ravi de vous: revoir !</Text>
+          <Text style={styles.userName}>{userData?.username}</Text>
+          <Text style={styles.subText}>Ravi de vous revoir !</Text>
         </View>
 
         <View style={styles.glowContainer}>
