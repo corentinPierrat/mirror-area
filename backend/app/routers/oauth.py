@@ -1,10 +1,13 @@
 from typing import Dict, Any
-import httpx
-from fastapi import APIRouter, Request, Body, Depends
+from fastapi import APIRouter, Request, Depends
 from fastapi.responses import RedirectResponse, JSONResponse
 from authlib.integrations.starlette_client import OAuth
-import os
+from sqlalchemy.orm import Session
 from app.config import settings
+from app.database import get_db
+from app.models.models import UserService
+from app.services.token_storage import save_token_to_db, get_token_from_db
+from app.services.auth import get_current_user
 
 oauth_router = APIRouter(prefix="/oauth", tags=["oauth"])
 
@@ -48,9 +51,6 @@ oauth.register(
     },
 )
 
-def update_ms_token(name, token, request):
-    save_token(request.session, name, token)
-
 oauth.register(
     name="microsoft",
     client_id=settings.MS_CLIENT_ID,
@@ -62,7 +62,6 @@ oauth.register(
         "scope": "openid profile email offline_access User.Read Mail.Read Mail.Send",
         "code_challenge_method": "S256",
     },
-    update_token=update_ms_token,
 )
 
 oauth.register(
@@ -78,23 +77,11 @@ oauth.register(
     },
 )
 
-def get_token_store(session) -> Dict[str, Any]:
-    if "oauth_tokens" not in session:
-        session["oauth_tokens"] = {}
-    return session["oauth_tokens"]
-
-def save_token(session, provider: str, token: Dict[str, Any]) -> None:
-    tokens = get_token_store(session)
-    tokens[provider] = token
-    session["oauth_tokens"] = tokens
-
-def get_token(session, provider: str) -> Dict[str, Any] | None:
-    return get_token_store(session).get(provider)
-
 @oauth_router.get("/{provider}/login")
-async def oauth_login(provider: str, request: Request):
+async def oauth_login(provider: str, request: Request, current_user = Depends(get_current_user)):
     if provider not in oauth._clients:
         return JSONResponse({"error": "Provider inconnu"}, status_code=400)
+    request.session['oauth_user_id'] = current_user.id
     if provider == "microsoft":
         redirect_uri = f"http://localhost:8080/oauth/{provider}/callback"
     elif provider == "faceit":
@@ -104,17 +91,46 @@ async def oauth_login(provider: str, request: Request):
     return await oauth.create_client(provider).authorize_redirect(request, redirect_uri)
 
 @oauth_router.get("/{provider}/callback")
-async def oauth_callback(provider: str, request: Request):
+async def oauth_callback(provider: str, request: Request, db: Session = Depends(get_db)):
     if provider not in oauth._clients:
         return JSONResponse({"error": "Provider inconnu"}, status_code=400)
-    client = oauth.create_client(provider)
-    token = await client.authorize_access_token(request, grant_type="authorization_code")
-    save_token(request.session, provider, token)
-    return RedirectResponse("http://127.0.0.1:5173")
+    try:
+        client = oauth.create_client(provider)
+        token = await client.authorize_access_token(request, grant_type="authorization_code")
+        user_id = request.session.get('oauth_user_id')
+        if user_id:
+            save_token_to_db(db, user_id, provider, token)
+        return RedirectResponse("http://127.0.0.1:5173")
+    except Exception as e:
+        print(f"Erreur OAuth callback: {e}")
+        return JSONResponse({
+            "success": False,
+            "error": "oauth_failed",
+            "details": str(e)
+        }, status_code=500)
 
 @oauth_router.get("/{provider}/status")
-async def oauth_status(provider: str, request: Request):
-    token = get_token(request.session, provider)
+async def oauth_status(provider: str, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    token = get_token_from_db(db, current_user.id, provider)
     if not token:
         return JSONResponse({"logged_in": False})
-    return JSONResponse({"logged_in": True, "token": token})
+    return JSONResponse({"logged_in": True, "has_token": True})
+
+@oauth_router.delete("/{provider}/disconnect")
+async def oauth_disconnect(provider: str, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    service = db.query(UserService).filter(
+        UserService.user_id == current_user.id,
+        UserService.service_key == provider
+    ).first()
+    if service:
+        db.delete(service)
+        db.commit()
+        return {"msg": f"Service {provider} déconnecté avec succès"}
+    return JSONResponse({"error": "Service non trouvé"}, status_code=404)
+
+@oauth_router.get("/{provider}/token")
+async def get_oauth_token(provider: str, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    token = get_token_from_db(db, current_user.id, provider)
+    if not token:
+        return JSONResponse({"error": "Token non trouvé"}, status_code=404)
+    return JSONResponse({"token": token})

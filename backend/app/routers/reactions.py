@@ -1,23 +1,27 @@
 import httpx
 from typing import Dict, Any, List
-from fastapi import APIRouter, Request, Body
+from fastapi import APIRouter, Request, Body, Depends
 from fastapi.responses import JSONResponse
-from app.routers.oauth import oauth, get_token
+from sqlalchemy.orm import Session
+from app.routers.oauth import oauth
+from app.services.token_storage import get_token_from_db
+from app.database import get_db
+from app.services.auth import get_current_user
 from pydantic import BaseModel, EmailStr
 
 reactions_router = APIRouter(prefix="/reactions", tags=["reactions"])
 
 @reactions_router.get("/spotify/play_weather_playlist")
-async def play_weather_playlist(request: Request):
-    token = get_token(request.session, "spotify")
+async def play_weather_playlist(request: Request, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    token = get_token_from_db(db, current_user.id, "spotify")
     if not token:
         return JSONResponse({"error": "Not logged in to Spotify"}, status_code=401)
     url = "https://api.open-meteo.com/v1/forecast?latitude=48.8566&longitude=2.3522&current_weather=true"
     async with httpx.AsyncClient() as client:
         weather_resp = await client.get(url, timeout=10)
         weather = weather_resp.json()["current_weather"]
-    temp = weather["temperature"]
-    code = weather["weathercode"]
+        temp = weather["temperature"]
+        code = weather["weathercode"]
     if code in [51, 53, 55, 61, 63, 65, 80, 81, 82]:
         playlist_uri = "spotify:playlist:37i9dQZF1DXbvABJXBIyiY"
     elif code in [71, 73, 75]:
@@ -39,8 +43,8 @@ async def play_weather_playlist(request: Request):
         return JSONResponse({"error": resp.json()}, status_code=resp.status_code)
 
 @reactions_router.post("/twitter/tweet")
-async def twitter_tweet(request: Request, payload: Dict[str, Any] = Body(..., example={"text": "Hello"})):
-    token = get_token(request.session, "twitter")
+async def twitter_tweet(request: Request, payload: Dict[str, Any] = Body(..., example={"text": "Hello"}), db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    token = get_token_from_db(db, current_user.id, "twitter")
     if not token:
         return JSONResponse({"error": "Not logged in to Twitter"}, status_code=401)
     text = (payload or {}).get("text")
@@ -59,8 +63,8 @@ class MailPayload(BaseModel):
     content_type: str = "HTML"
 
 @reactions_router.post("/microsoft/send_mail")
-async def send_mail(request: Request, payload: MailPayload = Body(...)):
-    token = get_token(request.session, "microsoft")
+async def send_mail(request: Request, payload: MailPayload = Body(...), db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    token = get_token_from_db(db, current_user.id, "microsoft")
     if not token:
         return JSONResponse({"error": "Not logged in to Microsoft"}, status_code=401)
     client = oauth.create_client("microsoft")
