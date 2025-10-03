@@ -6,6 +6,7 @@ from app.routers.auth import auth_router
 from app.routers.oauth import oauth_router
 from app.routers.actions import actions_router
 from app.routers.reactions import reactions_router
+from app.routers.catalog import catalog_router
 
 app = FastAPI()
 
@@ -30,6 +31,7 @@ app.include_router(auth_router)
 app.include_router(oauth_router)
 app.include_router(actions_router)
 app.include_router(reactions_router)
+app.include_router(catalog_router)
 
 @app.get("/")
 def read_root():
