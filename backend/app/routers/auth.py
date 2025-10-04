@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 from app.services.auth import get_user_by_email, hash_password, create_jwt_token, verify_password, send_verification_email, get_current_user
 from app.database import get_db
 from app.models.models import User
-from app.schemas.auth import UserCreate, Token, VerificationResponse, UserInfo, UserLogin, ResendVerificationRequest
+from app.schemas.auth import UserCreate, Token, VerificationResponse, UserInfo, UserLogin, ResendVerificationRequest, ChangePasswordRequest
 
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
@@ -94,3 +94,15 @@ def resend_verification(request: ResendVerificationRequest, db: Session = Depend
 @auth_router.get("/me", response_model=UserInfo)
 def get_my_info(current_user: User = Depends(get_current_user)):
     return current_user
+
+@auth_router.patch("/change-password")
+def change_password(
+    request: ChangePasswordRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if not verify_password(request.old_password, current_user.password_hash):
+        raise HTTPException(status_code=400, detail="Incorrect old password")
+    current_user.password_hash = hash_password(request.new_password)
+    db.commit()
+    return {"msg": "Password changed successfully"}

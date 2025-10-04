@@ -31,3 +31,7 @@ class UserInfo(BaseModel):
 
 class ResendVerificationRequest(BaseModel):
     email: EmailStr
+
+class ChangePasswordRequest(BaseModel):
+    old_password: str
+    new_password: constr(min_length=8, max_length=72)
