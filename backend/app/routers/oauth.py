@@ -134,3 +134,39 @@ async def get_oauth_token(provider: str, db: Session = Depends(get_db), current_
     if not token:
         return JSONResponse({"error": "Token non trouvé"}, status_code=404)
     return JSONResponse({"token": token})
+
+SERVICES_INFO = {
+    "spotify": {
+        "name": "Spotify",
+        "logo_url": "https://storage.googleapis.com/pr-newsroom-wp/1/2018/11/Spotify_Logo_RGB_Green.png"
+    },
+    "twitter": {
+        "name": "Twitter",
+        "logo_url": "https://abs.twimg.com/icons/apple-touch-icon-192x192.png"
+    },
+    "discord": {
+        "name": "Discord",
+        "logo_url": "https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png"
+    },
+    "microsoft": {
+        "name": "Microsoft 365",
+        "logo_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/512px-Microsoft_logo.svg.png"
+    },
+    "faceit": {
+        "name": "Faceit",
+        "logo_url": "https://cdn.faceit.com/static/layout/images/faceit-logo.svg"
+    }
+}
+
+@oauth_router.get("/services")
+async def get_services(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    services = []
+    for provider, info in SERVICES_INFO.items():
+        token = get_token_from_db(db, current_user.id, provider)
+        services.append({
+            "provider": provider,
+            "name": info["name"],
+            "logo_url": info["logo_url"],
+            "connected": bool(token)
+        })
+    return JSONResponse({"services": services})
