@@ -3,8 +3,9 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-nativ
 import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
 import Verifcode from './../screens/Verifcode';
+import { t } from 'i18next';
 
-const API_URL = 'https://b107b2467506.ngrok-free.app';
+const API_URL = 'https://73e67643c7fb.ngrok-free.app';
 
 const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -16,12 +17,12 @@ const RegisterScreen = ({ navigation }) => {
 
   const handleRegister = async () => {
     if (!email || !password || !confirmPassword) {
-      setMessage('Veuillez remplir tous les champs');
+      setMessage(t("EmptyFields"));
       return;
     }
 
     if (password !== confirmPassword) {
-      setMessage('Les mots de passe ne correspondent pas');
+      setMessage(t("PasswordDoesNotMatch"));
       return;
     }
 

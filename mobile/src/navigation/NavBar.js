@@ -7,11 +7,13 @@ import Profils from '../screens/profils';
 import CreateWorkflowScreen from '../screens/CreateWorflow';
 import MyWorkflowScreen from '../screens/MyWorflows';
 import ServiceScreen from '../screens/Services';
-import LoginScreen from '../screens/Login';
+import "../components/i18n";
+import { useTranslation } from "react-i18next";
 
 const Tab = createBottomTabNavigator();
 
 export default function TabNavigator() {
+  const { t } = useTranslation();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -52,10 +54,10 @@ export default function TabNavigator() {
         tabBarIconStyle: styles.tabBarIcon,
       })}
     >
-      <Tab.Screen name="Profil" component={Profils} />
-      <Tab.Screen name="Créer Workflow" component={CreateWorkflowScreen} />
-      <Tab.Screen name="Mes Workflows" component={MyWorkflowScreen} />
-      <Tab.Screen name="Services" component={ServiceScreen} />
+      <Tab.Screen name={t("Profile")} component={Profils} />
+      <Tab.Screen name={t("Create Workflow")} component={CreateWorkflowScreen} />
+      <Tab.Screen name={t("My Workflows")} component={MyWorkflowScreen} />
+      <Tab.Screen name={t("Services")} component={ServiceScreen} />
     </Tab.Navigator>
   );
 }

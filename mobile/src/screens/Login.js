@@ -4,10 +4,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import "../components/i18n";
+import { useTranslation } from "react-i18next";
 
 const API_URL = 'https://b107b2467506.ngrok-free.app';
 
 const LoginScreen = ({ navigation }) => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -15,7 +18,7 @@ const LoginScreen = ({ navigation }) => {
 
    const handleLogin = async () => {
     if (!email || !password) {
-      setMessage('Veuillez remplir tous les champs');
+      setMessage(t("EmptyFields"));
       return;
     }
     setLoading(true);
@@ -31,22 +34,22 @@ const LoginScreen = ({ navigation }) => {
   } catch (error) {
     console.log('Erreur login:', error.response?.data || error.message);
     if (error.response?.status === 401) {
-      setMessage('Email ou mot de passe incorrect');
+      setMessage(t("InvalidCredentials"));
     } else if (error.response?.status === 422) {
-      setMessage('Le mot de passe doit faire 8 caractères minimum');
+      setMessage(t("PasswordTooShort"));
    } else if (error.response?.status === 403) {
       try {
         const response = await axios.post(`${API_URL}/auth/resend-verification`, { email });
         if (response.status === 200)
-            setMessage('Code renvoyé !');
+            setMessage(t("CodeResent"));
             navigation.navigate('Verifcode', { email });
         } catch (error) {
         if (error?.response?.status === 422)
-            setMessage('Erreur lors de l\'envoi du code');
+            setMessage(t("ErrorResendCode"));
     }
-      setMessage('Email non vérifié');
+      setMessage(t("EmailNotVerified"));
     } else {
-      setMessage('Erreur réseau');
+      setMessage(t("NetworkError"));
     }
     } finally {
     setLoading(false);
@@ -65,11 +68,11 @@ const LoginScreen = ({ navigation }) => {
       style={styles.container}
     >
 
-      <Text style={styles.title}>Connexion</Text>
+      <Text style={styles.title}>{t("Connexion")}</Text>
 
       <TextInput
         style={styles.input}
-        placeholder="Email"
+        placeholder={t("Email")}
         placeholderTextColor="#ccc"
         value={email}
         onChangeText={setEmail}
@@ -79,7 +82,7 @@ const LoginScreen = ({ navigation }) => {
 
       <TextInput
         style={styles.input}
-        placeholder="Mot de passe"
+        placeholder={t("Password")}
         placeholderTextColor="#ccc"
         value={password}
         onChangeText={setPassword}
@@ -87,11 +90,11 @@ const LoginScreen = ({ navigation }) => {
       />
       {message ? (<Text style={styles.message}>{message}</Text>) : null}
       <TouchableOpacity onPress={handleLogin} style={styles.button} disabled={loading}>
-        <Text style={styles.buttonText}>{loading ? 'Connexion...' : 'Se connecter'}</Text>
+        <Text style={styles.buttonText}>{loading ? t("Login") + '...' : t("Login")}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={handleRegister}>
-        <Text style={styles.link}>Créer un compte</Text>
+        <Text style={styles.link}>{t("CreateAccount")}</Text>
       </TouchableOpacity>
     </LinearGradient>
   );
