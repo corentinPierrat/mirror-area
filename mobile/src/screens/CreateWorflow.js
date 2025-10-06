@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Alert, TextInput } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function CreateWorkflowScreen() {
   const API_URL = 'http://10.18.207.151:8080';
-
   const [actions, setActions] = useState([]);
   const [selectedAction, setSelectedAction] = useState(null);
-
+  const [WorkflowName, setWorkflowName] = useState('');
   const [reactions, setReactions] = useState([]);
   const [selectedReaction, setSelectedReaction] = useState(null);
+  const [serverId, setServerId] = useState('');
 
   const fetchActions = async () => {
     try {
@@ -64,7 +65,7 @@ export default function CreateWorkflowScreen() {
     if (!token) return console.log('No token found');
 
     const payload = {
-      name: "Mon Workflow",
+      name: WorkflowName || "Mon Workflow",
       description: "Workflow créé via l'app",
       visibility: "private",
       steps: [
@@ -72,7 +73,7 @@ export default function CreateWorkflowScreen() {
           type: "action",
           service: selectedAction?.service || "unknown",
           event: selectedAction?.event || "unknown",
-          params: selectedAction?.params || {}
+          params: selectedAction = { "guild_id": serverId } || {}
         },
         {
           type: "reaction",
@@ -106,7 +107,15 @@ export default function CreateWorkflowScreen() {
       <View style={styles.workflowContainer}>
         <BlurView style={styles.blurContainer} intensity={80} tint="systemUltraThinMaterialDark" />
         <View style={styles.overlayContainer} />
-
+       <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder={"Workflow Name"}
+            placeholderTextColor="#64748b"
+            value={WorkflowName}
+            onChangeText={setWorkflowName}
+          />
+        </View>
         <View style={styles.content}>
           <TouchableOpacity style={styles.serviceWrapper} activeOpacity={0.7} onPress={fetchActions}>
             <View style={styles.logoContainer}>
@@ -129,6 +138,13 @@ export default function CreateWorkflowScreen() {
                   <Text style={{ color: '#fff' }}>{action?.description || 'Description indisponible'}</Text>
                 </TouchableOpacity>
               ))}
+               <TextInput
+                    style={styles.input}
+                    placeholder={"Server ID"}
+                    placeholderTextColor="#64748b"
+                    value={serverId}
+                    onChangeText={setServerId}
+                  />
             </ScrollView>
           )}
 
@@ -194,4 +210,27 @@ const styles = StyleSheet.create({
   addButtonBlur: { ...StyleSheet.absoluteFillObject },
   addButtonOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(16,185,129,0.25)', borderRadius: 25, borderWidth: 1, borderColor: 'rgba(16,185,129,0.4)' },
   addButtonIcon: { fontSize: 16, fontWeight: '600', color: '#fff', textAlign: 'center' },
+  inputContainer: {
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 25,
+  },
+  input: {
+    marginTop: 25,
+    width: '90%',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    marginBottom: 20,
+    color: '#fff',
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+  },
+
 });
