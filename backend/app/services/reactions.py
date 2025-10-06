@@ -1,4 +1,4 @@
-from app.services.token_storage import get_token_from_db
+from app.services.token_storage import get_token_from_db, refresh_oauth_token
 from app.routers.oauth import oauth
 from sqlalchemy.orm import Session
 from typing import Dict, Any, Callable
@@ -6,7 +6,7 @@ import os
 import requests
 
 async def twitter_tweet_reaction(db: Session, user_id: int, params: dict):
-    token = get_token_from_db(db, user_id, "twitter")
+    token = await refresh_oauth_token(db, user_id, "twitter")
     if not token:
         return {"error": "Not logged in to Twitter"}
     text = params.get("message")
@@ -41,24 +41,9 @@ async def microsoft_send_mail_reaction(db: Session, user_id: int, params: dict):
         return {"status": "Mail envoyé"}
     return {"error": resp.text}
 
-async def discord_send_message_reaction(db, user_id, params):
-    BOT_URL = os.getenv("DISCORD_BOT_URL", "http://localhost:5000/send_message")
-    BOT_SECRET = os.getenv("BOT_SECRET", "super-secret-bot-token")
-    payload = {
-        "bot_secret": BOT_SECRET,
-        "channel_id": params["channel_id"],
-        "message": params["message"]
-    }
-    resp = requests.post(BOT_URL, json=payload, timeout=5)
-    if resp.status_code == 200:
-        return {"status": "Message envoyé"}
-    else:
-        return {"error": resp.text}
-
 REACTION_DISPATCH: Dict[tuple[str, str], Callable[[Session, int, dict], Any]] = {
     ("twitter", "tweet"): twitter_tweet_reaction,
     ("microsoft", "send_mail"): microsoft_send_mail_reaction,
-    ("discord", "send_message"): discord_send_message_reaction,
 }
 
 async def execute_reaction(service: str, event: str, db: Session, user_id: int, params: dict):

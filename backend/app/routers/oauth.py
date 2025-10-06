@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Request, Depends, Query
 from fastapi.responses import RedirectResponse, JSONResponse
 from authlib.integrations.starlette_client import OAuth
 from sqlalchemy.orm import Session
@@ -8,6 +8,8 @@ from app.database import get_db
 from app.models.models import UserService
 from app.services.token_storage import save_token_to_db, get_token_from_db
 from app.services.auth import get_current_user
+from jose import JWTError, jwt
+from app.models.models import User
 
 oauth_router = APIRouter(prefix="/oauth", tags=["oauth"])
 
@@ -78,10 +80,26 @@ oauth.register(
 )
 
 @oauth_router.get("/{provider}/login")
-async def oauth_login(provider: str, request: Request, current_user = Depends(get_current_user)):
+async def oauth_login(provider: str, request: Request, token: str = Query(None), db: Session = Depends(get_db)):
     if provider not in oauth._clients:
         return JSONResponse({"error": "Provider inconnu"}, status_code=400)
-    request.session['oauth_user_id'] = current_user.id
+
+    if not token:
+        return JSONResponse({"error": "Token manquant"}, status_code=401)
+
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+        email: str = payload.get("sub")
+        if not email:
+            return JSONResponse({"error": "Token invalide"}, status_code=401)
+        user = db.query(User).filter(User.email == email).first()
+        if not user:
+            return JSONResponse({"error": "Utilisateur introuvable"}, status_code=404)
+    except JWTError:
+        return JSONResponse({"error": "Token invalide"}, status_code=401)
+
+    request.session['oauth_user_id'] = user.id
+
     if provider == "microsoft":
         redirect_uri = f"http://localhost:8080/oauth/{provider}/callback"
     elif provider == "faceit":
