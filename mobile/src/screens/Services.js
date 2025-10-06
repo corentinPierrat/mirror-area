@@ -16,7 +16,7 @@ export default function ServiceScreen() {
     twitter: false,
     outlook: false,
     steam: false,
-    discord: false,
+    discord: true,
   });
 
   const API_URL = 'http://10.18.207.151:8080';
