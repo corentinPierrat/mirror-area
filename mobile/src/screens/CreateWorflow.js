@@ -1,10 +1,31 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'react-native';
 import { BlurView } from 'expo-blur';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 export default function CreateWorkflowScreen() {
+
+  const API_URL = 'https://84518e6399ca.ngrok-free.app';
+  const fetchData = async () => {
+    try {
+      const token = await AsyncStorage.getItem('userToken');
+      if (!token) {
+        console.log('No token found, user might not be logged in.');
+        return;
+      }
+      const response = await axios.get(`${API_URL}/catalog/reactions`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
   return (
      <LinearGradient
           colors={['#171542', '#2f339e']}
@@ -25,6 +46,7 @@ export default function CreateWorkflowScreen() {
           <TouchableOpacity
             style={styles.serviceWrapper}
             activeOpacity={0.7}
+            onPress={fetchData}
           >
             <View style={styles.logoContainer}>
               <Image

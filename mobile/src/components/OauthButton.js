@@ -1,13 +1,47 @@
 import React from 'react';
 import { TouchableOpacity, Text, Image, StyleSheet, View } from 'react-native';
 import { BlurView } from 'expo-blur';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import * as Linking from 'expo-linking';
+import { useNavigation } from '@react-navigation/native';
+ import * as WebBrowser from 'expo-web-browser';
 
-const OAuthButton = ({ logo, text, onClick, connected }) => {
-  const isSvg = typeof logo === 'function';
+const OAuthButton = ({ logo, text, apiRoute, onSuccess, connected }) => {
+  const navigation = useNavigation();
+
+const handlePress = async () => {
+  try {
+    // Récupérer le token depuis AsyncStorage
+    const token = await AsyncStorage.getItem('userToken');
+    
+    if (!token) {
+      navigation.replace('Login');
+      return;
+    }
+
+    // Construire l'URL avec le token en paramètre ou header
+    // Option 1 : En query parameter
+    const authUrl = `${apiRoute}?token=${encodeURIComponent(token)}`;
+    
+    // Option 2 : Si ton backend peut gérer le token autrement, utilise juste :
+    // const authUrl = apiRoute;
+    
+    // Ouvrir directement la route OAuth
+    await Linking.openURL(authUrl);
+    
+    // Optionnel : Appeler onSuccess si nécessaire
+    if (onSuccess) {
+      onSuccess();
+    }
+  } catch (error) {
+    console.error('Erreur lors de l\'ouverture OAuth:', error);
+  }
+};
 
   return (
     <TouchableOpacity
-      onPress={onClick}
+      onPress={handlePress}
       activeOpacity={0.2}
       style={styles.buttonWrapper}
     >
@@ -21,21 +55,23 @@ const OAuthButton = ({ logo, text, onClick, connected }) => {
       <View style={styles.overlayContainer} />
 
       <View style={[styles.content, connected ? styles.connected : styles.disconnected]}>
-         <View style={styles.logoContainer}>
+        <View style={styles.logoContainer}>
           <Image source={logo} style={styles.logo} />
         </View>
-
 
         <View style={styles.textContainer}>
           <Text style={[styles.status, connected ? styles.statusConnected : styles.statusDisconnected]}>
             {connected ? 'Connecté' : 'Déconnecté'}
           </Text>
         </View>
-        <View style={[styles.indicator, connected ? styles.indicatorConnected : styles.indicatorDisconnected]} />
+
+        <View
+          style={[styles.indicator, connected ? styles.indicatorConnected : styles.indicatorDisconnected]}
+        />
       </View>
     </TouchableOpacity>
   );
-};
+}
 
 const styles = StyleSheet.create({
   buttonWrapper: {
@@ -88,12 +124,12 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     resizeMode: 'contain',
-    borderRadius: 4
+    borderRadius: 4,
   },
   textContainer: {
     flex: 1,
     marginLeft: 18,
-    marginRight: 14
+    marginRight: 14,
   },
   status: {
     fontSize: 15,
@@ -117,12 +153,6 @@ const styles = StyleSheet.create({
   disconnected: {
     backgroundColor: 'rgba(248,250,252,0.08)',
     borderColor: 'rgba(248,250,252,0.2)',
-  },
-  textConnected: {
-    color: '#ffffff',
-  },
-  textDisconnected: {
-    color: '#f1f5f9',
   },
   statusConnected: {
     color: 'rgba(255,255,255,0.85)',

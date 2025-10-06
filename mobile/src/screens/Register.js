@@ -5,7 +5,7 @@ import axios from 'axios';
 import Verifcode from './../screens/Verifcode';
 import { t } from 'i18next';
 
-const API_URL = 'https://73e67643c7fb.ngrok-free.app';
+const API_URL = 'https://84518e6399ca.ngrok-free.app';
 
 const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
