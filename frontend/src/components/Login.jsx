@@ -3,7 +3,7 @@ import styles from "../styles/Login.module.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = "https://84518e6399ca.ngrok-free.app";
+const API_URL = "http://10.18.207.151:8080";
 
 export default function Login() {
   const navigate = useNavigate();
