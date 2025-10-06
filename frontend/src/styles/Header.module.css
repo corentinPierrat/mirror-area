@@ -1,0 +1,85 @@
+/* Header.css */
+
+.header {
+  padding: 1rem 2rem;
+  background-color: #1d4fd85b;
+
+  border-radius: 20px 20px;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.logo {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-top: -10px;
+  color: white;
+  text-decoration: none;
+}
+
+.nav-links {
+  display: none;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  align-items: center;
+  gap: 2rem;
+}
+
+.nav-links a {
+  color: #D1D5DB;
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+}
+
+.nav-links a:hover {
+  color: white;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nav-right a {
+   text-decoration: none;
+}
+
+.signin-btn {
+  color: #D1D5DB;
+  transition: color 0.2s ease-in-out;
+}
+
+.signin-btn:hover {
+  color: white;
+}
+
+.signup-btn {
+  background-color: #2563EB;
+  color: white;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.signup-btn:hover {
+  background-color: #1D4ED8;
+}
+
+@media (min-width: 768px) {
+  .nav-links {
+    display: flex;
+  }
+}

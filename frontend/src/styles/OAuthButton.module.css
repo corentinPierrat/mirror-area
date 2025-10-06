@@ -1,0 +1,25 @@
+.oauthButton {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(16,185,129,0.3);
+    background-color: #171542;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .oauthButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .logo {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+  }
+  

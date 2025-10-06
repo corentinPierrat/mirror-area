@@ -1,0 +1,14 @@
+.auth-resend {
+    background: transparent;
+    border: none;
+    color: #ddd;
+    text-decoration: underline;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .auth-resend:hover {
+    color: white;
+  }
+  
