@@ -8,7 +8,7 @@ import Footer from './components/Footer';
 import SpotifyLogo from "../public/Spotify.png";
 import FaceitLogo from "../public/faceit.png";
 import XLogo from "../public/X.png";
-import OutlookLogo from "../public/outlook.png";
+import GoogleLogo from "../public/google.png";
 import SteamLogo from "../public/steam.jpeg";
 import DiscordLogo from "../public/discord.png";
 
@@ -33,13 +33,13 @@ export default function Services() {
         <div className={styles.mainContent}>
           <Header />
           <h1>Se connecter à un service</h1>
-          <p>Token JWT actuel : <code>{token}</code></p>
+          {/* <p>Token JWT actuel : <code>{token}</code></p> */}
           
           <div className={styles.oauthContainer}>
             <OAuthButton logo={SpotifyLogo} apiRoute={`${API_URL}/oauth/spotify/login`} onSuccess={handleOAuthSuccess} connected={connected} />
             <OAuthButton logo={FaceitLogo} apiRoute={`${API_URL}/oauth/faceit/login`} onSuccess={handleOAuthSuccess} connected={connected} />
             <OAuthButton logo={XLogo} apiRoute={`${API_URL}/oauth/twitter/login`} onSuccess={handleOAuthSuccess} connected={connected} />
-            <OAuthButton logo={OutlookLogo} apiRoute={`${API_URL}/oauth/outlook/login`} onSuccess={handleOAuthSuccess} connected={connected} />
+            <OAuthButton logo={GoogleLogo} apiRoute={`${API_URL}/oauth/google/login`} onSuccess={handleOAuthSuccess} connected={connected} />
             <OAuthButton logo={SteamLogo} apiRoute={`${API_URL}/oauth/steam/login`} onSuccess={handleOAuthSuccess} connected={connected} />
             <OAuthButton logo={DiscordLogo} apiRoute={`${API_URL}/oauth/discord/login`} onSuccess={handleOAuthSuccess} connected={connected} />
           </div>

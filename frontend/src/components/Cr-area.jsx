@@ -11,6 +11,7 @@ export default function Crarea() {
   const [reactions, setReactions] = useState([]);
   const [selectedReaction, setSelectedReaction] = useState(null);
 
+  const [workflowName, setWorkflowName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -25,9 +26,8 @@ export default function Crarea() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const keys = Object.keys(res.data || {});
-      const data = keys.length > 0 ? res.data[keys[0]] : [];
-      setActions(Array.isArray(data) ? data : [data]);
+      const allActions = Object.values(res.data || {}).flat();
+      setActions(allActions);
     } catch (err) {
       console.error(err);
       setError("Impossible de charger les actions");
@@ -47,9 +47,8 @@ export default function Crarea() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const keys = Object.keys(res.data || {});
-      const data = keys.length > 0 ? res.data[keys[0]] : [];
-      setReactions(Array.isArray(data) ? data : [data]);
+      const allReactions = Object.values(res.data || {}).flat();
+      setReactions(allReactions);
     } catch (err) {
       console.error(err);
       setError("Impossible de charger les réactions");
@@ -58,19 +57,9 @@ export default function Crarea() {
     }
   };
 
-  const handleSelectAction = (action) => {
-    setSelectedAction(action);
-    setActions([]);
-  };
-
-  const handleSelectReaction = (reaction) => {
-    setSelectedReaction(reaction);
-    setReactions([]);
-  };
-
   const createWorkflow = async () => {
-    if (!selectedAction || !selectedReaction) {
-      return alert("Veuillez sélectionner une action et une réaction");
+    if (!workflowName || !selectedAction || !selectedReaction) {
+      return alert("Veuillez entrer un nom et sélectionner une action et une réaction");
     }
 
     try {
@@ -78,7 +67,7 @@ export default function Crarea() {
       if (!token) throw new Error("Token manquant");
 
       const payload = {
-        name: "Mon Workflow",
+        name: workflowName,
         description: "Workflow créé via le web",
         visibility: "private",
         steps: [
@@ -105,6 +94,7 @@ export default function Crarea() {
       console.log(res.data);
       setSelectedAction(null);
       setSelectedReaction(null);
+      setWorkflowName("");
     } catch (err) {
       console.error(err);
       alert("Impossible de créer le workflow");
@@ -114,39 +104,72 @@ export default function Crarea() {
   return (
     <div className={styles.container}>
       <div className={styles.workflowSection}>
+        <h2>Nom du Workflow</h2>
+        <input
+          type="text"
+          placeholder="Entrez le nom"
+          value={workflowName}
+          onChange={(e) => setWorkflowName(e.target.value)}
+          className={styles.input}
+        />
+      </div>
+
+      <div className={styles.workflowSection}>
         <h2>Actions</h2>
         <button onClick={fetchActions} disabled={loading}>
-          {loading ? "Chargement..." : "Sélectionner une action"}
+          {loading ? "Chargement..." : "Charger les actions"}
         </button>
         {actions.length > 0 && (
           <ul className={styles.list}>
             {actions.map((action, index) => (
-              <li key={action.id || index} onClick={() => handleSelectAction(action)}>
+              <li
+                key={action.id || index}
+                onClick={() => setSelectedAction(action)}
+                className={
+                  selectedAction === action ? styles.selectedItem : ""
+                }
+              >
                 <strong>{action.title || action.name}</strong>
                 <p>{action.description || "Pas de description"}</p>
               </li>
             ))}
           </ul>
         )}
-        {selectedAction && <p>Action sélectionnée: {selectedAction.title || selectedAction.name}</p>}
+        {selectedAction && (
+          <p>
+            ✅ Action sélectionnée :{" "}
+            <strong>{selectedAction.title || selectedAction.name}</strong>
+          </p>
+        )}
       </div>
 
       <div className={styles.workflowSection}>
-        <h2>Reactions</h2>
+        <h2>Réactions</h2>
         <button onClick={fetchReactions} disabled={loading}>
-          {loading ? "Chargement..." : "Sélectionner une réaction"}
+          {loading ? "Chargement..." : "Charger les réactions"}
         </button>
         {reactions.length > 0 && (
           <ul className={styles.list}>
             {reactions.map((reaction, index) => (
-              <li key={reaction.id || index} onClick={() => handleSelectReaction(reaction)}>
+              <li
+                key={reaction.id || index}
+                onClick={() => setSelectedReaction(reaction)}
+                className={
+                  selectedReaction === reaction ? styles.selectedItem : ""
+                }
+              >
                 <strong>{reaction.title || reaction.name}</strong>
                 <p>{reaction.description || "Pas de description"}</p>
               </li>
             ))}
           </ul>
         )}
-        {selectedReaction && <p>Réaction sélectionnée: {selectedReaction.title || selectedReaction.name}</p>}
+        {selectedReaction && (
+          <p>
+            ✅ Réaction sélectionnée :{" "}
+            <strong>{selectedReaction.title || selectedReaction.name}</strong>
+          </p>
+        )}
       </div>
 
       <button onClick={createWorkflow} className={styles.createButton}>

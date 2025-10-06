@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "../styles/MyWorkflows.module.css";
 import Workflows from "./Workflows";
+
 const API_URL = "http://10.18.207.151:8080";
 
 export default function MyWorkflow() {
@@ -14,20 +15,27 @@ export default function MyWorkflow() {
     setError("");
     try {
       const token = localStorage.getItem("userToken");
-      if (!token) {
-        setError("Utilisateur non authentifié.");
-        setLoading(false);
-        return;
-      }
+      if (!token) throw new Error("Utilisateur non authentifié.");
 
-      const response = await axios.get(`${API_URL}/workflows/`, {
+      const res = await axios.get(`${API_URL}/workflows/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setWorkflows(response.data || []);
+      // 🔹 Extraction action et reaction depuis steps
+      const data = (res.data || []).map((wf) => {
+        const actionStep = wf.steps?.find((s) => s.type === "action") || {};
+        const reactionStep = wf.steps?.find((s) => s.type === "reaction") || {};
+        return {
+          ...wf,
+          action: actionStep,
+          reaction: reactionStep,
+        };
+      });
+
+      setWorkflows(data);
     } catch (err) {
       console.error("Erreur lors de la récupération des workflows :", err);
-      setError("Impossible de charger les workflows.");
+      setError(err.message || "Impossible de charger les workflows.");
     } finally {
       setLoading(false);
     }
@@ -48,11 +56,13 @@ export default function MyWorkflow() {
         <div className={styles.workflowList}>
           {workflows.map((workflow) => (
             <Workflows
-              key={workflow.id}
-              Name={workflow.name}
-              Action={workflow.action || "Action inconnue"}
-              Reaction={workflow.reaction || "Reaction inconnue"}
-            />
+            key={workflow.id}
+            workflowId={workflow.id}
+            Name={workflow.name}
+            Action={workflow.action ? `${workflow.action.service} - ${workflow.action.event}` : "Action inconnue"}
+            Reaction={workflow.reaction ? `${workflow.reaction.service} - ${workflow.reaction.event}` : "Reaction inconnue"}
+            onDelete={(id) => setWorkflows((prev) => prev.filter((w) => w.id !== id))}
+          />          
           ))}
         </div>
       ) : (

@@ -1,39 +1,140 @@
 .container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 2rem;
-    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #171542 0%, #2f339e 100%);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 80px 40px;
+    font-family: 'Inter', sans-serif;
   }
   
-  .title {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-    text-align: center;
+  /* ===== SECTION GLOBALE ===== */
+  .workflowSection {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 30px 25px;
+    margin-bottom: 40px;
+    width: 100%;
+    max-width: 800px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
   
-  .section {
-    margin-bottom: 2rem;
+  .workflowSection:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
   }
   
-  .subtitle {
+  .workflowSection h2 {
     font-size: 1.5rem;
-    margin-bottom: 1rem;
-    color: #2f339e;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
   }
   
+  /* ===== INPUT ===== */
+  .input {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: background 0.3s;
+  }
+  
+  .input:focus {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  /* ===== BOUTONS ===== */
+  button {
+    background: linear-gradient(90deg, #00c6ff 0%, #0072ff 100%);
+    color: white;
+    font-size: 1rem;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 24px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+  }
+  
+  button:hover {
+    background: linear-gradient(90deg, #0072ff 0%, #00c6ff 100%);
+    transform: scale(1.05);
+  }
+  
+  /* ===== LISTE ===== */
   .list {
     list-style: none;
     padding: 0;
+    margin-top: 10px;
+    display: grid;
+    gap: 15px;
   }
   
-  .item {
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid #ccc;
+  .list li {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
   }
   
-  .loading, .error {
+  .list li:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(5px);
+  }
+  
+  .list li strong {
+    font-size: 1.1rem;
+    display: block;
+    margin-bottom: 6px;
+  }
+  
+  .list li p {
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+  
+  /* ===== ACTION / RÉACTION SÉLECTIONNÉE ===== */
+  .workflowSection p {
+    margin-top: 10px;
+    font-size: 1rem;
+    color: #a5b8ff;
+    text-align: left;
+  }
+  
+  /* ===== BOUTON FINAL ===== */
+  .createButton {
+    background: linear-gradient(90deg, #00ff9d 0%, #00c6ff 100%);
+    color: #0b0b22;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 16px 40px;
+    border-radius: 14px;
+    margin-top: 20px;
+    box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .createButton:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 30px rgba(0, 255, 157, 0.5);
+  }
+  
+  /* ===== MESSAGE D'ERREUR ===== */
+  .error {
+    color: #ff6b6b;
+    font-size: 1rem;
+    margin-top: 20px;
     text-align: center;
-    font-size: 1.2rem;
-    color: #ff4d4d;
+    font-weight: 500;
   }
   

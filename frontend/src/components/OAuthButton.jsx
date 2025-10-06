@@ -11,15 +11,13 @@ export default function OAuthButton({ logo, apiRoute, onSuccess, connected }) {
       return;
     }
 
-    console.log("Token actuel :", token); // Affiche le token pour vérification
+    console.log("Token actuel :", token);
 
     setLoading(true);
 
-    // Ouvre directement la page OAuth en ajoutant le token en query param
     const oauthUrl = `${apiRoute}?token=${token}`;
     window.open(oauthUrl, "_blank");
 
-    // Tu peux appeler onSuccess si nécessaire pour mettre à jour l'état
     onSuccess?.({ token });
 
     setLoading(false);
