@@ -10,13 +10,24 @@ import SteamLogo from '../../assets/steam.jpeg';
 import Discord from '../../assets/discord.png';
 
 export default function ServiceScreen() {
-  const [connected, setConnected] = useState(false);
+  // État pour chaque service
+  const [connectedServices, setConnectedServices] = useState({
+    spotify: false,
+    faceit: false,
+    twitter: false,
+    outlook: false,
+    steam: false,
+    discord: false,
+  });
 
-  const API_URL = 'https://84518e6399ca.ngrok-free.app';
+  const API_URL = 'http://10.18.207.151:8080';
 
-  const handleOAuthSuccess = (data) => {
-    console.log('Réponse du serveur:', data);
-    setConnected(true);
+  const handleOAuthSuccess = (service, data) => {
+    console.log(`Réponse du serveur pour ${service}:`, data);
+    setConnectedServices((prev) => ({
+      ...prev,
+      [service]: true,
+    }));
   };
 
   return (
@@ -29,38 +40,38 @@ export default function ServiceScreen() {
       <OAuthButton
         logo={SpotifyLogo}
         apiRoute={`${API_URL}/oauth/spotify/login`}
-        onSuccess={handleOAuthSuccess}
-        connected={connected}
+        onSuccess={(data) => handleOAuthSuccess('spotify', data)}
+        connected={connectedServices.spotify}
       />
       <OAuthButton
         logo={FaceitLogo}
         apiRoute={`${API_URL}/oauth/faceit/login`}
-        onSuccess={handleOAuthSuccess}
-        connected={connected}
+        onSuccess={(data) => handleOAuthSuccess('faceit', data)}
+        connected={connectedServices.faceit}
       />
       <OAuthButton
         logo={XLogo}
         apiRoute={`${API_URL}/oauth/twitter/login`}
-        onSuccess={handleOAuthSuccess}
-        connected={connected}
+        onSuccess={(data) => handleOAuthSuccess('twitter', data)}
+        connected={connectedServices.twitter}
       />
       <OAuthButton
         logo={OutlookLogo}
         apiRoute={`${API_URL}/oauth/outlook/login`}
-        onSuccess={handleOAuthSuccess}
-        connected={connected}
+        onSuccess={(data) => handleOAuthSuccess('outlook', data)}
+        connected={connectedServices.outlook}
       />
       <OAuthButton
         logo={SteamLogo}
         apiRoute={`${API_URL}/oauth/steam/login`}
-        onSuccess={handleOAuthSuccess}
-        connected={connected}
+        onSuccess={(data) => handleOAuthSuccess('steam', data)}
+        connected={connectedServices.steam}
       />
       <OAuthButton
         logo={Discord}
         apiRoute={`${API_URL}/oauth/discord/login`}
-        onSuccess={handleOAuthSuccess}
-        connected={connected}
+        onSuccess={(data) => handleOAuthSuccess('discord', data)}
+        connected={connectedServices.discord}
       />
     </LinearGradient>
   );
