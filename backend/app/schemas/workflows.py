@@ -18,6 +18,7 @@ class WorkflowOut(BaseModel):
     name: str
     description: Optional[str]
     visibility: str
+    steps: List[WorkflowStepCreate]
 
     class Config:
         from_attributes = True

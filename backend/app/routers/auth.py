@@ -95,6 +95,12 @@ def resend_verification(request: ResendVerificationRequest, db: Session = Depend
 def get_my_info(current_user: User = Depends(get_current_user)):
     return current_user
 
+@auth_router.delete("/me")
+def delete_my_account(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    db.delete(current_user)
+    db.commit()
+    return {"detail": "Compte supprimé"}
+
 @auth_router.patch("/change-password")
 def change_password(
     request: ChangePasswordRequest,
