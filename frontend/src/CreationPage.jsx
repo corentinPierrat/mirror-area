@@ -16,7 +16,7 @@ export default function CreationPage() {
 
         <main className={styles.mainContent}>
           <Header />
-          <h1 className={styles.title}>Créer un Workflow</h1>
+          {/* <h1 className={styles.title}>Créer un Workflow</h1> */}
           <Crarea />
         </main>
       </div>

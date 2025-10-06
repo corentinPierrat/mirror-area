@@ -32,7 +32,7 @@ export default function Services() {
         </aside>
         <div className={styles.mainContent}>
           <Header />
-          <h1>Se connecter à un service</h1>
+          {/* <h1>Se connecter à un service</h1> */}
           {/* <p>Token JWT actuel : <code>{token}</code></p> */}
           
           <div className={styles.oauthContainer}>

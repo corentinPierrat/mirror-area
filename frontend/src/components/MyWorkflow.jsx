@@ -21,7 +21,6 @@ export default function MyWorkflow() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // 🔹 Extraction action et reaction depuis steps
       const data = (res.data || []).map((wf) => {
         const actionStep = wf.steps?.find((s) => s.type === "action") || {};
         const reactionStep = wf.steps?.find((s) => s.type === "reaction") || {};
