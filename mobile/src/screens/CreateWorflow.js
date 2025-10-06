@@ -110,7 +110,7 @@ export default function CreateWorkflowScreen() {
         <View style={styles.content}>
           <TouchableOpacity style={styles.serviceWrapper} activeOpacity={0.7} onPress={fetchActions}>
             <View style={styles.logoContainer}>
-              <Image source={require("../../assets/X.png")} style={styles.logo} />
+              <Image source={selectedAction ? require("../../assets/discord.png") : require("../../assets/None.png")} style={styles.logo} />
             </View>
             <View style={[styles.badge, styles.badgeAction]}>
               <Text style={styles.badgeText}>{selectedAction?.title || 'Action'}</Text>
@@ -138,7 +138,7 @@ export default function CreateWorkflowScreen() {
 
           <TouchableOpacity style={styles.serviceWrapper} activeOpacity={0.7} onPress={fetchReactions}>
             <View style={styles.logoContainer}>
-              <Image source={require("../../assets/outlook.png")} style={styles.logo} />
+              <Image source={selectedReaction ? require("../../assets/X.png") : require("../../assets/None.png")} style={styles.logo} />
             </View>
             <View style={[styles.badge, styles.badgeReaction]}>
               <Text style={styles.badgeText}>{selectedReaction?.title || 'Reaction'}</Text>
