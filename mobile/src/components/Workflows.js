@@ -2,9 +2,13 @@ import React, { useState } from 'react';
 import { TouchableOpacity, Text, Image, StyleSheet, View, Switch } from 'react-native';
 import { BlurView } from 'expo-blur';
 
-const Workflows = ({ Name, Action, Reaction }) => {
+const Workflows = ({ Name, Action, Reaction, onDelete }) => {
   const [isEnabled, setIsEnabled] = useState(false);
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+
+  const handleDelete = () => {
+    if (onDelete) onDelete();
+  };
 
   const getServiceImage = (service) => {
     switch (service) {
@@ -27,10 +31,6 @@ const Workflows = ({ Name, Action, Reaction }) => {
 
   const imageAction = getServiceImage(Action);
   const imageReaction = getServiceImage(Reaction);
-
-  const handleDelete = () => {
-    console.log('Supprimé');
-  };
 
   return (
     <View style={styles.workflowWrapper}>

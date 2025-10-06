@@ -10,7 +10,6 @@ import SteamLogo from '../../assets/steam.jpeg';
 import Discord from '../../assets/discord.png';
 
 export default function ServiceScreen() {
-  // État pour chaque service
   const [connectedServices, setConnectedServices] = useState({
     spotify: false,
     faceit: false,

@@ -14,7 +14,6 @@ export default function CreateWorkflowScreen() {
   const [reactions, setReactions] = useState([]);
   const [selectedReaction, setSelectedReaction] = useState(null);
 
-  // Fetch Actions
   const fetchActions = async () => {
     try {
       const token = await AsyncStorage.getItem('userToken');
@@ -30,7 +29,6 @@ export default function CreateWorkflowScreen() {
     }
   };
 
-  // Fetch Reactions
   const fetchReactions = async () => {
     try {
       const token = await AsyncStorage.getItem('userToken');
@@ -56,7 +54,6 @@ export default function CreateWorkflowScreen() {
     setReactions([]);
   };
 
-  // Create workflow
   const createWorkflow = async () => {
   if (!selectedAction || !selectedReaction) {
     return Alert.alert('Erreur', 'Veuillez sélectionner une action et une réaction.');
@@ -66,9 +63,8 @@ export default function CreateWorkflowScreen() {
     const token = await AsyncStorage.getItem('userToken');
     if (!token) return console.log('No token found');
 
-    // Créer le workflow complet
     const payload = {
-      name: "Mon Workflow", // tu peux remplacer par un TextInput si besoin
+      name: "Mon Workflow",
       description: "Workflow créé via l'app",
       visibility: "private",
       steps: [
@@ -112,7 +108,6 @@ export default function CreateWorkflowScreen() {
         <View style={styles.overlayContainer} />
 
         <View style={styles.content}>
-          {/* Bouton Action */}
           <TouchableOpacity style={styles.serviceWrapper} activeOpacity={0.7} onPress={fetchActions}>
             <View style={styles.logoContainer}>
               <Image source={require("../../assets/X.png")} style={styles.logo} />
@@ -141,7 +136,6 @@ export default function CreateWorkflowScreen() {
             <View style={styles.connectorLine} />
           </View>
 
-          {/* Bouton Reaction */}
           <TouchableOpacity style={styles.serviceWrapper} activeOpacity={0.7} onPress={fetchReactions}>
             <View style={styles.logoContainer}>
               <Image source={require("../../assets/outlook.png")} style={styles.logo} />
@@ -166,7 +160,6 @@ export default function CreateWorkflowScreen() {
             </ScrollView>
           )}
 
-          {/* Bouton Créer Workflow */}
           <TouchableOpacity
             style={[styles.addButton, { marginTop: 20, alignSelf: 'center' }]}
             activeOpacity={0.8}
