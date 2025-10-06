@@ -4,6 +4,8 @@ from sqlalchemy.orm import Session
 from typing import Dict, Any, Callable
 import os
 import requests
+import base64
+from email.mime.text import MIMEText
 
 async def twitter_tweet_reaction(db: Session, user_id: int, params: dict):
     token = await refresh_oauth_token(db, user_id, "twitter")
@@ -41,9 +43,31 @@ async def microsoft_send_mail_reaction(db: Session, user_id: int, params: dict):
         return {"status": "Mail envoyé"}
     return {"error": resp.text}
 
+async def google_send_mail_reaction(db: Session, user_id: int, params: dict):
+    token = get_token_from_db(db, user_id, "google")
+    if not token:
+        return {"error": "Not logged in to Google"}
+
+    client = oauth.create_client("google")
+    mime_message = MIMEText(params["content"], params.get("content_type", "html").lower())
+    mime_message["to"] = params["to"]
+    mime_message["subject"] = params["subject"]
+    raw_message = base64.urlsafe_b64encode(mime_message.as_bytes()).decode()
+    message_body = {"raw": raw_message}
+    resp = await client.post("gmail/v1/users/me/messages/send", json=message_body, token=token)
+
+    if resp.status_code in (200, 201, 202):
+        return {"status": "Email envoyé avec succès"}
+    else:
+        try:
+            return {"error": resp.json()}
+        except Exception:
+            return {"error": resp.text}
+
 REACTION_DISPATCH: Dict[tuple[str, str], Callable[[Session, int, dict], Any]] = {
     ("twitter", "tweet"): twitter_tweet_reaction,
     ("microsoft", "send_mail"): microsoft_send_mail_reaction,
+    ("google", "send_mail"): google_send_mail_reaction,
 }
 
 async def execute_reaction(service: str, event: str, db: Session, user_id: int, params: dict):

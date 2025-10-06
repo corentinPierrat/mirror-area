@@ -27,6 +27,8 @@ class Settings:
         self.FACEIT_CLIENT_SECRET: str = os.getenv("FACEIT_CLIENT_SECRET")
         self.STEAM_WEB_API_KEY: str = os.getenv("STEAM_WEB_API_KEY")
         self.TOKEN_BOT: str = os.getenv("TOKEN_BOT")
+        self.GOOGLE_CLIENT_ID: str = os.getenv("GOOGLE_CLIENT_ID")
+        self.GOOGLE_CLIENT_SECRET: str = os.getenv("GOOGLE_CLIENT_SECRET")
 
     @property
     def DATABASE_URL(self) -> str:

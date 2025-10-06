@@ -5,7 +5,6 @@ from app.database import engine, Base
 from app.routers.auth import auth_router
 from app.routers.oauth import oauth_router
 from app.routers.actions import actions_router
-from app.routers.reactions import reactions_router
 from app.routers.catalog import catalog_router
 from app.routers.workflow import workflows_router
 
@@ -33,7 +32,6 @@ Base.metadata.create_all(bind=engine)
 app.include_router(auth_router)
 app.include_router(oauth_router)
 app.include_router(actions_router)
-app.include_router(reactions_router)
 app.include_router(catalog_router)
 app.include_router(workflows_router)
 

@@ -79,6 +79,23 @@ oauth.register(
     },
 )
 
+oauth.register(
+    name="google",
+    client_id=settings.GOOGLE_CLIENT_ID,
+    client_secret=settings.GOOGLE_CLIENT_SECRET,
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+    api_base_url="https://www.googleapis.com/",
+    client_kwargs={
+        "scope": (
+            "openid email profile "
+            "https://www.googleapis.com/auth/gmail.readonly "
+            "https://www.googleapis.com/auth/gmail.send"
+        ),
+        "access_type": "offline",
+        "prompt": "consent",
+    },
+)
+
 @oauth_router.get("/{provider}/login")
 async def oauth_login(provider: str, request: Request, token: str = Query(None), db: Session = Depends(get_db)):
     if provider not in oauth._clients:

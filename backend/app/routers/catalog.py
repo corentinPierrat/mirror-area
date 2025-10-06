@@ -39,6 +39,18 @@ REACTIONS_CATALOG = {
         },
         "description": "Envoie un courriel via Microsoft Graph."
     },
+    "google.send_mail": {
+        "title": "Envoyer un email (Gmail)",
+        "service": "google",
+        "event": "send_mail",
+        "payload_schema": {
+            "to": "string[] (email)",
+            "subject": "string",
+            "content": "string",
+            "content_type": "string (HTML|Text) = HTML"
+        },
+        "description": "Envoie un courriel via l'API Gmail."
+    },
 }
 
 @catalog_router.get("/actions")
