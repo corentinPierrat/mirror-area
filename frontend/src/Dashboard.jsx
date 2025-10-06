@@ -16,7 +16,7 @@
 
           <main className={styles.mainContent}>
         <Header />
-            <h1 className={styles.title}>Dashboard</h1>
+            {/* <h1 className={styles.title}>Dashboard</h1> */}
             <MyWorkflow />
           </main>
         </div>

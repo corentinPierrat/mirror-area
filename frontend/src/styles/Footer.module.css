@@ -2,6 +2,7 @@
     background: linear-gradient(to right, var(--color-1), var(--color-3), var(--color-5));
     color: white;
     padding: 50px 20px 20px;
+    margin-bottom: 100px;
     font-family: 'Arial', sans-serif;
     padding: 0% 20%;
   }
