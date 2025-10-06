@@ -11,7 +11,7 @@ export default function HeaderDashboard() {
             <ul className={styles['nav-links']}>
           <li><img src="/arrow.PNG" className={styles.navicons} alt="arrow" /><a href="/dashboard">Dashboard</a></li>
           <li><img src="/arrow.PNG" className={styles.navicons} alt="arrow" /><a href="/Services">Connexion</a></li>
-              <li><img src="/arrow.PNG" className={styles.navicons} alt="arrow" /><a href="/cr-area">Cr-rea</a></li>
+              <li><img src="/arrow.PNG" className={styles.navicons} alt="arrow" /><a href="/CreationPage">Cr-rea</a></li>
               <li><img src="/arrow.PNG" className={styles.navicons} alt="arrow" /><a href="#">Settings</a></li>
             </ul>
             <h2>Account Pages</h2>

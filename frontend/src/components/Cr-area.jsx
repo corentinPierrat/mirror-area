@@ -6,77 +6,154 @@ const API_URL = "http://10.18.207.151:8080";
 
 export default function Crarea() {
   const [actions, setActions] = useState([]);
+  const [selectedAction, setSelectedAction] = useState(null);
+
   const [reactions, setReactions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [selectedReaction, setSelectedReaction] = useState(null);
+
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError("");
+  const fetchActions = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const token = localStorage.getItem("userToken");
+      if (!token) throw new Error("Token manquant");
 
-      try {
-        const token = localStorage.getItem("userToken");
-        if (!token) throw new Error("Token manquant");
+      const res = await axios.get(`${API_URL}/catalog/actions`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-        const headers = { Authorization: `Bearer ${token}` };
+      const keys = Object.keys(res.data || {});
+      const data = keys.length > 0 ? res.data[keys[0]] : [];
+      setActions(Array.isArray(data) ? data : [data]);
+    } catch (err) {
+      console.error(err);
+      setError("Impossible de charger les actions");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        const [actionsRes, reactionsRes] = await Promise.all([
-          axios.get(`${API_URL}/catalog/actions`, { headers }),
-          axios.get(`${API_URL}/catalog/reactions`, { headers })
-        ]);
+  const fetchReactions = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const token = localStorage.getItem("userToken");
+      if (!token) throw new Error("Token manquant");
 
-        const actionsKeys = Object.keys(actionsRes.data || {});
-        const actionsData = actionsKeys.length > 0 ? actionsRes.data[actionsKeys[0]] : [];
-        setActions(Array.isArray(actionsData) ? actionsData : [actionsData]);
+      const res = await axios.get(`${API_URL}/catalog/reactions`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-        const reactionsKeys = Object.keys(reactionsRes.data || {});
-        const reactionsData = reactionsKeys.length > 0 ? reactionsRes.data[reactionsKeys[0]] : [];
-        setReactions(Array.isArray(reactionsData) ? reactionsData : [reactionsData]);
+      const keys = Object.keys(res.data || {});
+      const data = keys.length > 0 ? res.data[keys[0]] : [];
+      setReactions(Array.isArray(data) ? data : [data]);
+    } catch (err) {
+      console.error(err);
+      setError("Impossible de charger les réactions");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      } catch (err) {
-        console.error("Erreur fetch catalog:", err);
-        setError("Impossible de charger les données. Veuillez réessayer.");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const handleSelectAction = (action) => {
+    setSelectedAction(action);
+    setActions([]);
+  };
 
-    fetchData();
-  }, []);
+  const handleSelectReaction = (reaction) => {
+    setSelectedReaction(reaction);
+    setReactions([]);
+  };
 
-  if (loading) return <p className={styles.loading}>Chargement...</p>;
-  if (error) return <p className={styles.error}>{error}</p>;
+  const createWorkflow = async () => {
+    if (!selectedAction || !selectedReaction) {
+      return alert("Veuillez sélectionner une action et une réaction");
+    }
+
+    try {
+      const token = localStorage.getItem("userToken");
+      if (!token) throw new Error("Token manquant");
+
+      const payload = {
+        name: "Mon Workflow",
+        description: "Workflow créé via le web",
+        visibility: "private",
+        steps: [
+          {
+            type: "action",
+            service: selectedAction?.service || "unknown",
+            event: selectedAction?.event || "unknown",
+            params: selectedAction?.params || {},
+          },
+          {
+            type: "reaction",
+            service: selectedReaction?.service || "unknown",
+            event: selectedReaction?.event || "unknown",
+            params: selectedReaction?.params || {},
+          },
+        ],
+      };
+
+      const res = await axios.post(`${API_URL}/workflows/`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      alert("Workflow créé avec succès !");
+      console.log(res.data);
+      setSelectedAction(null);
+      setSelectedReaction(null);
+    } catch (err) {
+      console.error(err);
+      alert("Impossible de créer le workflow");
+    }
+  };
 
   return (
     <div className={styles.container}>
-      <h1>Catalogue Actions & Reactions</h1>
-
-      <section className={styles.listSection}>
+      <div className={styles.workflowSection}>
         <h2>Actions</h2>
-        {actions.length === 0 ? (
-          <p>Aucune action disponible</p>
-        ) : (
+        <button onClick={fetchActions} disabled={loading}>
+          {loading ? "Chargement..." : "Sélectionner une action"}
+        </button>
+        {actions.length > 0 && (
           <ul className={styles.list}>
             {actions.map((action, index) => (
-              <li key={action.id || index}>{action.title || action.name || index}</li>
+              <li key={action.id || index} onClick={() => handleSelectAction(action)}>
+                <strong>{action.title || action.name}</strong>
+                <p>{action.description || "Pas de description"}</p>
+              </li>
             ))}
           </ul>
         )}
-      </section>
+        {selectedAction && <p>Action sélectionnée: {selectedAction.title || selectedAction.name}</p>}
+      </div>
 
-      <section className={styles.listSection}>
+      <div className={styles.workflowSection}>
         <h2>Reactions</h2>
-        {reactions.length === 0 ? (
-          <p>Aucune réaction disponible</p>
-        ) : (
+        <button onClick={fetchReactions} disabled={loading}>
+          {loading ? "Chargement..." : "Sélectionner une réaction"}
+        </button>
+        {reactions.length > 0 && (
           <ul className={styles.list}>
             {reactions.map((reaction, index) => (
-              <li key={reaction.id || index}>{reaction.title || reaction.name || index}</li>
+              <li key={reaction.id || index} onClick={() => handleSelectReaction(reaction)}>
+                <strong>{reaction.title || reaction.name}</strong>
+                <p>{reaction.description || "Pas de description"}</p>
+              </li>
             ))}
           </ul>
         )}
-      </section>
+        {selectedReaction && <p>Réaction sélectionnée: {selectedReaction.title || selectedReaction.name}</p>}
+      </div>
+
+      <button onClick={createWorkflow} className={styles.createButton}>
+        Créer Workflow
+      </button>
+
+      {error && <p className={styles.error}>{error}</p>}
     </div>
   );
 }

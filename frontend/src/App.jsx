@@ -8,6 +8,8 @@ import HomePage from "./HomePage";
 import Dashboard from "./Dashboard";
 import TestCatalog from "./components/TestCatalog"
 import Services from "./Services"
+import CreationPage from "./CreationPage"
+
 
 function App() {
   return (
@@ -23,6 +25,7 @@ function App() {
         <Route path="/Cr-rea" element={<Dashboard />} />
         <Route path="/services" element={<Services />} />
         <Route path="/TestCatalog" element={<TestCatalog />} />
+        <Route path="/CreationPage" element={<CreationPage />} />
       </Routes>
     </Router>
   );

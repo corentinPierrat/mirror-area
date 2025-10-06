@@ -1,0 +1,31 @@
+.container {
+  padding: 40px 20px;
+  min-height: 80vh;
+  background: linear-gradient(135deg, #171542 0%, #2f339e 100%);
+  color: #fff;
+}
+
+.title {
+  font-size: 28px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.workflowList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.noWorkflows {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.loading, .error {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 16px;
+}
