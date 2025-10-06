@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import "../components/i18n";
 import { useTranslation } from "react-i18next";
 
-const API_URL = 'https://84518e6399ca.ngrok-free.app';
+const API_URL = 'http://10.18.207.151:8080';
 
 const LoginScreen = ({ navigation }) => {
   const { t } = useTranslation();

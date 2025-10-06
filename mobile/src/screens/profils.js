@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
 
-const API_URL = 'https://84518e6399ca.ngrok-free.app';
+const API_URL = 'http://10.18.207.151:8080';
 
 const ProfileDashboard = ({ navigation }) => {
   const { t } = useTranslation();
