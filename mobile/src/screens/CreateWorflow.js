@@ -4,7 +4,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import { Ionicons } from '@expo/vector-icons';
 
 export default function CreateWorkflowScreen() {
   const API_URL = 'http://10.18.207.151:8080';
@@ -62,7 +61,8 @@ export default function CreateWorkflowScreen() {
 
   try {
     const token = await AsyncStorage.getItem('userToken');
-    if (!token) return console.log('No token found');
+    if (!token)
+      return console.log('No token found');
 
     const payload = {
       name: WorkflowName || "Mon Workflow",
@@ -73,7 +73,7 @@ export default function CreateWorkflowScreen() {
           type: "action",
           service: selectedAction?.service || "unknown",
           event: selectedAction?.event || "unknown",
-          params: selectedAction = { "guild_id": serverId } || {}
+          params: { "guild_id": serverId } || {}
         },
         {
           type: "reaction",

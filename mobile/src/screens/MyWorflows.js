@@ -60,8 +60,9 @@ export default function MyWorkflowScreen({ navigation }) {
         headers: { Authorization: `Bearer ${token}` },
         data: { userData: { id: userData.id } },
       });
-      if (response.status === 200) {
+      if (response.status === 204) {
         setWorkflows((prevWorkflows) => prevWorkflows.filter((wf) => wf.id !== workflowId));
+        await getWorkflows();
       }
     } catch (error) {
       console.error('Erreur lors de la suppression du workflow :', error);
