@@ -12,25 +12,15 @@ const OAuthButton = ({ logo, text, apiRoute, onSuccess, connected }) => {
 
 const handlePress = async () => {
   try {
-    // Récupérer le token depuis AsyncStorage
     const token = await AsyncStorage.getItem('userToken');
-    
     if (!token) {
       navigation.replace('Login');
       return;
     }
-
-    // Construire l'URL avec le token en paramètre ou header
-    // Option 1 : En query parameter
     const authUrl = `${apiRoute}?token=${encodeURIComponent(token)}`;
-    
-    // Option 2 : Si ton backend peut gérer le token autrement, utilise juste :
-    // const authUrl = apiRoute;
-    
-    // Ouvrir directement la route OAuth
+
     await Linking.openURL(authUrl);
-    
-    // Optionnel : Appeler onSuccess si nécessaire
+
     if (onSuccess) {
       onSuccess();
     }

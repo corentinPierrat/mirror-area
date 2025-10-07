@@ -1,78 +1,61 @@
-import React, { useState } from 'react';
-import { StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, View, StyleSheet } from 'react-native';
 import OAuthButton from '../components/OauthButton';
 import { LinearGradient } from 'expo-linear-gradient';
-import SpotifyLogo from '../../assets/Spotify.png';
-import FaceitLogo from '../../assets/faceit.png';
-import XLogo from '../../assets/X.png';
-import OutlookLogo from '../../assets/outlook.png';
-import SteamLogo from '../../assets/steam.jpeg';
-import Discord from '../../assets/discord.png';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 export default function ServiceScreen() {
-  const [connectedServices, setConnectedServices] = useState({
-    spotify: false,
-    faceit: false,
-    twitter: false,
-    outlook: false,
-    steam: false,
-    discord: true,
-  });
-
+  const [services, setServices] = useState([]);
+  const [statuses, setStatuses] = useState({});
   const API_URL = 'http://10.18.207.151:8080';
 
-  const handleOAuthSuccess = (service, data) => {
-    console.log(`Réponse du serveur pour ${service}:`, data);
-    setConnectedServices((prev) => ({
-      ...prev,
-      [service]: true,
-    }));
+  const fetchStatus = async (serviceName) => {
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) return false;
+    try {
+      const res = await axios.get(`${API_URL}/oauth/${serviceName}/status`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return res.data.logged_in;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
   };
 
+  useEffect(() => {
+    const fetchServices = async () => {
+      const token = await AsyncStorage.getItem('userToken');
+      if (!token) return;
+      const res = await axios.get(`${API_URL}/oauth/services`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setServices(res.data.services);
+
+      const newStatuses = {};
+      for (const service of res.data.services) {
+        newStatuses[service.provider] = await fetchStatus(service.provider);
+      }
+      console.log(newStatuses);
+      setStatuses(newStatuses);
+    };
+    fetchServices();
+  }, []);
+
   return (
-    <LinearGradient
-      colors={['#171542', '#2f339e']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.container}
-    >
-      <OAuthButton
-        logo={SpotifyLogo}
-        apiRoute={`${API_URL}/oauth/spotify/login`}
-        onSuccess={(data) => handleOAuthSuccess('spotify', data)}
-        connected={connectedServices.spotify}
-      />
-      <OAuthButton
-        logo={FaceitLogo}
-        apiRoute={`${API_URL}/oauth/faceit/login`}
-        onSuccess={(data) => handleOAuthSuccess('faceit', data)}
-        connected={connectedServices.faceit}
-      />
-      <OAuthButton
-        logo={XLogo}
-        apiRoute={`${API_URL}/oauth/twitter/login`}
-        onSuccess={(data) => handleOAuthSuccess('twitter', data)}
-        connected={connectedServices.twitter}
-      />
-      <OAuthButton
-        logo={OutlookLogo}
-        apiRoute={`${API_URL}/oauth/outlook/login`}
-        onSuccess={(data) => handleOAuthSuccess('outlook', data)}
-        connected={connectedServices.outlook}
-      />
-      <OAuthButton
-        logo={SteamLogo}
-        apiRoute={`${API_URL}/oauth/steam/login`}
-        onSuccess={(data) => handleOAuthSuccess('steam', data)}
-        connected={connectedServices.steam}
-      />
-      <OAuthButton
-        logo={Discord}
-        apiRoute={`${API_URL}/oauth/discord/login`}
-        onSuccess={(data) => handleOAuthSuccess('discord', data)}
-        connected={connectedServices.discord}
-      />
-    </LinearGradient>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <LinearGradient colors={['#171542', '#2f339e']} style={styles.container}>
+        {services.map((service) => (
+          <OAuthButton
+            key={service.provider}
+            logo={{ uri: service.logo_url }}
+            apiRoute={`${API_URL}/oauth/${service.provider}/login`}
+            connected={statuses[service.provider] || false}
+          />
+        ))}
+      </LinearGradient>
+    </ScrollView>
   );
 }
 
@@ -80,7 +63,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'flex-start',
     paddingTop: 65,
   },
 });
