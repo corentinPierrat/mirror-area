@@ -9,81 +9,81 @@ catalog_router = APIRouter(prefix="/catalog", tags=["catalog"])
 
 ACTIONS_CATALOG = {
     "discord.member_join": {
-        "title": "Un membre rejoint le serveur Discord",
+        "title": "A member joins the Discord server",
         "service": "discord",
         "event": "member_join",
         "payload_schema": {
             "guild_id": {
                 "type": "string",
-                "label": "Identifiant unique du serveur Discord (guild_id)"
+                "label": "Server ID"
             }
         },
-        "description": "Déclenche l'action lorsqu'un membre rejoint le serveur Discord spécifié."
+        "description": "Triggers when a member joins the specified Discord server."
     },
 }
 
 REACTIONS_CATALOG = {
     "twitter.tweet": {
-        "title": "Tweeter un message",
+        "title": "Post a tweet",
         "service": "twitter",
         "event": "tweet",
         "payload_schema": {
             "text": {
                 "type": "string",
-                "label": "Texte du tweet à publier"
+                "label": "Tweet text"
             }
         },
-        "description": "Publie un tweet avec le texte fourni."
+        "description": "Posts a tweet with the given text."
     },
     "microsoft.send_mail": {
-        "title": "Envoyer un email (Microsoft 365)",
+        "title": "Send an email (Microsoft 365)",
         "service": "microsoft",
         "event": "send_mail",
         "payload_schema": {
             "to": {
                 "type": "string[] (email)",
-                "label": "Liste des adresses email des destinataires"
+                "label": "Recipients"
             },
             "subject": {
                 "type": "string",
-                "label": "Sujet du message"
+                "label": "Subject"
             },
             "content": {
                 "type": "string",
-                "label": "Contenu du message (HTML ou texte brut)"
+                "label": "Body"
             },
             "content_type": {
                 "type": "string (HTML|Text)",
                 "default": "HTML",
-                "label": "Type de contenu du message (HTML par défaut)"
+                "label": "Format"
             }
         },
-        "description": "Envoie un courriel via Microsoft Graph."
+        "description": "Sends an email through Microsoft Graph."
     },
     "google.send_mail": {
-        "title": "Envoyer un email (Gmail)",
+        "title": "Send an email (Gmail)",
         "service": "google",
         "event": "send_mail",
         "payload_schema": {
             "to": {
                 "type": "string[] (email)",
-                "label": "Liste des adresses email des destinataires"
+                "label": "Recipients"
             },
             "subject": {
                 "type": "string",
-                "label": "Sujet du message"
+                "label": "Subject"
             },
             "content": {
                 "type": "string",
-                "label": "Contenu du message (HTML ou texte brut)"
+                "label": "Body"
             },
             "content_type": {
                 "type": "string (HTML|Text)",
                 "default": "HTML",
-                "label": "Type de contenu du message (HTML par défaut)"
+                "label": "Format"
             }
         },
-        "description": "Envoie un courriel via l'API Gmail."
+        "description": "Sends an email using the Gmail API."
     },
 }
 
