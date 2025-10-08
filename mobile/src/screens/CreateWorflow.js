@@ -13,14 +13,12 @@ export default function CreateWorkflowScreen() {
   const [WorkflowName, setWorkflowName] = useState('');
   const [reactions, setReactions] = useState([]);
   const [selectedReaction, setSelectedReaction] = useState(null);
-  const [serverId, setServerId] = useState('');
   const [isActionModalVisible, setIsActionModalVisible] = useState(false);
   const [isReactionModalVisible, setIsReactionModalVisible] = useState(false);
   const [actionParams, setActionParams] = useState({});
   const [reactionParams, setReactionParams] = useState({});
   const [isActionParamsModalVisible, setIsActionParamsModalVisible] = useState(false);
   const [isReactionParamsModalVisible, setIsReactionParamsModalVisible] = useState(false);
-
 
   const fetchActions = async () => {
     try {
@@ -130,6 +128,7 @@ export default function CreateWorkflowScreen() {
 
   return (
     <LinearGradient colors={['#171542', '#2f339e']} style={styles.container}>
+      <Text style={styles.text}>Créer un Workflow</Text>
       <View style={styles.workflowContainer}>
         <BlurView style={styles.blurContainer} intensity={80} tint="systemUltraThinMaterialDark" />
         <View style={styles.overlayContainer} />
@@ -153,50 +152,68 @@ export default function CreateWorkflowScreen() {
             </View>
           </TouchableOpacity>
 
-        <Modal visible={isActionParamsModalVisible} transparent animationType="slide">
+        <Modal visible={isActionParamsModalVisible} transparent animationType="fade">
           <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700', marginBottom: 10 }}>
-                Paramètres de l’action
-              </Text>
-              <ScrollView>
-                {selectedAction && Object.keys(actionParams).map((key) => (
-                  <TextInput
-                    key={key}
-                    style={styles.input}
-                    placeholder={selectedAction.payload_schema[key].label || key}
-                    placeholderTextColor="#64748b"
-                    value={actionParams[key]}
-                    onChangeText={(text) => setActionParams({ ...actionParams, [key]: text })}
-                  />
-                ))}
-              </ScrollView>
+            <View style={styles.modalContentWrapper}>
+              <BlurView style={styles.modalBlur} intensity={90} tint="systemUltraThinMaterialDark" />
+              <View style={styles.modalOverlay} />
+              <View style={styles.modalInnerContent}>
+                <Text style={styles.modalHeaderText}>Paramètres de l'action</Text>
+                <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
+                  {selectedAction && Object.keys(actionParams).map((key) => (
+                    <View key={key} style={styles.paramInputWrapper}>
+                      <BlurView style={styles.paramInputBlur} intensity={60} tint="systemUltraThinMaterialDark" />
+                      <View style={styles.paramInputOverlay} />
+                      <TextInput
+                        style={styles.paramInput}
+                        placeholder={selectedAction.payload_schema[key].label || key}
+                        placeholderTextColor="#94a3b8"
+                        value={actionParams[key]}
+                        onChangeText={(text) => setActionParams({ ...actionParams, [key]: text })}
+                      />
+                    </View>
+                  ))}
+                </ScrollView>
 
-              <TouchableOpacity
-                onPress={() => setIsActionParamsModalVisible(false)}
-                style={styles.closeButton}
-              >
-                <Text style={{ color: '#fff', fontWeight: '600' }}>Enregistrer</Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setIsActionParamsModalVisible(false)}
+                  style={styles.modalButton}
+                >
+                  <BlurView style={styles.modalButtonBlur} intensity={70} tint="systemUltraThinMaterialDark" />
+                  <View style={styles.modalButtonOverlay} />
+                  <Text style={styles.modalButtonText}>Enregistrer</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </Modal>
 
 
-          <Modal visible={isActionModalVisible} transparent animationType="slide">
+          <Modal visible={isActionModalVisible} transparent animationType="fade">
             <View style={styles.modalContainer}>
-              <View style={styles.modalContent}>
-                <ScrollView>
-                  {actions.map((action, index) => (
-                    <TouchableOpacity key={index} style={styles.modalItem} onPress={() => handleSelectAction(action)}>
-                      <Text style={styles.modalTitle}>{action?.title || 'Titre inconnu'}</Text>
-                      <Text style={styles.modalDesc}>{action?.description || 'Description indisponible'}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-                <TouchableOpacity onPress={() => setIsActionModalVisible(false)} style={styles.closeButton}>
-                  <Text style={{ color: '#fff', fontWeight: '600' }}>Fermer</Text>
-                </TouchableOpacity>
+              <View style={styles.modalContentWrapper}>
+                <BlurView style={styles.modalBlur} intensity={90} tint="systemUltraThinMaterialDark" />
+                <View style={styles.modalOverlay} />
+                <View style={styles.modalInnerContent}>
+                  <Text style={styles.modalHeaderText}>Sélectionner une action</Text>
+                  <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
+                    {actions.map((action, index) => (
+                      <TouchableOpacity key={index} style={styles.modalItemWrapper} onPress={() => handleSelectAction(action)}>
+                        <BlurView style={styles.modalItemBlur} intensity={50} tint="systemUltraThinMaterialDark" />
+                        <View style={styles.modalItemOverlay} />
+                        <View style={styles.modalItemContent}>
+                          <Text style={styles.modalTitle}>{action?.title || 'Titre inconnu'}</Text>
+                          <Text style={styles.modalDesc}>{action?.description || 'Description indisponible'}</Text>
+                        </View>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                  <TouchableOpacity onPress={() => setIsActionModalVisible(false)} style={styles.modalButton}>
+                    <BlurView style={styles.modalButtonBlur} intensity={70} tint="systemUltraThinMaterialDark" />
+                    <View style={styles.modalButtonOverlay} />
+                    <Text style={styles.modalButtonText}>Fermer</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           </Modal>
@@ -214,54 +231,72 @@ export default function CreateWorkflowScreen() {
             </View>
           </TouchableOpacity>
 
-          <Modal visible={isReactionParamsModalVisible} transparent animationType="slide">
+          <Modal visible={isReactionParamsModalVisible} transparent animationType="fade">
             <View style={styles.modalContainer}>
-              <View style={styles.modalContent}>
-                <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700', marginBottom: 10 }}>
-                  Paramètres de la réaction
-                </Text>
-                <ScrollView>
-                  {selectedReaction && Object.keys(reactionParams).map((key) => (
-                    <TextInput
-                      key={key}
-                      style={styles.input}
-                      placeholder={selectedReaction.payload_schema[key].label || key}
-                      placeholderTextColor="#64748b"
-                      value={reactionParams[key]}
-                      onChangeText={(text) => setReactionParams({ ...reactionParams, [key]: text })}
-                    />
-                  ))}
-                </ScrollView>
+              <View style={styles.modalContentWrapper}>
+                <BlurView style={styles.modalBlur} intensity={90} tint="systemUltraThinMaterialDark" />
+                <View style={styles.modalOverlay} />
+                <View style={styles.modalInnerContent}>
+                  <Text style={styles.modalHeaderText}>Paramètres de la réaction</Text>
+                  <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
+                    {selectedReaction && Object.keys(reactionParams).map((key) => (
+                      <View key={key} style={styles.paramInputWrapper}>
+                        <BlurView style={styles.paramInputBlur} intensity={60} tint="systemUltraThinMaterialDark" />
+                        <View style={styles.paramInputOverlay} />
+                        <TextInput
+                          style={styles.paramInput}
+                          placeholder={selectedReaction.payload_schema[key].label || key}
+                          placeholderTextColor="#94a3b8"
+                          value={reactionParams[key]}
+                          onChangeText={(text) => setReactionParams({ ...reactionParams, [key]: text })}
+                        />
+                      </View>
+                    ))}
+                  </ScrollView>
 
-                <TouchableOpacity
-                  onPress={() => setIsReactionParamsModalVisible(false)}
-                  style={styles.closeButton}
-                >
-                  <Text style={{ color: '#fff', fontWeight: '600' }}>Enregistrer</Text>
-                </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => setIsReactionParamsModalVisible(false)}
+                    style={styles.modalButton}
+                  >
+                    <BlurView style={styles.modalButtonBlur} intensity={70} tint="systemUltraThinMaterialDark" />
+                    <View style={styles.modalButtonOverlay} />
+                    <Text style={styles.modalButtonText}>Enregistrer</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           </Modal>
 
-          <Modal visible={isReactionModalVisible} transparent animationType="slide">
+          <Modal visible={isReactionModalVisible} transparent animationType="fade">
             <View style={styles.modalContainer}>
-              <View style={styles.modalContent}>
-                <ScrollView>
-                  {reactions.map((reaction, index) => (
-                    <TouchableOpacity key={index} style={styles.modalItem} onPress={() => handleSelectReaction(reaction)}>
-                      <Text style={styles.modalTitle}>{reaction?.title || 'Titre inconnu'}</Text>
-                      <Text style={styles.modalDesc}>{reaction?.description || 'Description indisponible'}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-                <TouchableOpacity onPress={() => setIsReactionModalVisible(false)} style={styles.closeButton}>
-                  <Text style={{ color: '#fff', fontWeight: '600' }}>Fermer</Text>
-                </TouchableOpacity>
+              <View style={styles.modalContentWrapper}>
+                <BlurView style={styles.modalBlur} intensity={90} tint="systemUltraThinMaterialDark" />
+                <View style={styles.modalOverlay} />
+                <View style={styles.modalInnerContent}>
+                  <Text style={styles.modalHeaderText}>Sélectionner une réaction</Text>
+                  <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
+                    {reactions.map((reaction, index) => (
+                      <TouchableOpacity key={index} style={styles.modalItemWrapper} onPress={() => handleSelectReaction(reaction)}>
+                        <BlurView style={styles.modalItemBlur} intensity={50} tint="systemUltraThinMaterialDark" />
+                        <View style={styles.modalItemOverlay} />
+                        <View style={styles.modalItemContent}>
+                          <Text style={styles.modalTitle}>{reaction?.title || 'Titre inconnu'}</Text>
+                          <Text style={styles.modalDesc}>{reaction?.description || 'Description indisponible'}</Text>
+                        </View>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                  <TouchableOpacity onPress={() => setIsReactionModalVisible(false)} style={styles.modalButton}>
+                    <BlurView style={styles.modalButtonBlur} intensity={70} tint="systemUltraThinMaterialDark" />
+                    <View style={styles.modalButtonOverlay} />
+                    <Text style={styles.modalButtonText}>Fermer</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           </Modal>
 
-          <TouchableOpacity style={[styles.addButton, { marginTop: 20, alignSelf: 'center' }]} onPress={createWorkflow}>
+          <TouchableOpacity style={[styles.addButton, { marginTop: 70, alignSelf: 'center' }]} onPress={createWorkflow}>
             <BlurView style={styles.addButtonBlur} intensity={60} tint="systemUltraThinMaterialDark" />
             <View style={styles.addButtonOverlay} />
             <Text style={[styles.addButtonIcon, { fontSize: 18 }]}>Créer Workflow</Text>
@@ -278,7 +313,7 @@ const styles = StyleSheet.create({
   blurContainer: { ...StyleSheet.absoluteFillObject, borderRadius: 24 },
   overlayContainer: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
   content: { paddingVertical: 32, paddingHorizontal: 24 },
-  serviceWrapper: { alignItems: 'center', marginVertical: 8 },
+  serviceWrapper: { alignItems: 'center', marginVertical: 8, },
   logoContainer: { width: 64, height: 64, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.15)', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', shadowColor: 'rgba(0,0,0,0.2)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 6, marginBottom: 12 },
   logo: { width: 40, height: 40, resizeMode: 'contain', borderRadius: 6 },
   badge: { paddingHorizontal: 12, paddingVertical: 4, borderRadius: 8, borderWidth: 1 },
@@ -313,10 +348,145 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 6,
   },
- modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.6)' },
-  modalContent: { width: '90%', maxHeight: '70%', backgroundColor: '#22225A', borderRadius: 20, padding: 20 },
-  modalItem: { padding: 12, backgroundColor: 'rgba(255,255,255,0.1)', marginVertical: 6, borderRadius: 10 },
-  modalTitle: { color: '#fff', fontWeight: '600', fontSize: 16 },
-  modalDesc: { color: '#fff', fontSize: 12, marginTop: 2 },
-  closeButton: { marginTop: 10, alignSelf: 'center', padding: 10, backgroundColor: '#4444AA', borderRadius: 10 },
+  modalContainer: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    backgroundColor: 'rgba(0,0,0,0.85)',
+    paddingHorizontal: 20,
+  },
+  modalContentWrapper: { 
+    width: '100%', 
+    maxWidth: 400,
+    maxHeight: '80%', 
+    borderRadius: 24, 
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    elevation: 16,
+  },
+  modalBlur: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 24,
+  },
+  modalOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(30,30,60,0.85)',
+    borderRadius: 24,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.25)',
+  },
+  modalInnerContent: {
+    padding: 24,
+    height: '100%',
+  },
+  modalHeaderText: {
+    color: '#fff',
+    fontSize: 22,
+    fontWeight: '700',
+    marginBottom: 20,
+    textAlign: 'center',
+    letterSpacing: 0.5,
+  },
+  modalScrollView: {
+    flex: 1,
+    marginBottom: 16,
+  },
+  modalItemWrapper: {
+    marginVertical: 6,
+    borderRadius: 14,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  modalItemBlur: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  modalItemOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 14,
+  },
+  modalItemContent: {
+    padding: 14,
+  },
+  modalTitle: { 
+    color: '#fff', 
+    fontWeight: '700', 
+    fontSize: 16,
+    marginBottom: 4,
+    letterSpacing: 0.3,
+  },
+  modalDesc: { 
+    color: 'rgba(255,255,255,0.75)', 
+    fontSize: 13, 
+    lineHeight: 18,
+  },
+  modalButton: {
+    height: 50,
+    borderRadius: 16,
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  modalButtonBlur: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  modalButtonOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(99,102,241,0.3)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(99,102,241,0.5)',
+    borderRadius: 16,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 16,
+    letterSpacing: 0.5,
+  },
+  paramInputWrapper: {
+    marginBottom: 16,
+    borderRadius: 12,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  paramInputBlur: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  paramInputOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 12,
+  },
+  paramInput: {
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '500',
+  },
+    text: {
+    fontSize: 26,
+    color: '#fff',
+    marginBottom: 20,
+  },
 });
