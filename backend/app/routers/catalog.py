@@ -13,7 +13,10 @@ ACTIONS_CATALOG = {
         "service": "discord",
         "event": "member_join",
         "payload_schema": {
-            "guild_id": "string"
+            "guild_id": {
+                "type": "string",
+                "label": "Identifiant unique du serveur Discord (guild_id)"
+            }
         },
         "description": "Déclenche l'action lorsqu'un membre rejoint le serveur Discord spécifié."
     },
@@ -24,18 +27,36 @@ REACTIONS_CATALOG = {
         "title": "Tweeter un message",
         "service": "twitter",
         "event": "tweet",
-        "description": "Publie un tweet avec le texte fourni.",
-        "payload_schema": None
+        "payload_schema": {
+            "text": {
+                "type": "string",
+                "label": "Texte du tweet à publier"
+            }
+        },
+        "description": "Publie un tweet avec le texte fourni."
     },
     "microsoft.send_mail": {
         "title": "Envoyer un email (Microsoft 365)",
         "service": "microsoft",
         "event": "send_mail",
         "payload_schema": {
-            "to": "string[] (email)",
-            "subject": "string",
-            "content": "string",
-            "content_type": "string (HTML|Text) = HTML"
+            "to": {
+                "type": "string[] (email)",
+                "label": "Liste des adresses email des destinataires"
+            },
+            "subject": {
+                "type": "string",
+                "label": "Sujet du message"
+            },
+            "content": {
+                "type": "string",
+                "label": "Contenu du message (HTML ou texte brut)"
+            },
+            "content_type": {
+                "type": "string (HTML|Text)",
+                "default": "HTML",
+                "label": "Type de contenu du message (HTML par défaut)"
+            }
         },
         "description": "Envoie un courriel via Microsoft Graph."
     },
@@ -44,10 +65,23 @@ REACTIONS_CATALOG = {
         "service": "google",
         "event": "send_mail",
         "payload_schema": {
-            "to": "string[] (email)",
-            "subject": "string",
-            "content": "string",
-            "content_type": "string (HTML|Text) = HTML"
+            "to": {
+                "type": "string[] (email)",
+                "label": "Liste des adresses email des destinataires"
+            },
+            "subject": {
+                "type": "string",
+                "label": "Sujet du message"
+            },
+            "content": {
+                "type": "string",
+                "label": "Contenu du message (HTML ou texte brut)"
+            },
+            "content_type": {
+                "type": "string (HTML|Text)",
+                "default": "HTML",
+                "label": "Type de contenu du message (HTML par défaut)"
+            }
         },
         "description": "Envoie un courriel via l'API Gmail."
     },
