@@ -19,36 +19,48 @@ export default function CreateWorkflowScreen() {
   const [reactionParams, setReactionParams] = useState({});
   const [isActionParamsModalVisible, setIsActionParamsModalVisible] = useState(false);
   const [isReactionParamsModalVisible, setIsReactionParamsModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [isError, setIsError] = useState(true);
 
   const fetchActions = async () => {
+    setMessage('');
     try {
       const token = await AsyncStorage.getItem('userToken');
-      if (!token) return console.log('No token found');
+      if (!token) {
+        navigate('Login');
+        return;
+      }
       const response = await axios.get(`${API_URL}/catalog/actions`, {
         headers: { Authorization: `Bearer ${token}` },
       });
     const data = Object.values(response.data || {}).flat();
     setActions(data);
-    console.log(data);
     setIsActionModalVisible(true);
     } catch (error) {
-      console.error(error);
+      setIsError(true);
+      setMessage('Erreur lors de la récupération des actions.');
     }
   };
 
   const fetchReactions = async () => {
+    setMessage('');
     try {
       const token = await AsyncStorage.getItem('userToken');
-      if (!token) return console.log('No token found');
+      if (!token) {
+        navigate('Login');
+        return;
+      }
+
       const response = await axios.get(`${API_URL}/catalog/reactions`, {
         headers: { Authorization: `Bearer ${token}` },
       });
     const data = Object.values(response.data || {}).flat();
     setReactions(data);
-    console.log(data);
     setIsReactionModalVisible(true);
     } catch (error) {
-      console.error(error);
+      setIsError(true);
+      setMessage('Erreur lors de la récupération des réactions.');
     }
   };
 
@@ -85,13 +97,17 @@ export default function CreateWorkflowScreen() {
 
   const createWorkflow = async () => {
   if (!selectedAction || !selectedReaction) {
-    return Alert.alert('Erreur', 'Veuillez sélectionner une action et une réaction.');
+    setIsError(true);
+    setMessage('Sélectionner une action et une réaction.');
+    return;
   }
 
   try {
     const token = await AsyncStorage.getItem('userToken');
-    if (!token)
-      return console.log('No token found');
+    if (!token) {
+      navigate('Login');
+      return;
+    }
 
     const payload = {
       name: WorkflowName || "Mon Workflow",
@@ -100,29 +116,26 @@ export default function CreateWorkflowScreen() {
       steps: [
         {
           type: "action",
-          service: selectedAction?.service || "unknown",
-          event: selectedAction?.event || "unknown",
+          service: selectedAction?.service,
+          event: selectedAction?.event,
           params: actionParams
         },
         {
           type: "reaction",
-          service: selectedReaction?.service || "unknown",
-          event: selectedReaction?.event || "unknown",
+          service: selectedReaction?.service,
+          event: selectedReaction?.event,
           params: reactionParams
         }
       ]
     };
-
     const response = await axios.post(`${API_URL}/workflows/`, payload, {
       headers: { Authorization: `Bearer ${token}` },
     });
-
-    Alert.alert('Succès', 'Workflow créé avec succès !');
-    console.log(response.data);
-
+    setIsError(false);
+    setMessage("Workflow créé avec succès !");
   } catch (error) {
-    console.error(error);
-    Alert.alert('Erreur', 'Impossible de créer le workflow.');
+    setIsError(true);
+    setMessage("Impossible de créer le workflow.");
   }
 };
 
@@ -295,6 +308,8 @@ export default function CreateWorkflowScreen() {
               </View>
             </View>
           </Modal>
+
+          {message ? (<Text style={[styles.message, { color: isError ? '#ff4d4d' : '#63f614ff' }]}>{message}</Text>) : null}
 
           <TouchableOpacity style={[styles.addButton, { marginTop: 70, alignSelf: 'center' }]} onPress={createWorkflow}>
             <BlurView style={styles.addButtonBlur} intensity={60} tint="systemUltraThinMaterialDark" />
@@ -488,5 +503,10 @@ const styles = StyleSheet.create({
     fontSize: 26,
     color: '#fff',
     marginBottom: 20,
+  },
+  message: {
+    marginBottom: 15,
+    textAlign: 'center',
+    fontSize: 15,
   },
 });
