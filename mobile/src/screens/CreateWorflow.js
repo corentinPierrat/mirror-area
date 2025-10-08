@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { Modal } from 'react-native';
 
 export default function CreateWorkflowScreen() {
   const API_URL = 'http://10.18.207.151:8080';
@@ -13,6 +14,13 @@ export default function CreateWorkflowScreen() {
   const [reactions, setReactions] = useState([]);
   const [selectedReaction, setSelectedReaction] = useState(null);
   const [serverId, setServerId] = useState('');
+  const [isActionModalVisible, setIsActionModalVisible] = useState(false);
+  const [isReactionModalVisible, setIsReactionModalVisible] = useState(false);
+  const [actionParams, setActionParams] = useState({});
+  const [reactionParams, setReactionParams] = useState({});
+  const [isActionParamsModalVisible, setIsActionParamsModalVisible] = useState(false);
+  const [isReactionParamsModalVisible, setIsReactionParamsModalVisible] = useState(false);
+
 
   const fetchActions = async () => {
     try {
@@ -21,9 +29,10 @@ export default function CreateWorkflowScreen() {
       const response = await axios.get(`${API_URL}/catalog/actions`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const keys = Object.keys(response.data || {});
-      const data = keys.length > 0 ? response.data[keys[0]] : [];
-      setActions(Array.isArray(data) ? data : [data]);
+    const data = Object.values(response.data || {}).flat();
+    setActions(data);
+    console.log(data);
+    setIsActionModalVisible(true);
     } catch (error) {
       console.error(error);
     }
@@ -36,9 +45,10 @@ export default function CreateWorkflowScreen() {
       const response = await axios.get(`${API_URL}/catalog/reactions`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const keys = Object.keys(response.data || {});
-      const data = keys.length > 0 ? response.data[keys[0]] : [];
-      setReactions(Array.isArray(data) ? data : [data]);
+    const data = Object.values(response.data || {}).flat();
+    setReactions(data);
+    console.log(data);
+    setIsReactionModalVisible(true);
     } catch (error) {
       console.error(error);
     }
@@ -46,12 +56,33 @@ export default function CreateWorkflowScreen() {
 
   const handleSelectAction = (action) => {
     setSelectedAction(action);
-    setActions([]);
+
+    const params = action.payload_schema
+      ? Object.keys(action.payload_schema).reduce((acc, key) => {
+          acc[key] = '';
+          return acc;
+        }, {})
+      : {};
+
+    setActionParams(params);
+    setIsActionModalVisible(false);
+    setIsActionParamsModalVisible(true);
   };
+
 
   const handleSelectReaction = (reaction) => {
     setSelectedReaction(reaction);
-    setReactions([]);
+
+    const params = reaction.payload_schema
+      ? Object.keys(reaction.payload_schema).reduce((acc, key) => {
+          acc[key] = '';
+          return acc;
+        }, {})
+      : {};
+
+    setReactionParams(params);
+    setIsReactionModalVisible(false);
+    setIsReactionParamsModalVisible(true);
   };
 
   const createWorkflow = async () => {
@@ -73,13 +104,13 @@ export default function CreateWorkflowScreen() {
           type: "action",
           service: selectedAction?.service || "unknown",
           event: selectedAction?.event || "unknown",
-          params: { "guild_id": serverId } || {}
+          params: actionParams
         },
         {
           type: "reaction",
           service: selectedReaction?.service || "unknown",
           event: selectedReaction?.event || "unknown",
-          params: selectedReaction?.params || {}
+          params: reactionParams
         }
       ]
     };
@@ -98,26 +129,22 @@ export default function CreateWorkflowScreen() {
 };
 
   return (
-    <LinearGradient
-      colors={['#171542', '#2f339e']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.container}
-    >
+    <LinearGradient colors={['#171542', '#2f339e']} style={styles.container}>
       <View style={styles.workflowContainer}>
         <BlurView style={styles.blurContainer} intensity={80} tint="systemUltraThinMaterialDark" />
         <View style={styles.overlayContainer} />
-       <View style={styles.inputContainer}>
+        <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder={"Workflow Name"}
+            placeholder="Workflow Name"
             placeholderTextColor="#64748b"
             value={WorkflowName}
             onChangeText={setWorkflowName}
           />
         </View>
+
         <View style={styles.content}>
-          <TouchableOpacity style={styles.serviceWrapper} activeOpacity={0.7} onPress={fetchActions}>
+          <TouchableOpacity style={styles.serviceWrapper} onPress={fetchActions}>
             <View style={styles.logoContainer}>
               <Image source={selectedAction ? require("../../assets/discord.png") : require("../../assets/None.png")} style={styles.logo} />
             </View>
@@ -126,33 +153,59 @@ export default function CreateWorkflowScreen() {
             </View>
           </TouchableOpacity>
 
-          {actions?.length > 0 && (
-            <ScrollView style={{ marginTop: 10, maxHeight: 150 }}>
-              {actions.map((action, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={{ padding: 10, backgroundColor: 'rgba(255,255,255,0.1)', marginVertical: 4, borderRadius: 8 }}
-                  onPress={() => handleSelectAction(action)}
-                >
-                  <Text style={{ color: '#fff', fontWeight: '600' }}>{action?.title || 'Titre inconnu'}</Text>
-                  <Text style={{ color: '#fff' }}>{action?.description || 'Description indisponible'}</Text>
-                </TouchableOpacity>
-              ))}
-               <TextInput
+        <Modal visible={isActionParamsModalVisible} transparent animationType="slide">
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700', marginBottom: 10 }}>
+                Paramètres de l’action
+              </Text>
+              <ScrollView>
+                {selectedAction && Object.keys(actionParams).map((key) => (
+                  <TextInput
+                    key={key}
                     style={styles.input}
-                    placeholder={"Server ID"}
+                    placeholder={selectedAction.payload_schema[key].label || key}
                     placeholderTextColor="#64748b"
-                    value={serverId}
-                    onChangeText={setServerId}
+                    value={actionParams[key]}
+                    onChangeText={(text) => setActionParams({ ...actionParams, [key]: text })}
                   />
-            </ScrollView>
-          )}
+                ))}
+              </ScrollView>
+
+              <TouchableOpacity
+                onPress={() => setIsActionParamsModalVisible(false)}
+                style={styles.closeButton}
+              >
+                <Text style={{ color: '#fff', fontWeight: '600' }}>Enregistrer</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+
+          <Modal visible={isActionModalVisible} transparent animationType="slide">
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <ScrollView>
+                  {actions.map((action, index) => (
+                    <TouchableOpacity key={index} style={styles.modalItem} onPress={() => handleSelectAction(action)}>
+                      <Text style={styles.modalTitle}>{action?.title || 'Titre inconnu'}</Text>
+                      <Text style={styles.modalDesc}>{action?.description || 'Description indisponible'}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+                <TouchableOpacity onPress={() => setIsActionModalVisible(false)} style={styles.closeButton}>
+                  <Text style={{ color: '#fff', fontWeight: '600' }}>Fermer</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
 
           <View style={styles.connectorWrapper}>
             <View style={styles.connectorLine} />
           </View>
 
-          <TouchableOpacity style={styles.serviceWrapper} activeOpacity={0.7} onPress={fetchReactions}>
+          <TouchableOpacity style={styles.serviceWrapper} onPress={fetchReactions}>
             <View style={styles.logoContainer}>
               <Image source={selectedReaction ? require("../../assets/X.png") : require("../../assets/None.png")} style={styles.logo} />
             </View>
@@ -161,26 +214,54 @@ export default function CreateWorkflowScreen() {
             </View>
           </TouchableOpacity>
 
-          {reactions?.length > 0 && (
-            <ScrollView style={{ marginTop: 10, maxHeight: 150 }}>
-              {reactions.map((reaction, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={{ padding: 10, backgroundColor: 'rgba(255,255,255,0.1)', marginVertical: 4, borderRadius: 8 }}
-                  onPress={() => handleSelectReaction(reaction)}
-                >
-                  <Text style={{ color: '#fff', fontWeight: '600' }}>{reaction?.title || 'Titre inconnu'}</Text>
-                  <Text style={{ color: '#fff' }}>{reaction?.description || 'Description indisponible'}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          )}
+          <Modal visible={isReactionParamsModalVisible} transparent animationType="slide">
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700', marginBottom: 10 }}>
+                  Paramètres de la réaction
+                </Text>
+                <ScrollView>
+                  {selectedReaction && Object.keys(reactionParams).map((key) => (
+                    <TextInput
+                      key={key}
+                      style={styles.input}
+                      placeholder={selectedReaction.payload_schema[key].label || key}
+                      placeholderTextColor="#64748b"
+                      value={reactionParams[key]}
+                      onChangeText={(text) => setReactionParams({ ...reactionParams, [key]: text })}
+                    />
+                  ))}
+                </ScrollView>
 
-          <TouchableOpacity
-            style={[styles.addButton, { marginTop: 20, alignSelf: 'center' }]}
-            activeOpacity={0.8}
-            onPress={createWorkflow}
-          >
+                <TouchableOpacity
+                  onPress={() => setIsReactionParamsModalVisible(false)}
+                  style={styles.closeButton}
+                >
+                  <Text style={{ color: '#fff', fontWeight: '600' }}>Enregistrer</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+
+          <Modal visible={isReactionModalVisible} transparent animationType="slide">
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <ScrollView>
+                  {reactions.map((reaction, index) => (
+                    <TouchableOpacity key={index} style={styles.modalItem} onPress={() => handleSelectReaction(reaction)}>
+                      <Text style={styles.modalTitle}>{reaction?.title || 'Titre inconnu'}</Text>
+                      <Text style={styles.modalDesc}>{reaction?.description || 'Description indisponible'}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+                <TouchableOpacity onPress={() => setIsReactionModalVisible(false)} style={styles.closeButton}>
+                  <Text style={{ color: '#fff', fontWeight: '600' }}>Fermer</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+
+          <TouchableOpacity style={[styles.addButton, { marginTop: 20, alignSelf: 'center' }]} onPress={createWorkflow}>
             <BlurView style={styles.addButtonBlur} intensity={60} tint="systemUltraThinMaterialDark" />
             <View style={styles.addButtonOverlay} />
             <Text style={[styles.addButtonIcon, { fontSize: 18 }]}>Créer Workflow</Text>
@@ -232,5 +313,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 6,
   },
-
+ modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.6)' },
+  modalContent: { width: '90%', maxHeight: '70%', backgroundColor: '#22225A', borderRadius: 20, padding: 20 },
+  modalItem: { padding: 12, backgroundColor: 'rgba(255,255,255,0.1)', marginVertical: 6, borderRadius: 10 },
+  modalTitle: { color: '#fff', fontWeight: '600', fontSize: 16 },
+  modalDesc: { color: '#fff', fontSize: 12, marginTop: 2 },
+  closeButton: { marginTop: 10, alignSelf: 'center', padding: 10, backgroundColor: '#4444AA', borderRadius: 10 },
 });

@@ -84,6 +84,7 @@ const ProfileDashboard = ({ navigation }) => {
         setUserData(response.data);
       }
     } catch (error) {
+      navigation.replace('Login');
       setIsError(true);
       setMessage(t("UpdateProfileError"));
     }
