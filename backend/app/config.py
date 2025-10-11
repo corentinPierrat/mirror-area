@@ -19,16 +19,15 @@ class Settings:
         self.JWT_EXPIRE_MINUTES: int = int(os.getenv("JWT_EXPIRE_MINUTES", "30"))
         self.USER_SMTP_EMAIL: str = os.getenv("USER_SMTP_EMAIL")
         self.USER_SMTP_PASSWORD: str = os.getenv("USER_SMTP_PASSWORD")
-        self.MS_CLIENT_ID: str = os.getenv("MS_CLIENT_ID")
-        self.MS_CLIENT_SECRET: str = os.getenv("MS_CLIENT_SECRET")
         self.DISCORD_CLIENT_ID: str = os.getenv("DISCORD_CLIENT_ID")
         self.DISCORD_CLIENT_SECRET: str = os.getenv("DISCORD_CLIENT_SECRET")
         self.FACEIT_CLIENT_ID: str = os.getenv("FACEIT_CLIENT_ID")
         self.FACEIT_CLIENT_SECRET: str = os.getenv("FACEIT_CLIENT_SECRET")
-        self.STEAM_WEB_API_KEY: str = os.getenv("STEAM_WEB_API_KEY")
         self.TOKEN_BOT: str = os.getenv("TOKEN_BOT")
         self.GOOGLE_CLIENT_ID: str = os.getenv("GOOGLE_CLIENT_ID")
         self.GOOGLE_CLIENT_SECRET: str = os.getenv("GOOGLE_CLIENT_SECRET")
+        self.TWITCH_CLIENT_ID: str = os.getenv("TWITCH_CLIENT_ID")
+        self.TWITCH_CLIENT_SECRET: str = os.getenv("TWITCH_CLIENT_SECRET")
 
     @property
     def DATABASE_URL(self) -> str:

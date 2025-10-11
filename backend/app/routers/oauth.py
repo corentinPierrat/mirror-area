@@ -54,19 +54,6 @@ oauth.register(
 )
 
 oauth.register(
-    name="microsoft",
-    client_id=settings.MS_CLIENT_ID,
-    client_secret=settings.MS_CLIENT_SECRET,
-    authorize_url="https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
-    access_token_url="https://login.microsoftonline.com/common/oauth2/v2.0/token",
-    api_base_url="https://graph.microsoft.com/v1.0/",
-    client_kwargs={
-        "scope": "openid profile email offline_access User.Read Mail.Read Mail.Send",
-        "code_challenge_method": "S256",
-    },
-)
-
-oauth.register(
     name="faceit",
     client_id=settings.FACEIT_CLIENT_ID,
     client_secret=settings.FACEIT_CLIENT_SECRET,
@@ -96,6 +83,19 @@ oauth.register(
     },
 )
 
+oauth.register(
+    name="twitch",
+    client_id=settings.TWITCH_CLIENT_ID,
+    client_secret=settings.TWITCH_CLIENT_SECRET,
+    access_token_url="https://id.twitch.tv/oauth2/token",
+    authorize_url="https://id.twitch.tv/oauth2/authorize",
+    api_base_url="https://api.twitch.tv/helix/",
+    client_kwargs={
+        "scope": "user:read:email user:read:follows",
+        "token_endpoint_auth_method": "client_secret_post"
+    }
+)
+
 @oauth_router.get("/{provider}/login")
 async def oauth_login(provider: str, request: Request, token: str = Query(None), db: Session = Depends(get_db)):
     if provider not in oauth._clients:
@@ -116,13 +116,7 @@ async def oauth_login(provider: str, request: Request, token: str = Query(None),
         return JSONResponse({"error": "Token invalide"}, status_code=401)
 
     request.session['oauth_user_id'] = user.id
-
-    if provider == "microsoft":
-        redirect_uri = f"http://localhost:8080/oauth/{provider}/callback"
-    elif provider == "faceit":
-        redirect_uri = f"https://b107b2467506.ngrok-free.app/oauth/{provider}/callback"
-    else:
-        redirect_uri = f"http://127.0.0.1:8080/oauth/{provider}/callback"
+    redirect_uri = f"http://127.0.0.1:8080/oauth/{provider}/callback"
     return await oauth.create_client(provider).authorize_redirect(request, redirect_uri)
 
 @oauth_router.get("/{provider}/callback")
@@ -183,13 +177,17 @@ SERVICES_INFO = {
         "name": "Discord",
         "logo_url": "https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png"
     },
-    "microsoft": {
-        "name": "Microsoft 365",
-        "logo_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/512px-Microsoft_logo.svg.png"
-    },
     "faceit": {
         "name": "Faceit",
         "logo_url": "https://cdn.faceit.com/static/layout/images/faceit-logo.svg"
+    },
+    "google": {
+        "name": "Google",
+        "logo_url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png"
+    },
+    "twitch": {
+        "name": "Twitch",
+        "logo_url": "https://static.twitchcdn.net/assets/favicon-32-e29e246c157142c94346.png"
     }
 }
 

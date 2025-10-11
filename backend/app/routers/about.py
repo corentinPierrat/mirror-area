@@ -38,6 +38,21 @@ async def about(request: Request):
                 }
             ]
         },
+        {
+            "name": "faceit",
+            "actions": [],
+            "reactions": []
+        },
+        {
+            "name": "twitch",
+            "actions": [],
+            "reactions": []
+        },
+        {
+            "name": "spotify",
+            "actions": [],
+            "reactions": []
+        }
     ]
 
     return JSONResponse({

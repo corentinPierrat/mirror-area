@@ -35,31 +35,6 @@ REACTIONS_CATALOG = {
         },
         "description": "Posts a tweet with the given text."
     },
-    "microsoft.send_mail": {
-        "title": "Send an email (Microsoft 365)",
-        "service": "microsoft",
-        "event": "send_mail",
-        "payload_schema": {
-            "to": {
-                "type": "string[] (email)",
-                "label": "Recipients"
-            },
-            "subject": {
-                "type": "string",
-                "label": "Subject"
-            },
-            "content": {
-                "type": "string",
-                "label": "Body"
-            },
-            "content_type": {
-                "type": "string (HTML|Text)",
-                "default": "HTML",
-                "label": "Format"
-            }
-        },
-        "description": "Sends an email through Microsoft Graph."
-    },
     "google.send_mail": {
         "title": "Send an email (Gmail)",
         "service": "google",
