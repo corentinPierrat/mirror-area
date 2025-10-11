@@ -7,10 +7,12 @@ from app.routers.oauth import oauth_router
 from app.routers.actions import actions_router
 from app.routers.catalog import catalog_router
 from app.routers.workflow import workflows_router
+from app.routers.about import about_router
+from app.config import settings
 
 app = FastAPI()
 
-app.add_middleware(SessionMiddleware, secret_key="!secret!", same_site="lax", https_only=False)
+app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY, same_site="lax", https_only=False)
 
 origins = [
     "http://127.0.0.1:8081",
@@ -34,6 +36,7 @@ app.include_router(oauth_router)
 app.include_router(actions_router)
 app.include_router(catalog_router)
 app.include_router(workflows_router)
+app.include_router(about_router)
 
 @app.get("/")
 def read_root():

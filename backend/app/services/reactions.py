@@ -20,29 +20,6 @@ async def twitter_tweet_reaction(db: Session, user_id: int, params: dict):
     else:
         return {"error": resp.json()}
 
-async def microsoft_send_mail_reaction(db: Session, user_id: int, params: dict):
-    token = get_token_from_db(db, user_id, "microsoft")
-    if not token:
-        return {"error": "Not logged in to Microsoft"}
-    client = oauth.create_client("microsoft")
-    message = {
-        "message": {
-            "subject": params["subject"],
-            "body": {
-                "contentType": params.get("content_type", "HTML"),
-                "content": params["content"]
-            },
-            "toRecipients": [
-                {"emailAddress": {"address": addr}} for addr in params["to"]
-            ]
-        },
-        "saveToSentItems": True
-    }
-    resp = await client.post("me/sendMail", json=message, token=token)
-    if resp.status_code in (202, 200):
-        return {"status": "Mail envoyé"}
-    return {"error": resp.text}
-
 async def google_send_mail_reaction(db: Session, user_id: int, params: dict):
     token = get_token_from_db(db, user_id, "google")
     if not token:
@@ -66,7 +43,6 @@ async def google_send_mail_reaction(db: Session, user_id: int, params: dict):
 
 REACTION_DISPATCH: Dict[tuple[str, str], Callable[[Session, int, dict], Any]] = {
     ("twitter", "tweet"): twitter_tweet_reaction,
-    ("microsoft", "send_mail"): microsoft_send_mail_reaction,
     ("google", "send_mail"): google_send_mail_reaction,
 }
 

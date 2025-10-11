@@ -9,47 +9,56 @@ catalog_router = APIRouter(prefix="/catalog", tags=["catalog"])
 
 ACTIONS_CATALOG = {
     "discord.member_join": {
-        "title": "Un membre rejoint le serveur Discord",
+        "title": "A member joins the Discord server",
         "service": "discord",
         "event": "member_join",
         "payload_schema": {
-            "guild_id": "string"
+            "guild_id": {
+                "type": "string",
+                "label": "Server ID"
+            }
         },
-        "description": "Déclenche l'action lorsqu'un membre rejoint le serveur Discord spécifié."
+        "description": "Triggers when a member joins the specified Discord server."
     },
 }
 
 REACTIONS_CATALOG = {
     "twitter.tweet": {
-        "title": "Tweeter un message",
+        "title": "Post a tweet",
         "service": "twitter",
         "event": "tweet",
-        "description": "Publie un tweet avec le texte fourni.",
-        "payload_schema": None
-    },
-    "microsoft.send_mail": {
-        "title": "Envoyer un email (Microsoft 365)",
-        "service": "microsoft",
-        "event": "send_mail",
         "payload_schema": {
-            "to": "string[] (email)",
-            "subject": "string",
-            "content": "string",
-            "content_type": "string (HTML|Text) = HTML"
+            "text": {
+                "type": "string",
+                "label": "Tweet text"
+            }
         },
-        "description": "Envoie un courriel via Microsoft Graph."
+        "description": "Posts a tweet with the given text."
     },
     "google.send_mail": {
-        "title": "Envoyer un email (Gmail)",
+        "title": "Send an email (Gmail)",
         "service": "google",
         "event": "send_mail",
         "payload_schema": {
-            "to": "string[] (email)",
-            "subject": "string",
-            "content": "string",
-            "content_type": "string (HTML|Text) = HTML"
+            "to": {
+                "type": "string[] (email)",
+                "label": "Recipients"
+            },
+            "subject": {
+                "type": "string",
+                "label": "Subject"
+            },
+            "content": {
+                "type": "string",
+                "label": "Body"
+            },
+            "content_type": {
+                "type": "string (HTML|Text)",
+                "default": "HTML",
+                "label": "Format"
+            }
         },
-        "description": "Envoie un courriel via l'API Gmail."
+        "description": "Sends an email using the Gmail API."
     },
 }
 
