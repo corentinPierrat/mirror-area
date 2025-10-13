@@ -15,6 +15,14 @@ async def about(request: Request):
                 {
                     "name": "member_join",
                     "description": "Un membre rejoint le serveur Discord"
+                },
+                {
+                    "name": "member_remove",
+                    "description": "Un membre quitte le serveur Discord"
+                },
+                {
+                    "name": "member_update",
+                    "description": "Un membre met à jour son pseudo ou ses rôles sur le serveur Discord"
                 }
             ]
         },
