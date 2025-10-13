@@ -20,6 +20,31 @@ ACTIONS_CATALOG = {
         },
         "description": "Triggers when a member joins the specified Discord server."
     },
+    "discord.member_remove": {
+        "title": "A member leaves the Discord server",
+        "service": "discord",
+        "event": "member_remove",
+        "payload_schema": {
+            "guild_id": {
+                "type": "string",
+                "label": "Server ID"
+            }
+        },
+        "description": "Triggers when a member leaves the specified Discord server."
+    },
+    "discord.member_update": {
+        "title": "A member updates their nickname",
+        "service": "discord",
+
+        "event": "member_update",
+        "payload_schema": {
+            "guild_id": {
+                "type": "string",
+                "label": "Server ID"
+            }
+        },
+        "description": "Triggers when a member changes their nickname in the specified Discord server."
+    }
 }
 
 REACTIONS_CATALOG = {
