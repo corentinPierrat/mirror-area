@@ -56,6 +56,28 @@ const ProfileDashboard = ({ navigation }) => {
     }
 };
 
+  const handleDeleteAccount = async () => {
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) {
+      navigation.replace('Login');
+      return;
+    }
+    try {
+      const response = await axios.delete(`${API_URL}/auth/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.status === 200) {
+        await AsyncStorage.removeItem('userToken');
+        navigation.replace('Login');
+      }
+    } catch (error) {
+      setIsError(true);
+      setMessage(t("ErrorDeleteAccount"));
+    }
+  };
+
  const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('userToken');
@@ -157,10 +179,15 @@ const ProfileDashboard = ({ navigation }) => {
         </TouchableOpacity>
       </View>
      {message ? (<Text style={[styles.message, { color: isError ? '#ff4d4d' : '#63f614ff' }]}>{message}</Text>) : null}
+     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 40 }}>
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Ionicons name="log-out-outline" size={20} color="#ef4444" />
         <Text style={styles.logoutButtonText}>{t("logout")}</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.deleteAccountButton} onPress={handleDeleteAccount}>
+        <Ionicons name="trash" size={20} color="#ef4444" />
+      </TouchableOpacity>
+      </View>
     </ScrollView>
       </LinearGradient>
   );
@@ -276,6 +303,19 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   logoutButton: {
+    padding: 75,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1e293b',
+    borderRadius: 12,
+    paddingVertical: 14,
+    marginBottom: 40,
+    borderWidth: 1,
+    borderColor: '#ef4444',
+  },
+  deleteAccountButton: {
+    padding: 15,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

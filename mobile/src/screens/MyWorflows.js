@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { ScrollView, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Workflows from '../components/Workflows';
@@ -90,11 +91,13 @@ export default function MyWorkflowScreen({ navigation }) {
     }
   };
 
-  useEffect(() => {
-    getWorkflows();
-    handleUpdateProfile();
-    getURLs();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getWorkflows();
+      handleUpdateProfile();
+      getURLs();
+    }, [])
+  );
 
   return (
     <LinearGradient

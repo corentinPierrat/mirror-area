@@ -25,5 +25,6 @@
   "Password": "Password",
   "Login": "Login",
   "Create Account": "Create Account",
-  "PasswordDoesNotMatch": "Passwords do not match"
+  "PasswordDoesNotMatch": "Passwords do not match",
+  "ErrorDeleteAccount": "Error deleting account"
 }

@@ -135,6 +135,12 @@ export default function CreateWorkflowScreen() {
     });
     setIsError(false);
     setLoading(false);
+    setActions([]);
+    setSelectedAction(null);
+    setWorkflowName('');
+    setReactions([]);
+    setSelectedReaction(null);
+    setActionParams({});
     setMessage("Workflow créé avec succès !");
   } catch (error) {
     setLoading(false);

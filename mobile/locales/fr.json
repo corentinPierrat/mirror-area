@@ -24,5 +24,6 @@
   "Email": "Email",
   "Password": "Mot de passe",
   "Login": "Se connecter",
-  "PasswordDoesNotMatch": "Les mots de passe ne correspondent pas"
+  "PasswordDoesNotMatch": "Les mots de passe ne correspondent pas",
+  "ErrorDeleteAccount": "Erreur lors de la suppression du compte"
 }
