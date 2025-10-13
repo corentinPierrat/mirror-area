@@ -4,10 +4,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Workflows from '../components/Workflows';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { API_URL } from "../../config";
 
 export default function MyWorkflowScreen({ navigation }) {
   const [workflows, setWorkflows] = useState([]);
-  const API_URL = 'http://10.18.207.151:8080';
   const [userData, setUserData] = useState(null);
 
   const getWorkflows = async () => {

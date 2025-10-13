@@ -4,11 +4,11 @@ import OAuthButton from '../components/OauthButton';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { API_URL } from "../../config";
 
 export default function ServiceScreen() {
   const [services, setServices] = useState([]);
   const [statuses, setStatuses] = useState({});
-  const API_URL = 'http://10.18.207.151:8080';
 
   const fetchStatus = async (serviceName) => {
     const token = await AsyncStorage.getItem('userToken');
@@ -37,8 +37,8 @@ export default function ServiceScreen() {
       for (const service of res.data.services) {
         newStatuses[service.provider] = await fetchStatus(service.provider);
       }
-      console.log(newStatuses);
       setStatuses(newStatuses);
+      console.log(res.data.services);
     };
     fetchServices();
   }, []);

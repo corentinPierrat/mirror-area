@@ -4,8 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
 import Verifcode from './../screens/Verifcode';
 import { t } from 'i18next';
-
-const API_URL = 'http://10.18.207.151:8080';
+import { API_URL } from "../../config";
 
 const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');

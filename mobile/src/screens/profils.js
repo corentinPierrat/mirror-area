@@ -7,9 +7,7 @@ import axios from 'axios';
 import "../components/i18n";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from '../components/LanguageSwitcher';
-
-
-const API_URL = 'http://10.18.207.151:8080';
+import { API_URL } from "../../config";
 
 const ProfileDashboard = ({ navigation }) => {
   const { t } = useTranslation();

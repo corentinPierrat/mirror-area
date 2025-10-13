@@ -5,9 +5,10 @@ import { BlurView } from 'expo-blur';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { Modal } from 'react-native';
+import { useEffect } from 'react/cjs/react.development';
+import { API_URL } from "../../config";
 
 export default function CreateWorkflowScreen() {
-  const API_URL = 'http://10.18.207.151:8080';
   const [actions, setActions] = useState([]);
   const [selectedAction, setSelectedAction] = useState(null);
   const [WorkflowName, setWorkflowName] = useState('');
@@ -22,6 +23,7 @@ export default function CreateWorkflowScreen() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(true);
+  const [URLs, setURLs] = useState([]);
 
   const fetchActions = async () => {
     setMessage('');
@@ -101,7 +103,7 @@ export default function CreateWorkflowScreen() {
     setMessage('Sélectionner une action et une réaction.');
     return;
   }
-
+    setLoading(true);
   try {
     const token = await AsyncStorage.getItem('userToken');
     if (!token) {
@@ -132,12 +134,40 @@ export default function CreateWorkflowScreen() {
       headers: { Authorization: `Bearer ${token}` },
     });
     setIsError(false);
+    setLoading(false);
     setMessage("Workflow créé avec succès !");
   } catch (error) {
+    setLoading(false);
     setIsError(true);
     setMessage("Impossible de créer le workflow.");
   }
 };
+
+  const getURL = async () => {
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) {
+      navigate('Login');
+      return;
+    }
+    try {
+      const res = await axios.get(`${API_URL}/oauth/services`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      const urls = res.data.services.map(s => ({
+        provider: s.provider,
+        logo_url: s.logo_url,
+      }));
+      console.log('Liste des URLs :', urls);
+      setURLs(urls);
+      } catch (error) {
+        setIsError(true);
+        setMessage("Erreur lors de la récupération des services.");
+      }
+  };
+
+useEffect(() => {
+  getURL();
+}, []);
 
   return (
     <LinearGradient colors={['#171542', '#2f339e']} style={styles.container}>
@@ -158,7 +188,7 @@ export default function CreateWorkflowScreen() {
         <View style={styles.content}>
           <TouchableOpacity style={styles.serviceWrapper} onPress={fetchActions}>
             <View style={styles.logoContainer}>
-              <Image source={selectedAction ? require("../../assets/discord.png") : require("../../assets/None.png")} style={styles.logo} />
+              <Image source={selectedAction ? { uri: URLs.find(u => u.provider === selectedAction?.service)?.logo_url} : require("../../assets/None.png")} style={styles.logo}/>
             </View>
             <View style={[styles.badge, styles.badgeAction]}>
               <Text style={styles.badgeText}>{selectedAction?.title || 'Action'}</Text>
@@ -237,7 +267,7 @@ export default function CreateWorkflowScreen() {
 
           <TouchableOpacity style={styles.serviceWrapper} onPress={fetchReactions}>
             <View style={styles.logoContainer}>
-              <Image source={selectedReaction ? require("../../assets/X.png") : require("../../assets/None.png")} style={styles.logo} />
+              <Image source={selectedReaction ? { uri: URLs.find(u => u.provider === selectedReaction?.service)?.logo_url} : require("../../assets/None.png")} style={styles.logo}/>
             </View>
             <View style={[styles.badge, styles.badgeReaction]}>
               <Text style={styles.badgeText}>{selectedReaction?.title || 'Reaction'}</Text>
@@ -314,7 +344,7 @@ export default function CreateWorkflowScreen() {
           <TouchableOpacity style={[styles.addButton, { marginTop: 70, alignSelf: 'center' }]} onPress={createWorkflow}>
             <BlurView style={styles.addButtonBlur} intensity={60} tint="systemUltraThinMaterialDark" />
             <View style={styles.addButtonOverlay} />
-            <Text style={[styles.addButtonIcon, { fontSize: 18 }]}>Créer Workflow</Text>
+            <Text style={[styles.addButtonIcon, { fontSize: 18 }]}>{loading ? 'Création...' : 'Créer Workflow'}</Text>
           </TouchableOpacity>
         </View>
       </View>
