@@ -53,7 +53,20 @@ async def about(request: Request):
         },
         {
             "name": "twitch",
-            "actions": [],
+            "actions": [
+                {
+                    "name": "stream_online",
+                    "description": "Un streamer passe en direct sur Twitch"
+                },
+                {
+                    "name": "new_follow",
+                    "description": "Un utilisateur suit un streamer sur Twitch"
+                },
+                {
+                    "name": "new_subscribe",
+                    "description": "Un utilisateur s'abonne à un streamer sur Twitch"
+                }
+            ],
             "reactions": []
         },
         {
