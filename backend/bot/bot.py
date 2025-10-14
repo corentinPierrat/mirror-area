@@ -1,9 +1,8 @@
 import discord
 import requests
+from app.config import settings
 
-TOKEN = "MTQyNDQxMjQ0NDM4NTc0MjkzOQ.Gqe9lw.5LTCquR1T-iFm8IO1RlLMla6VFqiTbn6OS9WVw"
 BACKEND_URL = "http://localhost:8080/actions/discord"
-BOT_SECRET = "super-secret-bot-token"
 
 intents = discord.Intents.default()
 intents.members = True
@@ -22,7 +21,7 @@ async def on_member_join(member):
         "user_id": str(member.id),
         "message": f"Welcome, {member.name}!"
     }
-    headers = {"bot-token": BOT_SECRET}
+    headers = {"bot-token": settings.BOT_SECRET}
     try:
         response = requests.post(BACKEND_URL, json=payload, headers=headers, timeout=5)
         print(f"Sent event to backend: {response.status_code} {response.text}")
@@ -37,7 +36,7 @@ async def on_member_remove(member):
         "user_id": str(member.id),
         "message": f"Goodbye, {member.name}!"
     }
-    headers = {"bot-token": BOT_SECRET}
+    headers = {"bot-token": settings.BOT_SECRET}
     try:
         response = requests.post(BACKEND_URL, json=payload, headers=headers, timeout=5)
         print(f"Sent event to backend: {response.status_code} {response.text}")
@@ -88,11 +87,11 @@ async def on_member_update(before, after):
             "changes": changes,
             "message": f"{after.display_name} updated: {', '.join(changes)}"
         }
-        headers = {"bot-token": BOT_SECRET}
+        headers = {"bot-token": settings.BOT_SECRET}
         try:
             response = requests.post(BACKEND_URL, json=payload, headers=headers, timeout=5)
             print(f"Sent member update to backend: {response.status_code} {response.text}")
         except Exception as e:
             print(f"Error sending member update to backend: {e}")
 
-client.run(TOKEN)
+client.run(settings.TOKEN_BOT_DISCORD)
