@@ -116,7 +116,7 @@ async def oauth_login(provider: str, request: Request, token: str = Query(None),
         return JSONResponse({"error": "Token invalide"}, status_code=401)
 
     request.session['oauth_user_id'] = user.id
-    redirect_uri = f"http://127.0.0.1:8080/oauth/{provider}/callback"
+    redirect_uri = f"https://trigger.ink/oauth/{provider}/callback"
     return await oauth.create_client(provider).authorize_redirect(request, redirect_uri)
 
 @oauth_router.get("/{provider}/callback")
