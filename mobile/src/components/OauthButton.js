@@ -1,33 +1,36 @@
 import React from 'react';
-import { TouchableOpacity, Text, Image, StyleSheet, View } from 'react-native';
+import { TouchableOpacity, Text, Image, StyleSheet, View, Alert } from 'react-native';
 import { BlurView } from 'expo-blur';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import * as Linking from 'expo-linking';
 import { useNavigation } from '@react-navigation/native';
- import * as WebBrowser from 'expo-web-browser';
 
-const OAuthButton = ({ logo, text, apiRoute, onSuccess, connected }) => {
+const OAuthButton = ({ logo, apiRoute, onSuccess, connected }) => {
   const navigation = useNavigation();
 
-const handlePress = async () => {
-  try {
-    const token = await AsyncStorage.getItem('userToken');
-    if (!token) {
-      navigation.replace('Login');
-      return;
-    }
-    const authUrl = `${apiRoute}?token=${encodeURIComponent(token)}`;
+  const handlePress = async () => {
+    try {
+      const token = await AsyncStorage.getItem('userToken');
+      if (!token) {
+        navigation.replace('Login');
+        return;
+      }
 
-    await Linking.openURL(authUrl);
-
-    if (onSuccess) {
-      onSuccess();
+      if (connected) {
+        await axios.delete(apiRoute, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (onSuccess) onSuccess();
+      } else {
+        const authUrl = `${apiRoute}?token=${encodeURIComponent(token)}`;
+        await Linking.openURL(authUrl);
+      }
+    } catch (error) {
+      console.error('Erreur OAuth:', error);
+      Alert.alert('Erreur', 'Une erreur est survenue.');
     }
-  } catch (error) {
-    console.error('Erreur lors de l\'ouverture OAuth:', error);
-  }
-};
+  };
 
   return (
     <TouchableOpacity
