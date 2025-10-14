@@ -4,7 +4,7 @@ import axios from "axios";
 
 const API_URL = "http://10.18.207.83:8080";
 
-export default function Workflows({ Name, Action, Reactions = [], workflowId, onDelete }) {
+export default function Workflows({ Name, Action, Reactions = [], workflowId, onDelete, onEdit }) {
   const handleDelete = async () => {
     if (!window.confirm("Voulez-vous vraiment supprimer ce workflow ?")) return;
     try {
@@ -37,9 +37,14 @@ export default function Workflows({ Name, Action, Reactions = [], workflowId, on
             ))
           : "Aucune réaction"}
       </p>
-      <button className={styles.deleteButton} onClick={handleDelete}>
-        Supprimer
-      </button>
+      <div className={styles.buttonContainer}>
+        <button className={styles.editButton} onClick={() => onEdit(workflowId)}>
+          Modifier
+        </button>
+        <button className={styles.deleteButton} onClick={handleDelete}>
+          Supprimer
+        </button>
+      </div>
     </div>
   );
 }

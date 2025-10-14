@@ -224,6 +224,10 @@
   border: 2px solid #fff;
 }
 
+.react-flow__controls-button.react-flow__controls-zoomin{
+  background-color: #0056b3;
+}
+
 .nodeAction {
   background: #2a72a2;
 }

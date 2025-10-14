@@ -10,6 +10,7 @@ import TestCatalog from "./components/TestCatalog"
 import Services from "./Services"
 import CreationPage from "./CreationPage"
 import Account from "./Account"
+import EditWorkflowModal from "./components/EditWorkflow"
 
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
         <Route path="/TestCatalog" element={<TestCatalog />} />
         <Route path="/CreationPage" element={<CreationPage />} />
         <Route path="/Account" element={<Account />} />
+        <Route path="/EditWorkflowModal" element={<EditWorkflowModal />} />
       </Routes>
     </Router>
   );

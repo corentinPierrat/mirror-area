@@ -37,7 +37,7 @@ function WorkflowNode({ data, onParamsChange }) {
               });
               newOptions[key] = response.data;
             } catch (error) {
-              console.error(`Erreur lors du chargement des options pour ${key}:`, error);
+              console.error(`Error loading options for ${key}:`, error);
               newOptions[key] = [];
             }
           }
@@ -91,7 +91,7 @@ function WorkflowNode({ data, onParamsChange }) {
       <div className={styles.nodeDescription}>{description}</div>
       {payload_schema && Object.keys(payload_schema).length > 0 && (
         <button onClick={() => setEditing(!editing)} className={styles.editParamsBtn}>
-          {editing ? "Fermer" : (Object.values(params).some(v => v) ? "Modifier" : "Définir les paramètres")}
+          {editing ? "Close" : (Object.values(params).some(v => v) ? "Modify" : "Set settings")}
         </button>
       )}
       {renderParamsForm()}
@@ -204,7 +204,7 @@ export default function CrArea() {
         setConnectedServices(connected);
 
       } catch (error) {
-        console.error("Erreur lors de la récupération des données:", error);
+        console.error("Error receiving data:", error);
       } finally {
         setIsLoading(false);
       }
@@ -228,18 +228,18 @@ export default function CrArea() {
   const onConnect = useCallback((params) => setEdges((eds) => addEdge({ ...params, animated: true }, eds)), [setEdges]);
 
   const handleCreateWorkflow = async () => {
-    if (!workflowName) return alert("Donne un nom à ton workflow !");
-    if (edges.length === 0) return alert("Relie au moins une action à une réaction !");
+    if (!workflowName) return alert("Give your workflow a name");
+    if (edges.length === 0) return alert("Match at least one action to a reaction!");
     const linkedNodes = nodes.filter((n) => edges.some((e) => e.source === n.id || e.target === n.id));
     const steps = linkedNodes.map((n) => ({ type: n.data.type, service: n.data.service, event: n.data.event, params: n.data.params || {} }));
-    const payload = { name: workflowName, description: "Workflow créé depuis ReactFlow", visibility: "private", steps };
+    const payload = { name: workflowName, description: "Workflow created from ReactFlow", visibility: "private", steps };
     try {
       await axios.post(`${API_URL}/workflows/`, payload, { headers: { Authorization: `Bearer ${token}` } });
-      alert("✅ Workflow créé !");
+      alert("Workflow created !");
       setEdges([]); setNodes([]); setWorkflowName("");
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la création du workflow");
+      alert("Error creating workflow");
     }
   };
 
@@ -265,16 +265,16 @@ export default function CrArea() {
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <h2>Blueprint AREA</h2>
-          <input type="text" placeholder="Nom du workflow" value={workflowName} onChange={(e) => setWorkflowName(e.target.value)} className={styles.workflowInput} />
+          <input type="text" placeholder="Workflow name" value={workflowName} onChange={(e) => setWorkflowName(e.target.value)} className={styles.workflowInput} />
         </div>
         <div className={styles.headerRight} ref={menuRef}>
           <button onClick={() => setMenuType("action")} className={styles.btn}>Actions</button>
-          <button onClick={() => setMenuType("reaction")} className={styles.btn}>Réactions</button>
-          <button onClick={() => alert("Fonction de vérification")} className={`${styles.btn} ${styles.btnCheck}`}>Vérifier</button>
-          <button onClick={handleCreateWorkflow} className={`${styles.btn} ${styles.btnSubmit}`}>Envoyer</button>
+          <button onClick={() => setMenuType("reaction")} className={styles.btn}>Reactions</button>
+          <button onClick={() => alert("Verification function")} className={`${styles.btn} ${styles.btnCheck}`}>Verify</button>
+          <button onClick={handleCreateWorkflow} className={`${styles.btn} ${styles.btnSubmit}`}>Send</button>
           {menuType && (
             <div className={styles.menuContainer}>
-              {isLoading ? ( <div className={styles.menuMessage}>Chargement...</div> ) : 
+              {isLoading ? ( <div className={styles.menuMessage}>Loading...</div> ) : 
               Object.keys(groupedMenuItems).length > 0 ? (
                 Object.entries(groupedMenuItems).map(([service, items]) => {
                   const isConnected = connectedServices.includes(service);
@@ -291,7 +291,7 @@ export default function CrArea() {
                     </div>
                   );
                 })
-              ) : ( <div className={styles.menuMessage}>Aucun élément disponible.</div> )}
+              ) : ( <div className={styles.menuMessage}>No items available.</div> )}
             </div>
           )}
         </div>
