@@ -5,9 +5,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import * as Linking from 'expo-linking';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from "react-i18next";
 
 const OAuthButton = ({ logo, apiRoute, onSuccess, connected }) => {
   const navigation = useNavigation();
+  const { t } = useTranslation();
 
   const handlePress = async () => {
     try {
@@ -28,7 +30,6 @@ const OAuthButton = ({ logo, apiRoute, onSuccess, connected }) => {
       }
     } catch (error) {
       console.error('Erreur OAuth:', error);
-      Alert.alert('Erreur', 'Une erreur est survenue.');
     }
   };
 
@@ -54,7 +55,7 @@ const OAuthButton = ({ logo, apiRoute, onSuccess, connected }) => {
 
         <View style={styles.textContainer}>
           <Text style={[styles.status, connected ? styles.statusConnected : styles.statusDisconnected]}>
-            {connected ? 'Connecté' : 'Déconnecté'}
+            {connected ? t("Connected") : t("Disconnected")}
           </Text>
         </View>
 

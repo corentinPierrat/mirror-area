@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { TouchableOpacity, Text, Image, StyleSheet, View, Switch } from 'react-native';
 import { BlurView } from 'expo-blur';
+import { useTranslation } from "react-i18next";
 
 const Workflows = ({ Name, ActionLogo, ReactionLogo, onDelete }) => {
+  const { t } = useTranslation();
   const [isEnabled, setIsEnabled] = useState(false);
   const toggleSwitch = () => setIsEnabled(prev => !prev);
 
@@ -65,7 +67,7 @@ const Workflows = ({ Name, ActionLogo, ReactionLogo, onDelete }) => {
                 isEnabled ? styles.statusActive : styles.statusInactive,
               ]}
             >
-              {isEnabled ? 'Actif' : 'Inactif'}
+              {isEnabled ? t("Actif") : t("Inactif")}
             </Text>
           </View>
 

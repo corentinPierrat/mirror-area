@@ -6,8 +6,10 @@ import Workflows from '../components/Workflows';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { API_URL } from "../../config";
+import { useTranslation } from "react-i18next";
 
 export default function MyWorkflowScreen({ navigation }) {
+  const { t } = useTranslation();
   const [workflows, setWorkflows] = useState([]);
   const [userData, setUserData] = useState(null);
   const [URLs, setURLs] = useState([]);
@@ -43,7 +45,6 @@ export default function MyWorkflowScreen({ navigation }) {
       const response = await axios.get(`${API_URL}/workflows/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log('Workflows récupérés :', response.data);
       setWorkflows(response.data);
     } catch (error) {
       console.error('Erreur lors de la récupération des workflows :', error);
@@ -64,7 +65,6 @@ export default function MyWorkflowScreen({ navigation }) {
       });
       if (response.status === 200) {
         setUserData(response.data);
-        console.log('Données utilisateur mises à jour :', response.data);
       }
     } catch (error) {
       console.error('Erreur lors de la mise à jour des données utilisateur :', error);
@@ -107,7 +107,7 @@ export default function MyWorkflowScreen({ navigation }) {
       style={styles.container}
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.text}>Mes Workflows</Text>
+        <Text style={styles.text}>{t("My Workflows")}</Text>
 
         {workflows.length > 0 ? (
           workflows.map((workflow) => {

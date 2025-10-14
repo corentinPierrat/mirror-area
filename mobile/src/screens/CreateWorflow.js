@@ -7,8 +7,10 @@ import axios from 'axios';
 import { Modal } from 'react-native';
 import { useEffect } from 'react/cjs/react.development';
 import { API_URL } from "../../config";
+import { useTranslation } from "react-i18next";
 
 export default function CreateWorkflowScreen() {
+  const { t } = useTranslation();
   const [actions, setActions] = useState([]);
   const [selectedAction, setSelectedAction] = useState(null);
   const [WorkflowName, setWorkflowName] = useState('');
@@ -62,7 +64,7 @@ export default function CreateWorkflowScreen() {
     setIsReactionModalVisible(true);
     } catch (error) {
       setIsError(true);
-      setMessage('Erreur lors de la récupération des réactions.');
+      setMessage(t("GetReaction"));
     }
   };
 
@@ -100,7 +102,7 @@ export default function CreateWorkflowScreen() {
   const createWorkflow = async () => {
   if (!selectedAction || !selectedReaction) {
     setIsError(true);
-    setMessage('Sélectionner une action et une réaction.');
+    setMessage(t("SelectActionOrReaction"));
     return;
   }
     setLoading(true);
@@ -167,7 +169,7 @@ export default function CreateWorkflowScreen() {
       setURLs(urls);
       } catch (error) {
         setIsError(true);
-        setMessage("Erreur lors de la récupération des services.");
+        setMessage(t("ErreurGetServices"));
       }
   };
 
@@ -177,7 +179,7 @@ useEffect(() => {
 
   return (
     <LinearGradient colors={['#171542', '#2f339e']} style={styles.container}>
-      <Text style={styles.text}>Créer un Workflow</Text>
+      <Text style={styles.text}>{t("Create Workflow")}</Text>
       <View style={styles.workflowContainer}>
         <BlurView style={styles.blurContainer} intensity={80} tint="systemUltraThinMaterialDark" />
         <View style={styles.overlayContainer} />
@@ -230,7 +232,7 @@ useEffect(() => {
                 >
                   <BlurView style={styles.modalButtonBlur} intensity={70} tint="systemUltraThinMaterialDark" />
                   <View style={styles.modalButtonOverlay} />
-                  <Text style={styles.modalButtonText}>Enregistrer</Text>
+                  <Text style={styles.modalButtonText}>{t("Enregistrer")}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -244,7 +246,7 @@ useEffect(() => {
                 <BlurView style={styles.modalBlur} intensity={90} tint="systemUltraThinMaterialDark" />
                 <View style={styles.modalOverlay} />
                 <View style={styles.modalInnerContent}>
-                  <Text style={styles.modalHeaderText}>Sélectionner une action</Text>
+                  <Text style={styles.modalHeaderText}>{t("SelectAction")}</Text>
                   <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
                     {actions.map((action, index) => (
                       <TouchableOpacity key={index} style={styles.modalItemWrapper} onPress={() => handleSelectAction(action)}>
@@ -260,7 +262,7 @@ useEffect(() => {
                   <TouchableOpacity onPress={() => setIsActionModalVisible(false)} style={styles.modalButton}>
                     <BlurView style={styles.modalButtonBlur} intensity={70} tint="systemUltraThinMaterialDark" />
                     <View style={styles.modalButtonOverlay} />
-                    <Text style={styles.modalButtonText}>Fermer</Text>
+                    <Text style={styles.modalButtonText}>{t("Close")}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -286,7 +288,7 @@ useEffect(() => {
                 <BlurView style={styles.modalBlur} intensity={90} tint="systemUltraThinMaterialDark" />
                 <View style={styles.modalOverlay} />
                 <View style={styles.modalInnerContent}>
-                  <Text style={styles.modalHeaderText}>Paramètres de la réaction</Text>
+                  <Text style={styles.modalHeaderText}>{t("ParamReaction")}</Text>
                   <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
                     {selectedReaction && Object.keys(reactionParams).map((key) => (
                       <View key={key} style={styles.paramInputWrapper}>
@@ -309,7 +311,7 @@ useEffect(() => {
                   >
                     <BlurView style={styles.modalButtonBlur} intensity={70} tint="systemUltraThinMaterialDark" />
                     <View style={styles.modalButtonOverlay} />
-                    <Text style={styles.modalButtonText}>Enregistrer</Text>
+                    <Text style={styles.modalButtonText}>{t("Enregistrer")}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -322,7 +324,7 @@ useEffect(() => {
                 <BlurView style={styles.modalBlur} intensity={90} tint="systemUltraThinMaterialDark" />
                 <View style={styles.modalOverlay} />
                 <View style={styles.modalInnerContent}>
-                  <Text style={styles.modalHeaderText}>Sélectionner une réaction</Text>
+                  <Text style={styles.modalHeaderText}>{t("SelectReaction")}</Text>
                   <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
                     {reactions.map((reaction, index) => (
                       <TouchableOpacity key={index} style={styles.modalItemWrapper} onPress={() => handleSelectReaction(reaction)}>
@@ -338,7 +340,7 @@ useEffect(() => {
                   <TouchableOpacity onPress={() => setIsReactionModalVisible(false)} style={styles.modalButton}>
                     <BlurView style={styles.modalButtonBlur} intensity={70} tint="systemUltraThinMaterialDark" />
                     <View style={styles.modalButtonOverlay} />
-                    <Text style={styles.modalButtonText}>Fermer</Text>
+                    <Text style={styles.modalButtonText}>{t("Close")}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
