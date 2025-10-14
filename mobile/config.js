@@ -1,1 +1,1 @@
-export const API_URL = "http://10.18.207.83:8080";
+export const API_URL = "https://trigger.ink";

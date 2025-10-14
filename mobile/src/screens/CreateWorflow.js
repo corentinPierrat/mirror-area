@@ -209,7 +209,7 @@ useEffect(() => {
               <BlurView style={styles.modalBlur} intensity={90} tint="systemUltraThinMaterialDark" />
               <View style={styles.modalOverlay} />
               <View style={styles.modalInnerContent}>
-                <Text style={styles.modalHeaderText}>Paramètres de l'action</Text>
+                <Text style={styles.modalHeaderText}>{t("ParamAction")}</Text>
                 <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
                   {selectedAction && Object.keys(actionParams).map((key) => (
                     <View key={key} style={styles.paramInputWrapper}>
@@ -352,7 +352,7 @@ useEffect(() => {
           <TouchableOpacity style={[styles.addButton, { marginTop: 70, alignSelf: 'center' }]} onPress={createWorkflow}>
             <BlurView style={styles.addButtonBlur} intensity={60} tint="systemUltraThinMaterialDark" />
             <View style={styles.addButtonOverlay} />
-            <Text style={[styles.addButtonIcon, { fontSize: 18 }]}>{loading ? 'Création...' : 'Créer Workflow'}</Text>
+            <Text style={[styles.addButtonIcon, { fontSize: 18 }]}>{loading ? (t("Create Workflow") + '...') : t("Create Workflow")}</Text>
           </TouchableOpacity>
         </View>
       </View>
