@@ -3,6 +3,7 @@
     color: white;
     padding: 50px 20px 20px;
     margin-bottom: 100px;
+    margin-top: 200px;
     font-family: 'Arial', sans-serif;
     padding: 0% 20%;
   }
@@ -14,7 +15,6 @@
     max-width: 1200px;
     padding: 0 20px;
     margin: 0 auto;
-    margin-top: 30px;
     justify-content: space-between;
   }
   

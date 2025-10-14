@@ -91,3 +91,91 @@
     justify-content: center;
   }
   
+  .servicesContainer {
+    text-align: center;
+    padding: 2rem;
+  }
+  
+  .servicesTitle {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+  }
+  
+  .oauthList {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+  }
+  
+  .serviceCard {
+    background: #1a1a1a;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    width: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+  }
+  
+  .serviceCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 16px rgba(255, 255, 255, 0.2);
+  }
+  
+  .serviceLogo {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    margin-bottom: 1rem;
+  }
+  
+  .serviceName {
+    color: white;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    text-transform: capitalize;
+  }
+  
+  .statusConnected {
+    color: #00ff88;
+    font-weight: bold;
+  }
+  
+  .statusDisconnected {
+    color: #ff5252;
+    font-weight: bold;
+  }
+  
+  .connectBtn,
+  .disconnectBtn {
+    margin-top: 0.8rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    border: none;
+  }
+  
+  .connectBtn {
+    background-color: #00ff88;
+    color: #000;
+  }
+  
+  .connectBtn:hover {
+    background-color: #00cc6a;
+  }
+  
+  .disconnectBtn {
+    background-color: #ff5252;
+    color: #fff;
+  }
+  
+  .disconnectBtn:hover {
+    background-color: #e64545;
+  }
+  

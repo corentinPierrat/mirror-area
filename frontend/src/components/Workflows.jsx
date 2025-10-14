@@ -2,9 +2,9 @@ import React from "react";
 import styles from "../styles/Workflows.module.css";
 import axios from "axios";
 
-const API_URL = "http://10.18.207.151:8080";
+const API_URL = "http://10.18.207.83:8080";
 
-export default function Workflows({ Name, Action, Reaction, workflowId, onDelete }) {
+export default function Workflows({ Name, Action, Reactions = [], workflowId, onDelete, onEdit }) {
   const handleDelete = async () => {
     if (!window.confirm("Voulez-vous vraiment supprimer ce workflow ?")) return;
     try {
@@ -27,10 +27,24 @@ export default function Workflows({ Name, Action, Reaction, workflowId, onDelete
     <div className={styles.workflowCard}>
       <h2 className={styles.workflowName}>{Name}</h2>
       <p><strong>Action :</strong> {Action}</p>
-      <p><strong>Reaction :</strong> {Reaction}</p>
-      <button className={styles.deleteButton} onClick={handleDelete}>
-        Supprimer
-      </button>
+      <p>
+        <strong>Réactions :</strong>{" "}
+        {Reactions.length > 0
+          ? Reactions.map((r, i) => (
+              <span key={i}>
+                {r.service} - {r.event}{i < Reactions.length - 1 ? ", " : ""}
+              </span>
+            ))
+          : "Aucune réaction"}
+      </p>
+      <div className={styles.buttonContainer}>
+        <button className={styles.editButton} onClick={() => onEdit(workflowId)}>
+          Modifier
+        </button>
+        <button className={styles.deleteButton} onClick={handleDelete}>
+          Supprimer
+        </button>
+      </div>
     </div>
   );
 }

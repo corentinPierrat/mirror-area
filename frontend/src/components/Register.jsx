@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "../styles/Register.module.css";
 
-const API_URL = "http://10.18.207.151:8080";
+const API_URL = "http://10.18.207.83:8080";
 
 export default function Register() {
   const navigate = useNavigate();

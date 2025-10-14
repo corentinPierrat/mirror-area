@@ -2,13 +2,16 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "../styles/MyWorkflows.module.css";
 import Workflows from "./Workflows";
+import EditWorkflowModal from './EditWorkflow';
 
-const API_URL = "http://10.18.207.151:8080";
+const API_URL = "http://10.18.207.83:8080";
 
 export default function MyWorkflow() {
   const [workflows, setWorkflows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  
+  const [editingWorkflowId, setEditingWorkflowId] = useState(null);
 
   const getWorkflows = async () => {
     setLoading(true);
@@ -23,11 +26,12 @@ export default function MyWorkflow() {
 
       const data = (res.data || []).map((wf) => {
         const actionStep = wf.steps?.find((s) => s.type === "action") || {};
-        const reactionStep = wf.steps?.find((s) => s.type === "reaction") || {};
+        const reactionSteps = wf.steps?.filter((s) => s.type === "reaction") || [];
+
         return {
           ...wf,
           action: actionStep,
-          reaction: reactionStep,
+          reactions: reactionSteps,
         };
       });
 
@@ -44,29 +48,65 @@ export default function MyWorkflow() {
     getWorkflows();
   }, []);
 
+  const handleEdit = (id) => {
+    console.log("Tentative d'édition avec l'ID :", id);
+    setEditingWorkflowId(id);
+  };
+
+  const handleCloseModal = () => {
+    setEditingWorkflowId(null);
+  };
+
+  const handleSave = () => {
+    setEditingWorkflowId(null);
+    getWorkflows();
+  };
+
   if (loading) return <p className={styles.loading}>Chargement...</p>;
   if (error) return <p className={styles.error}>{error}</p>;
 
-  return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>Mes Workflows</h1>
+  // Fichier : MyWorkflows.js
+// ... (le reste du code est bon)
 
-      {workflows.length > 0 ? (
-        <div className={styles.workflowList}>
-          {workflows.map((workflow) => (
-            <Workflows
+return (
+  <div className={styles.container}>
+    <h1 className={styles.title}>Mes Workflows</h1>
+
+    {workflows.length > 0 ? (
+      <div className={styles.workflowList}>
+        {workflows.map((workflow) => (
+          <Workflows
+            // --- CORRECTIONS ICI ---
             key={workflow.id}
             workflowId={workflow.id}
+            // -----------------------
             Name={workflow.name}
-            Action={workflow.action ? `${workflow.action.service} - ${workflow.action.event}` : "Action inconnue"}
-            Reaction={workflow.reaction ? `${workflow.reaction.service} - ${workflow.reaction.event}` : "Reaction inconnue"}
-            onDelete={(id) => setWorkflows((prev) => prev.filter((w) => w.id !== id))}
-          />          
-          ))}
-        </div>
-      ) : (
-        <p className={styles.noWorkflows}>Aucun workflow disponible.</p>
-      )}
-    </div>
-  );
+            Action={
+              workflow.action
+                ? `${workflow.action.service} - ${workflow.action.event}`
+                : "Action inconnue"
+            }
+            Reactions={workflow.reactions || []} 
+            onDelete={(id) =>
+              // --- CORRECTION ICI AUSSI ---
+              setWorkflows((prev) => prev.filter((w) => w.id !== id))
+            }
+            onEdit={handleEdit} 
+          />
+        ))}
+      </div>
+    ) : (
+      <p className={styles.noWorkflows}>Aucun workflow disponible.</p>
+    )}
+
+    {/* Le reste du code est bon */}
+    {editingWorkflowId && (
+      <EditWorkflowModal
+        workflowId={editingWorkflowId}
+        onClose={handleCloseModal}
+        onSave={handleSave}
+      />
+    )}
+  </div>
+);
 }
