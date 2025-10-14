@@ -3,8 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-nativ
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import axios from 'axios';
-
-const API_URL = 'http://10.18.207.151:8080';
+import { API_URL } from "../../config";
 
 import { useNavigation } from '@react-navigation/native';
 

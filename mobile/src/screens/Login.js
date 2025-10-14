@@ -6,8 +6,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import "../components/i18n";
 import { useTranslation } from "react-i18next";
-
-const API_URL = 'http://10.18.207.151:8080';
+import { API_URL } from "../../config";
 
 const LoginScreen = ({ navigation }) => {
   const { t } = useTranslation();

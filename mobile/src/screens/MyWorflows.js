@@ -1,14 +1,36 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { ScrollView, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Workflows from '../components/Workflows';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { API_URL } from "../../config";
 
 export default function MyWorkflowScreen({ navigation }) {
   const [workflows, setWorkflows] = useState([]);
-  const API_URL = 'http://10.18.207.151:8080';
   const [userData, setUserData] = useState(null);
+  const [URLs, setURLs] = useState([]);
+
+  const getURLs = async () => {
+  try {
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) {
+      navigation.replace('Login');
+      return;
+    }
+    const res = await axios.get(`${API_URL}/oauth/services`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const urls = res.data.services.map(s => ({
+      provider: s.provider,
+      logo_url: s.logo_url,
+    }));
+    setURLs(urls);
+  } catch (error) {
+    console.error('Erreur lors de la récupération des logos :', error);
+  }
+};
 
   const getWorkflows = async () => {
     try {
@@ -69,10 +91,13 @@ export default function MyWorkflowScreen({ navigation }) {
     }
   };
 
-  useEffect(() => {
-    getWorkflows();
-    handleUpdateProfile();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getWorkflows();
+      handleUpdateProfile();
+      getURLs();
+    }, [])
+  );
 
   return (
     <LinearGradient
@@ -85,15 +110,23 @@ export default function MyWorkflowScreen({ navigation }) {
         <Text style={styles.text}>Mes Workflows</Text>
 
         {workflows.length > 0 ? (
-          workflows.map((workflow) => (
-            <Workflows
-              key={workflow.id}
-              Name={workflow.name}
-              Action={"Discord"}
-              Reaction={"X"}
-              onDelete={() => handleDeleteWorkflow(workflow.id)}
-            />
-          ))
+          workflows.map((workflow) => {
+            const actionService = workflow.steps?.find(s => s.type === 'action')?.service;
+            const reactionService = workflow.steps?.find(s => s.type === 'reaction')?.service;
+
+            const actionLogo = URLs.find(u => u.provider === actionService)?.logo_url;
+            const reactionLogo = URLs.find(u => u.provider === reactionService)?.logo_url;
+
+            return (
+              <Workflows
+                key={workflow.id}
+                Name={workflow.name}
+                ActionLogo={actionLogo}
+                ReactionLogo={reactionLogo}
+                onDelete={() => handleDeleteWorkflow(workflow.id)}
+              />
+            );
+          })
         ) : (
           <Text style={{ color: '#fff', marginTop: 20 }}>Aucun workflow disponible.</Text>
         )}

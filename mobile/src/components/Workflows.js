@@ -2,35 +2,13 @@ import React, { useState } from 'react';
 import { TouchableOpacity, Text, Image, StyleSheet, View, Switch } from 'react-native';
 import { BlurView } from 'expo-blur';
 
-const Workflows = ({ Name, Action, Reaction, onDelete }) => {
+const Workflows = ({ Name, ActionLogo, ReactionLogo, onDelete }) => {
   const [isEnabled, setIsEnabled] = useState(false);
-  const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+  const toggleSwitch = () => setIsEnabled(prev => !prev);
 
   const handleDelete = () => {
     if (onDelete) onDelete();
   };
-
-  const getServiceImage = (service) => {
-    switch (service) {
-      case "Spotify":
-        return require('../../assets/Spotify.png');
-      case "Outlook":
-        return require('../../assets/outlook.png');
-      case "Steam":
-        return require('../../assets/steam.jpeg');
-      case "Faceit":
-        return require('../../assets/faceit.png');
-      case "X":
-        return require('../../assets/X.png');
-      case "Discord":
-        return require('../../assets/discord.png');
-      default:
-        return null;
-    }
-  };
-
-  const imageAction = getServiceImage(Action);
-  const imageReaction = getServiceImage(Reaction);
 
   return (
     <View style={styles.workflowWrapper}>
@@ -44,10 +22,13 @@ const Workflows = ({ Name, Action, Reaction, onDelete }) => {
 
       <View style={styles.content}>
         <View style={styles.servicesRow}>
-          {imageAction && (
+          {ActionLogo && (
             <View style={styles.serviceContainer}>
               <View style={styles.logoContainer}>
-                <Image source={imageAction} style={styles.logo} />
+                <Image
+                  source={{ uri: ActionLogo || 'https://via.placeholder.com/40' }}
+                  style={styles.logo}
+                />
               </View>
             </View>
           )}
@@ -56,10 +37,13 @@ const Workflows = ({ Name, Action, Reaction, onDelete }) => {
             <Text style={styles.arrowText}>→</Text>
           </View>
 
-          {imageReaction && (
+          {ReactionLogo && (
             <View style={styles.serviceContainer}>
               <View style={styles.logoContainer}>
-                <Image source={imageReaction} style={styles.logo} />
+                <Image
+                  source={{ uri: ReactionLogo || 'https://via.placeholder.com/40' }}
+                  style={styles.logo}
+                />
               </View>
             </View>
           )}
@@ -69,8 +53,18 @@ const Workflows = ({ Name, Action, Reaction, onDelete }) => {
 
         <View style={styles.controlsRow}>
           <View style={styles.statusContainer}>
-            <View style={[styles.indicator, isEnabled ? styles.indicatorActive : styles.indicatorInactive]} />
-            <Text style={[styles.statusText, isEnabled ? styles.statusActive : styles.statusInactive]}>
+            <View
+              style={[
+                styles.indicator,
+                isEnabled ? styles.indicatorActive : styles.indicatorInactive,
+              ]}
+            />
+            <Text
+              style={[
+                styles.statusText,
+                isEnabled ? styles.statusActive : styles.statusInactive,
+              ]}
+            >
               {isEnabled ? 'Actif' : 'Inactif'}
             </Text>
           </View>
@@ -84,11 +78,7 @@ const Workflows = ({ Name, Action, Reaction, onDelete }) => {
             style={styles.switch}
           />
 
-          <TouchableOpacity
-            onPress={handleDelete}
-            activeOpacity={0.7}
-            style={styles.deleteButton}
-          >
+          <TouchableOpacity onPress={handleDelete} activeOpacity={0.7} style={styles.deleteButton}>
             <Text style={styles.deleteIcon}>🗑️</Text>
           </TouchableOpacity>
         </View>
