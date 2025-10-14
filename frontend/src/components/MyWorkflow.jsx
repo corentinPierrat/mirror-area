@@ -3,7 +3,7 @@ import axios from "axios";
 import styles from "../styles/MyWorkflows.module.css";
 import Workflows from "./Workflows";
 
-const API_URL = "http://10.18.207.151:8080";
+const API_URL = "http://10.18.207.83:8080";
 
 export default function MyWorkflow() {
   const [workflows, setWorkflows] = useState([]);
@@ -23,11 +23,12 @@ export default function MyWorkflow() {
 
       const data = (res.data || []).map((wf) => {
         const actionStep = wf.steps?.find((s) => s.type === "action") || {};
-        const reactionStep = wf.steps?.find((s) => s.type === "reaction") || {};
+        const reactionSteps = wf.steps?.filter((s) => s.type === "reaction") || [];
+
         return {
           ...wf,
           action: actionStep,
-          reaction: reactionStep,
+          reactions: reactionSteps,
         };
       });
 
@@ -55,13 +56,19 @@ export default function MyWorkflow() {
         <div className={styles.workflowList}>
           {workflows.map((workflow) => (
             <Workflows
-            key={workflow.id}
-            workflowId={workflow.id}
-            Name={workflow.name}
-            Action={workflow.action ? `${workflow.action.service} - ${workflow.action.event}` : "Action inconnue"}
-            Reaction={workflow.reaction ? `${workflow.reaction.service} - ${workflow.reaction.event}` : "Reaction inconnue"}
-            onDelete={(id) => setWorkflows((prev) => prev.filter((w) => w.id !== id))}
-          />          
+              key={workflow.id}
+              workflowId={workflow.id}
+              Name={workflow.name}
+              Action={
+                workflow.action
+                  ? `${workflow.action.service} - ${workflow.action.event}`
+                  : "Action inconnue"
+              }
+              Reactions={workflow.reactions || []} 
+              onDelete={(id) =>
+                setWorkflows((prev) => prev.filter((w) => w.id !== id))
+              }
+            />
           ))}
         </div>
       ) : (

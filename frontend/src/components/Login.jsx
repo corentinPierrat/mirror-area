@@ -3,7 +3,7 @@ import styles from "../styles/Login.module.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = "http://10.18.207.151:8080";
+const API_URL = "http://10.18.207.83:8080";
 
 export default function Login() {
   const navigate = useNavigate();

@@ -1,0 +1,57 @@
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import styles from "../styles/ProfileBubble.module.css";
+
+const API_URL = "http://10.18.207.83:8080";
+
+export default function ProfileBubble() {
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState("");
+  const token = localStorage.getItem("userToken");
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUser(res.data);
+      } catch (err) {
+        console.error("Erreur chargement profil:", err);
+        setError("Impossible de charger le profil.");
+      }
+    };
+    fetchUser();
+  }, []);
+
+  if (error) {
+    return <div className={styles.error}>{error}</div>;
+  }
+
+  if (!user) {
+    return <div className={styles.loading}>Chargement...</div>;
+  }
+
+  const avatarUrl = `https://api.dicebear.com/7.x/identicon/svg?seed=${user.username}`;
+
+  return (
+    <div
+      className={styles.bubble}
+      style={{
+        backgroundImage: `linear-gradient(
+          rgba(120, 0, 255, 0.5),
+          rgba(60, 0, 150, 0.6)
+        ), url('${avatarUrl}')`,
+      }}
+    >
+      <div className={styles.overlay}>
+        <div className={styles.info}>
+          <h2>Welcome back !</h2>
+          <h2 className={styles.username}>{user.username}</h2>
+          <h3>{user.email}</h3>
+          <p>Start with new area !</p>
+        </div>
+      </div>
+    </div>
+  );
+}

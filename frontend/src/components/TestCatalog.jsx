@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-const API_URL = "http://10.18.207.151:8080";
+const API_URL = "http://10.18.207.83:8080";
 
 export default function TestCatalog() {
   const [actions, setActions] = useState([]);

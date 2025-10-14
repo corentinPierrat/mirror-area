@@ -3,7 +3,7 @@ import Header from './components/Header';
 import HeaderDashboard from './components/HeaderDashboard';
 import Footer from './components/Footer';
 import Crarea from './components/Cr-area';
-import styles from "./styles/Dashboard.module.css";
+import styles from "./styles/CreationPage.module.css";
 
 export default function CreationPage() {
   return (
@@ -20,8 +20,8 @@ export default function CreationPage() {
           <Crarea />
         </main>
       </div>
-
       <Footer />
+
     </div>
   );
 }
