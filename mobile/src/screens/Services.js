@@ -24,6 +24,22 @@ export default function ServiceScreen() {
     }
   };
 
+
+  const loadServices = async () => {
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) return;
+    const res = await axios.get(`${API_URL}/oauth/services`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setServices(res.data.services);
+
+    const newStatuses = {};
+    for (const service of res.data.services) {
+      newStatuses[service.provider] = await fetchStatus(service.provider);
+    }
+    setStatuses(newStatuses);
+  };
+
   useEffect(() => {
     const fetchServices = async () => {
       const token = await AsyncStorage.getItem('userToken');
@@ -41,21 +57,27 @@ export default function ServiceScreen() {
       console.log(res.data.services);
     };
     fetchServices();
+    loadServices();
   }, []);
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <LinearGradient colors={['#171542', '#2f339e']} style={styles.container}>
-        {services.map((service) => (
-          <OAuthButton
-            key={service.provider}
-            logo={{ uri: service.logo_url }}
-            apiRoute={`${API_URL}/oauth/${service.provider}/login`}
-            connected={statuses[service.provider] || false}
-          />
-        ))}
-      </LinearGradient>
-    </ScrollView>
+    <LinearGradient colors={['#171542', '#2f339e']} style={styles.container}>
+     {services.map((service) => {
+      const isConnected = statuses[service.provider] || false;
+      const route = `${API_URL}/oauth/${service.provider}/${isConnected ? 'disconnect' : 'login'}`;
+      return (
+        <OAuthButton
+          key={service.provider}
+          logo={{ uri: service.logo_url }}
+          apiRoute={route}
+          connected={isConnected}
+          onSuccess={loadServices}
+        />
+      );
+    })}
+    </LinearGradient>
+  </ScrollView>
   );
 }
 
