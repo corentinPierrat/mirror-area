@@ -20,6 +20,67 @@ ACTIONS_CATALOG = {
         },
         "description": "Triggers when a member joins the specified Discord server."
     },
+    "discord.member_remove": {
+        "title": "A member leaves the Discord server",
+        "service": "discord",
+        "event": "member_remove",
+        "payload_schema": {
+            "guild_id": {
+                "type": "string",
+                "label": "Server ID"
+            }
+        },
+        "description": "Triggers when a member leaves the specified Discord server."
+    },
+    "discord.member_update": {
+        "title": "A member updates their nickname",
+        "service": "discord",
+
+        "event": "member_update",
+        "payload_schema": {
+            "guild_id": {
+                "type": "string",
+                "label": "Server ID"
+            }
+        },
+        "description": "Triggers when a member changes their nickname in the specified Discord server."
+    },
+    "twitch.stream_online": {
+        "title": "Stream goes live",
+        "service": "twitch",
+        "event": "stream.online",
+        "payload_schema": {
+            "broadcaster_username": {
+                "type": "string",
+                "label": "Streamer Username"
+            }
+        },
+        "description": "Triggers when a Twitch stream goes live."
+    },
+    "twitch.new_follow": {
+        "title": "New follower",
+        "service": "twitch",
+        "event": "channel.follow",
+        "payload_schema": {
+            "broadcaster_username": {
+                "type": "string",
+                "label": "Streamer Username"
+            }
+        },
+        "description": "Triggers when someone follows the channel."
+    },
+    "twitch.new_subscriber": {
+        "title": "New subscriber",
+        "service": "twitch",
+        "event": "channel.subscribe",
+        "payload_schema": {
+            "broadcaster_username": {
+                "type": "string",
+                "label": "Streamer Username"
+            }
+        },
+        "description": "Triggers when someone subscribes to the channel."
+    }
 }
 
 REACTIONS_CATALOG = {

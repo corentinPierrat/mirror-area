@@ -28,6 +28,9 @@ class Settings:
         self.GOOGLE_CLIENT_SECRET: str = os.getenv("GOOGLE_CLIENT_SECRET")
         self.TWITCH_CLIENT_ID: str = os.getenv("TWITCH_CLIENT_ID")
         self.TWITCH_CLIENT_SECRET: str = os.getenv("TWITCH_CLIENT_SECRET")
+        self.TOKEN_BOT_DISCORD: str = os.getenv("TOKEN_BOT_DISCORD")
+        self.BOT_SECRET: str = os.getenv("BOT_SECRET")
+        self.TWITCH_WEBHOOK_SECRET: str = os.getenv("TWITCH_WEBHOOK_SECRET")
 
     @property
     def DATABASE_URL(self) -> str:
