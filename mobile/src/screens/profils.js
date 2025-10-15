@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   logoutButton: {
-    padding: 75,
+    width: '81%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
