@@ -248,17 +248,33 @@ useEffect(() => {
                 <View style={styles.modalInnerContent}>
                   <Text style={styles.modalHeaderText}>{t("SelectAction")}</Text>
                   <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
-                    {actions.map((action, index) => (
-                      <TouchableOpacity key={index} style={styles.modalItemWrapper} onPress={() => handleSelectAction(action)}>
-                        <BlurView style={styles.modalItemBlur} intensity={50} tint="systemUltraThinMaterialDark" />
-                        <View style={styles.modalItemOverlay} />
-                        <View style={styles.modalItemContent}>
-                          <Text style={styles.modalTitle}>{action?.title || 'Titre inconnu'}</Text>
-                          <Text style={styles.modalDesc}>{action?.description || 'Description indisponible'}</Text>
-                        </View>
-                      </TouchableOpacity>
+                    {Object.entries(
+                      actions.reduce((acc, action) => {
+                        if (!acc[action.service]) acc[action.service] = [];
+                        acc[action.service].push(action);
+                        return acc;
+                      }, {})
+                    ).map(([service, serviceActions]) => (
+                      <View key={service}>
+                        <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700', marginVertical: 10 }}>{service.charAt(0).toUpperCase() + service.slice(1)}</Text>
+                        {serviceActions.map((action, index) => (
+                          <TouchableOpacity
+                            key={index}
+                            style={styles.modalItemWrapper}
+                            onPress={() => handleSelectAction(action)}
+                          >
+                            <BlurView style={styles.modalItemBlur} intensity={50} tint="systemUltraThinMaterialDark" />
+                            <View style={styles.modalItemOverlay} />
+                            <View style={styles.modalItemContent}>
+                              <Text style={styles.modalTitle}>{action?.title || 'Titre inconnu'}</Text>
+                              <Text style={styles.modalDesc}>{action?.description || 'Description indisponible'}</Text>
+                            </View>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
                     ))}
                   </ScrollView>
+
                   <TouchableOpacity onPress={() => setIsActionModalVisible(false)} style={styles.modalButton}>
                     <BlurView style={styles.modalButtonBlur} intensity={70} tint="systemUltraThinMaterialDark" />
                     <View style={styles.modalButtonOverlay} />
@@ -268,6 +284,7 @@ useEffect(() => {
               </View>
             </View>
           </Modal>
+
 
           <View style={styles.connectorWrapper}>
             <View style={styles.connectorLine} />
@@ -326,15 +343,32 @@ useEffect(() => {
                 <View style={styles.modalInnerContent}>
                   <Text style={styles.modalHeaderText}>{t("SelectReaction")}</Text>
                   <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
-                    {reactions.map((reaction, index) => (
-                      <TouchableOpacity key={index} style={styles.modalItemWrapper} onPress={() => handleSelectReaction(reaction)}>
-                        <BlurView style={styles.modalItemBlur} intensity={50} tint="systemUltraThinMaterialDark" />
-                        <View style={styles.modalItemOverlay} />
-                        <View style={styles.modalItemContent}>
-                          <Text style={styles.modalTitle}>{reaction?.title || 'Titre inconnu'}</Text>
-                          <Text style={styles.modalDesc}>{reaction?.description || 'Description indisponible'}</Text>
-                        </View>
-                      </TouchableOpacity>
+                    {Object.entries(
+                      reactions.reduce((acc, reaction) => {
+                        if (!acc[reaction.service]) acc[reaction.service] = [];
+                        acc[reaction.service].push(reaction);
+                        return acc;
+                      }, {})
+                    ).map(([service, serviceReactions]) => (
+                      <View key={service}>
+                        <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700', marginVertical: 10 }}>
+                          {service.charAt(0).toUpperCase() + service.slice(1)}
+                        </Text>
+                        {serviceReactions.map((reaction, index) => (
+                          <TouchableOpacity
+                            key={index}
+                            style={styles.modalItemWrapper}
+                            onPress={() => handleSelectReaction(reaction)}
+                          >
+                            <BlurView style={styles.modalItemBlur} intensity={50} tint="systemUltraThinMaterialDark" />
+                            <View style={styles.modalItemOverlay} />
+                            <View style={styles.modalItemContent}>
+                              <Text style={styles.modalTitle}>{reaction?.title || 'Titre inconnu'}</Text>
+                              <Text style={styles.modalDesc}>{reaction?.description || 'Description indisponible'}</Text>
+                            </View>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
                     ))}
                   </ScrollView>
                   <TouchableOpacity onPress={() => setIsReactionModalVisible(false)} style={styles.modalButton}>
