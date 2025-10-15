@@ -7,7 +7,6 @@ from fastapi import HTTPException
 async def get_twitch_user_id(db: Session, user_id: int, username_streamer: str) -> str:
     token = await refresh_oauth_token(db, user_id, "twitch")
     if not token:
-        print("❌ [TWITCH] User not connected to Twitch")
         raise HTTPException(status_code=401, detail="User not connected to Twitch")
 
     headers = {
@@ -26,11 +25,25 @@ async def get_twitch_user_id(db: Session, user_id: int, username_streamer: str) 
     user = data["data"][0]
     return user["id"]
 
-async def create_twitch_webhook(db: Session, user_id: int, event_type: str, broadcaster_id: str):
+async def get_app_access_token() -> str:
+    response = requests.post(
+        "https://id.twitch.tv/oauth2/token",
+        params={
+            "client_id": settings.TWITCH_CLIENT_ID,
+            "client_secret": settings.TWITCH_CLIENT_SECRET,
+            "grant_type": "client_credentials"
+        }
+    )
+    if response.status_code != 200:
+        raise Exception(f"Failed to get app access token: {response.text}")
+    data = response.json()
+    return data["access_token"]
 
+async def create_twitch_webhook(event_type: str, broadcaster_id: str):
+    app_token = await get_app_access_token()
 
     headers = {
-        "Authorization": f"Bearer {settings.TWITCH_CLIENT_SECRET}",
+        "Authorization": f"Bearer {app_token}",
         "Client-Id": settings.TWITCH_CLIENT_ID,
         "Content-Type": "application/json"
     }
