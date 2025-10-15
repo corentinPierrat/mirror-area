@@ -50,7 +50,7 @@ ACTIONS_CATALOG = {
         "service": "twitch",
         "event": "stream.online",
         "payload_schema": {
-            "broadcaster_username": {
+            "username_streamer": {
                 "type": "string",
                 "label": "Streamer Username"
             }
@@ -62,7 +62,7 @@ ACTIONS_CATALOG = {
         "service": "twitch",
         "event": "channel.follow",
         "payload_schema": {
-            "broadcaster_username": {
+            "username_streamer": {
                 "type": "string",
                 "label": "Streamer Username"
             }
@@ -74,7 +74,7 @@ ACTIONS_CATALOG = {
         "service": "twitch",
         "event": "channel.subscribe",
         "payload_schema": {
-            "broadcaster_username": {
+            "username_streamer": {
                 "type": "string",
                 "label": "Streamer Username"
             }
