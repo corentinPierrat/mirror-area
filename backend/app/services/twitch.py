@@ -56,7 +56,7 @@ async def create_twitch_webhook(event_type: str, broadcaster_id: str):
         },
         "transport": {
             "method": "webhook",
-            "callback": "http://localhost:8080/actions/twitch",
+            "callback": "https://trigger.ink/actions/twitch",
             "secret": settings.TWITCH_WEBHOOK_SECRET
         }
     }
