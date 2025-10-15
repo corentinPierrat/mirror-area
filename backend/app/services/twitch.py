@@ -7,6 +7,7 @@ from fastapi import HTTPException
 async def get_twitch_user_id(db: Session, user_id: int, username_streamer: str) -> str:
     token = await refresh_oauth_token(db, user_id, "twitch")
     if not token:
+        print("❌ [TWITCH] User not connected to Twitch")
         raise HTTPException(status_code=401, detail="User not connected to Twitch")
 
     headers = {
