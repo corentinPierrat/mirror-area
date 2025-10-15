@@ -9,7 +9,7 @@ from app.services.twitch import create_twitch_webhook, get_twitch_user_id, delet
 workflows_router = APIRouter(prefix="/workflows", tags=["workflows"])
 
 @workflows_router.post("/", response_model=WorkflowOut)
-def create_workflow(
+async def create_workflow(
     workflow: WorkflowCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -37,9 +37,9 @@ def create_workflow(
 
         if step.type == "action" and step.service == "twitch":
             try:
-                broadcaster_id = get_twitch_user_id(
+                broadcaster_id = await get_twitch_user_id(
                     db, current_user.id, step.params["username_streamer"])
-                webhook_id = create_twitch_webhook(
+                webhook_id = await create_twitch_webhook(
                     db, current_user.id, step.event, broadcaster_id)
                 db_step.params["webhook_id"] = webhook_id
             except Exception as e:
@@ -55,7 +55,7 @@ def list_workflows(
     return db.query(Workflow).filter_by(user_id=current_user.id).all()
 
 @workflows_router.delete("/{workflow_id}", status_code=204)
-def delete_workflow(
+async def delete_workflow(
     workflow_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -69,7 +69,7 @@ def delete_workflow(
             webhook_id = step.params.get("webhook_id") if step.params else None
             if webhook_id:
                 try:
-                    delete_twitch_webhook(db, current_user.id, webhook_id)
+                    await delete_twitch_webhook(db, current_user.id, webhook_id)
                 except Exception as e:
                     print(f"Failed to delete Twitch webhook {webhook_id}: {e}")
 
