@@ -6,8 +6,7 @@ import Footer from "./components/Footer";
 import ProfileInfo from "./components/ProfileInfo";
 import styles from "./styles/Account.module.css";
 
-const API_URL = "http://10.18.207.83:8080";
-
+const API_URL = import.meta.env.VITE_API_URL;
 export default function Account() {
   const [user, setUser] = useState(null);
   const [showPasswordForm, setShowPasswordForm] = useState(false);

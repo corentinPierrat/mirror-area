@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "../styles/Register.module.css";
 
-const API_URL = "http://10.18.207.83:8080";
-
+const API_URL = import.meta.env.VITE_API_URL;
 export default function Register() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -17,11 +16,11 @@ export default function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
     if (!email || !username || !password || !confirmPassword) {
-      setMessage("Veuillez remplir tous les champs");
+      setMessage("Please fill in all fields");
       return;
     }
     if (password !== confirmPassword) {
-      setMessage("Les mots de passe ne correspondent pas");
+      setMessage("Passwords do not match");
       return;
     }
 
@@ -34,9 +33,9 @@ export default function Register() {
         navigate("/verify-code", { state: { email } });
       }
     } catch (error) {
-      if (error.response?.status === 422) setMessage("Le mot de passe doit faire 8 caractères minimum");
-      else if (error.response?.status === 400) setMessage("Cet email est déjà utilisé");
-      else setMessage("Erreur réseau, veuillez réessayer");
+      if (error.response?.status === 422) setMessage("Password must be at least 8 characters long");
+      else if (error.response?.status === 400) setMessage("This email is already in useé");
+      else setMessage("Network error, please try again");
     } finally {
       setLoading(false);
     }
@@ -44,11 +43,11 @@ export default function Register() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Créer un compte</h1>
+      <h1 className={styles.title}>Create an account</h1>
       <form onSubmit={handleRegister} className={styles.form}>
         <input
           type="text"
-          placeholder="Nom d'utilisateur"
+          placeholder="User name"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           className={styles.input}
@@ -62,27 +61,27 @@ export default function Register() {
         />
         <input
           type="password"
-          placeholder="Mot de passe"
+          placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className={styles.input}
         />
         <input
           type="password"
-          placeholder="Confirmer le mot de passe"
+          placeholder="Confirm password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           className={styles.input}
         />
         {message && <p className={styles.message}>{message}</p>}
         <button type="submit" disabled={loading} className={styles.button}>
-          {loading ? "Inscription..." : "S'inscrire"}
+          {loading ? "Registration..." : "Register"}
         </button>
       </form>
       <p>
-        Déjà un compte ?{" "}
+      Already an account ?{" "}
         <span onClick={() => navigate("/login")} className={styles.link}>
-          Se connecter
+        Log in
         </span>
       </p>
     </div>

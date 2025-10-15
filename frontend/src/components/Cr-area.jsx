@@ -14,8 +14,7 @@ import axios from "axios";
 import "reactflow/dist/style.css";
 import styles from '../styles/Cr-area.module.css';
 
-const API_URL = "http://10.18.207.83:8080";
-
+const API_URL = import.meta.env.VITE_API_URL;
 function WorkflowNode({ data, onParamsChange }) {
   const { title, description, params, payload_schema, type, id, service } = data;
   const [editing, setEditing] = useState(false);

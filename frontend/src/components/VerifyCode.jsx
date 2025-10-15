@@ -3,8 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "../styles/VerifyCode.module.css";
 
-const API_URL = "http://10.18.207.83:8080";
-
+const API_URL = import.meta.env.VITE_API_URL;
 export default function VerifyCode() {
   const navigate = useNavigate();
   const location = useLocation();
