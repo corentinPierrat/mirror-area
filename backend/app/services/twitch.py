@@ -4,8 +4,22 @@ from app.config import settings
 from app.services.token_storage import refresh_oauth_token
 from fastapi import HTTPException
 
-async def get_twitch_user_id(db: Session, user_id: int, username_streamer: str) -> str:
-    token = await refresh_oauth_token(db, user_id, "twitch")
+async def get_app_access_token() -> str:
+    response = requests.post(
+        "https://id.twitch.tv/oauth2/token",
+        params={
+            "client_id": settings.TWITCH_CLIENT_ID,
+            "client_secret": settings.TWITCH_CLIENT_SECRET,
+            "grant_type": "client_credentials"
+        }
+    )
+    if response.status_code != 200:
+        raise Exception(f"Failed to get app access token: {response.text}")
+    data = response.json()
+    return data["access_token"]
+
+async def get_twitch_user_id(username_streamer: str) -> str:
+    token = await get_app_access_token()
     if not token:
         raise HTTPException(status_code=401, detail="User not connected to Twitch")
 
@@ -24,20 +38,6 @@ async def get_twitch_user_id(db: Session, user_id: int, username_streamer: str) 
 
     user = data["data"][0]
     return user["id"]
-
-async def get_app_access_token() -> str:
-    response = requests.post(
-        "https://id.twitch.tv/oauth2/token",
-        params={
-            "client_id": settings.TWITCH_CLIENT_ID,
-            "client_secret": settings.TWITCH_CLIENT_SECRET,
-            "grant_type": "client_credentials"
-        }
-    )
-    if response.status_code != 200:
-        raise Exception(f"Failed to get app access token: {response.text}")
-    data = response.json()
-    return data["access_token"]
 
 async def create_twitch_webhook(event_type: str, broadcaster_id: str):
     app_token = await get_app_access_token()

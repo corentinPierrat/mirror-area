@@ -65,7 +65,7 @@ async def create_workflow(
                     print(f"🟢 [TWITCH_{idx}] Event: {step.event}")
                     print(f"🟢 [TWITCH_{idx}] Getting Twitch user ID...")
                     
-                    broadcaster_id = await get_twitch_user_id(db, current_user.id, username)
+                    broadcaster_id = await get_twitch_user_id(username)
                     print(f"✅ [TWITCH_{idx}] Broadcaster ID: {broadcaster_id}")
                     
                     print(f"🟢 [TWITCH_{idx}] Creating webhook with Twitch API...")
