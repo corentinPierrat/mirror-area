@@ -5,8 +5,7 @@ import Footer from "./components/Footer";
 import styles from "./styles/Services.module.css";
 import axios from "axios";
 
-const API_URL = "http://10.18.207.83:8080";
-
+const API_URL = import.meta.env.VITE_API_URL;
 export default function Services() {
   const [services, setServices] = useState([]);
   const [connected, setConnected] = useState({});
@@ -23,8 +22,8 @@ export default function Services() {
         setServices(res.data.services);
       }
     } catch (err) {
-      console.error("Erreur chargement services:", err);
-      setError("Impossible de charger les services disponibles.");
+      console.error("Error loading services:", err);
+      setError("Unable to load available services.");
     }
   };
 
@@ -51,8 +50,8 @@ export default function Services() {
       });
       setConnected((prev) => ({ ...prev, [provider]: false }));
     } catch (err) {
-      console.error(`Erreur déconnexion ${provider}:`, err);
-      alert("Impossible de se déconnecter de " + provider);
+      console.error(`Disconnect error ${provider}:`, err);
+      alert("Unable to log out of " + provider);
     }
   };
 
@@ -62,7 +61,7 @@ export default function Services() {
 
   useEffect(() => {
     if (!token) {
-      setError("Token manquant. Veuillez vous reconnecter.");
+      setError("Missing token. Please log in again..");
       setLoading(false);
       return;
     }
@@ -82,7 +81,7 @@ export default function Services() {
   if (loading)
     return (
       <div className={styles.loadingContainer}>
-        <p>Chargement des services...</p>
+        <p>Loading services...</p>
       </div>
     );
 
@@ -104,7 +103,7 @@ export default function Services() {
           <Header />
 
           <div className={styles.servicesContainer}>
-            <h2 className={styles.servicesTitle}>Mes connexions</h2>
+            <h2 className={styles.servicesTitle}>My connections</h2>
 
             <div className={styles.oauthList}>
               {services.map((service) => {
@@ -120,24 +119,24 @@ export default function Services() {
 
                     {isConnected ? (
                       <>
-                        <p className={styles.statusConnected}>Connecté</p>
+                        <p className={styles.statusConnected}>Connected</p>
                         <button
                           className={`${styles.disconnectBtn}`}
                           onClick={() => disconnect(service.provider)}
                         >
-                          Déconnecter
+                          Disconnect
                         </button>
                       </>
                     ) : (
                       <>
                         <p className={styles.statusDisconnected}>
-                          Non connecté
+                        Not connected
                         </p>
                         <button
                           className={styles.connectBtn}
                           onClick={() => handleLogin(service.provider)}
                         >
-                          Se connecter
+                          Log in
                         </button>
                       </>
                     )}

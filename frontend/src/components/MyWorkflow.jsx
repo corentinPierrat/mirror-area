@@ -4,8 +4,7 @@ import styles from "../styles/MyWorkflows.module.css";
 import Workflows from "./Workflows";
 import EditWorkflowModal from './EditWorkflow';
 
-const API_URL = "http://10.18.207.83:8080";
-
+const API_URL = import.meta.env.VITE_API_URL;
 export default function MyWorkflow() {
   const [workflows, setWorkflows] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +17,7 @@ export default function MyWorkflow() {
     setError("");
     try {
       const token = localStorage.getItem("userToken");
-      if (!token) throw new Error("Utilisateur non authentifié.");
+      if (!token) throw new Error("Unauthenticated user.");
 
       const res = await axios.get(`${API_URL}/workflows/`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -37,8 +36,8 @@ export default function MyWorkflow() {
 
       setWorkflows(data);
     } catch (err) {
-      console.error("Erreur lors de la récupération des workflows :", err);
-      setError(err.message || "Impossible de charger les workflows.");
+      console.error("Error retrieving workflows:", err);
+      setError(err.message || "Unable to load workflows.");
     } finally {
       setLoading(false);
     }
@@ -49,7 +48,7 @@ export default function MyWorkflow() {
   }, []);
 
   const handleEdit = (id) => {
-    console.log("Tentative d'édition avec l'ID :", id);
+    console.log("Attempting to edit with ID:", id);
     setEditingWorkflowId(id);
   };
 
@@ -65,9 +64,6 @@ export default function MyWorkflow() {
   if (loading) return <p className={styles.loading}>Chargement...</p>;
   if (error) return <p className={styles.error}>{error}</p>;
 
-  // Fichier : MyWorkflows.js
-// ... (le reste du code est bon)
-
 return (
   <div className={styles.container}>
     <h1 className={styles.title}>Mes Workflows</h1>
@@ -76,19 +72,16 @@ return (
       <div className={styles.workflowList}>
         {workflows.map((workflow) => (
           <Workflows
-            // --- CORRECTIONS ICI ---
             key={workflow.id}
             workflowId={workflow.id}
-            // -----------------------
             Name={workflow.name}
             Action={
               workflow.action
                 ? `${workflow.action.service} - ${workflow.action.event}`
-                : "Action inconnue"
+                : "Action unknow"
             }
             Reactions={workflow.reactions || []} 
             onDelete={(id) =>
-              // --- CORRECTION ICI AUSSI ---
               setWorkflows((prev) => prev.filter((w) => w.id !== id))
             }
             onEdit={handleEdit} 
@@ -96,10 +89,9 @@ return (
         ))}
       </div>
     ) : (
-      <p className={styles.noWorkflows}>Aucun workflow disponible.</p>
+      <p className={styles.noWorkflows}>No workflow available.</p>
     )}
 
-    {/* Le reste du code est bon */}
     {editingWorkflowId && (
       <EditWorkflowModal
         workflowId={editingWorkflowId}

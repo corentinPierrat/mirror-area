@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from '../styles/EditWorkflow.module.css'; 
 
-const API_URL = "http://10.18.207.83:8080";
-
+const API_URL = import.meta.env.VITE_API_URL;
 export default function EditWorkflowModal({ workflowId, onClose, onSave }) {
   const [workflowData, setWorkflowData] = useState(null);
   const [loading, setLoading] = useState(true);
