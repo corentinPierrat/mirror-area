@@ -38,11 +38,11 @@ const RegisterScreen = ({ navigation }) => {
       console.log('Erreur register:', error.response?.data || error.message);
 
       if (error.response?.status === 422) {
-        setMessage('Le mot de passe doit faire 8 caractères minimum');
+        setMessage(t("PasswordTooShort"));
       } else if (error.response?.status === 400) {
-        setMessage('Cet email est déjà utilisé');
+        setMessage(t("EmailAlreadyUsed"));
       } else {
-        setMessage('Erreur réseau, veuillez réessayer');
+        setMessage(t("NetworkError"));
       }
     } finally {
       setLoading(false);
@@ -56,11 +56,11 @@ const RegisterScreen = ({ navigation }) => {
       end={{ x: 1, y: 1 }}
       style={styles.container}
     >
-      <Text style={styles.title}>Créer un compte</Text>
+      <Text style={styles.title}>{t("Create Account")}</Text>
 
       <TextInput
         style={styles.input}
-        placeholder="Nom d'utilisateur"
+        placeholder={t("Username")}
         placeholderTextColor="#ccc"
         value={username}
         onChangeText={setUsername}
@@ -78,7 +78,7 @@ const RegisterScreen = ({ navigation }) => {
 
       <TextInput
         style={styles.input}
-        placeholder="Mot de passe"
+        placeholder={t("Password")}
         placeholderTextColor="#ccc"
         value={password}
         onChangeText={setPassword}
@@ -87,7 +87,7 @@ const RegisterScreen = ({ navigation }) => {
 
       <TextInput
         style={styles.input}
-        placeholder="Confirmer le mot de passe"
+        placeholder={t("Confirm Password")}
         placeholderTextColor="#ccc"
         value={confirmPassword}
         onChangeText={setConfirmPassword}
@@ -97,11 +97,11 @@ const RegisterScreen = ({ navigation }) => {
       {message ? <Text style={styles.message}>{message}</Text> : null}
 
       <TouchableOpacity onPress={handleRegister} style={styles.button} disabled={loading}>
-        <Text style={styles.buttonText}>{loading ? 'Inscription...' : "S'inscrire"}</Text>
+        <Text style={styles.buttonText}>{loading ? t("Register") + '...' : t("Register")}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text styltokene={styles.link}>Retour à la connexion</Text>
+        <Text style={styles.link}>{t("Back to Login")}</Text>
       </TouchableOpacity>
     </LinearGradient>
   );
