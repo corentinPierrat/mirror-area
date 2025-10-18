@@ -80,7 +80,17 @@ ACTIONS_CATALOG = {
             }
         },
         "description": "Triggers when someone subscribes to the channel."
-    }
+    },
+    "faceit.stats": {
+        "title": "FACEIT – Lifetime stats",
+        "service": "faceit",
+        "event": "stats",
+        "payload_schema": {
+            "nickname": { "type": "string", "label": "FACEIT Nickname" },
+            "game_id":  { "type": "string", "label": "Game ID", "default": "cs2" }
+        },
+        "description": "Fetches lifetime stats for a FACEIT player (wins, ELO/skill level, etc.)."
+    },
 }
 
 REACTIONS_CATALOG = {

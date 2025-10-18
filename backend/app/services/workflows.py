@@ -20,6 +20,10 @@ async def trigger_workflows(service: str, event_type: str, data: dict, db: Sessi
         filter_conditions.append(
             func.JSON_EXTRACT(WorkflowStep.params, '$.broadcaster_user_id') == data["broadcaster_user_id"]
         )
+    elif service == "faceit" and "player_id" in data:
+        filter_conditions.append(
+            func.JSON_EXTRACT(WorkflowStep.params, '$.player_id') == data["player_id"]
+        )
 
     workflows = db.query(Workflow).join(WorkflowStep).filter(*filter_conditions).all()
 
@@ -31,7 +35,14 @@ async def trigger_workflows(service: str, event_type: str, data: dict, db: Sessi
                     step.params = {}
 
                 step.params["message"] = data.get("message", "")
-
+                if service == "faceit":
+                    step.params["faceit_data"] = {
+                        "nickname": data.get("nickname"),
+                        "skill_level": data.get("skill_level"),
+                        "faceit_elo": data.get("faceit_elo"),
+                        "game": data.get("game"),
+                        "lifetime_stats": data.get("lifetime_stats", {})
+                    }
                 try:
                     result = await execute_reaction(step.service, step.event, db, workflow.user_id, step.params)
                     results.append({"success": True, "result": result})
