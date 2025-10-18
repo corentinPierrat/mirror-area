@@ -61,7 +61,7 @@ oauth.register(
     access_token_url="https://api.faceit.com/auth/v1/oauth/token",
     api_base_url="https://open.faceit.com/data/v4/",
     client_kwargs={
-        "scope": "openid email profile membership",
+        "scope": "email profile membership",
         "code_challenge_method": "S256",
     },
 )
@@ -117,7 +117,7 @@ async def oauth_login(provider: str, request: Request, token: str = Query(None),
 
     request.session['oauth_user_id'] = user.id
     redirect_uri = f"https://trigger.ink/oauth/{provider}/callback"
-    return await oauth.create_client(provider).authorize_redirect(request, redirect_uri)
+    return await oauth.create_client(provider).authorize_redirect(request, redirect_uri, redirect_popup="true")
 
 @oauth_router.get("/{provider}/callback")
 async def oauth_callback(provider: str, request: Request, db: Session = Depends(get_db)):
@@ -129,7 +129,7 @@ async def oauth_callback(provider: str, request: Request, db: Session = Depends(
         user_id = request.session.get('oauth_user_id')
         if user_id:
             save_token_to_db(db, user_id, provider, token)
-        return RedirectResponse("http://127.0.0.1:5173")
+        return RedirectResponse("http://localhost:8081/Services")
     except Exception as e:
         print(f"Erreur OAuth callback: {e}")
         return JSONResponse({
