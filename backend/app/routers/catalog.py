@@ -130,6 +130,27 @@ REACTIONS_CATALOG = {
         },
         "description": "Sends an email using the Gmail API."
     },
+    "google.create_calendar_event": {
+        "title": "Create a calendar event (today)",
+        "service": "google",
+        "event": "create_calendar_event",
+        "payload_schema": {
+            "title": {
+                "type": "string",
+                "label": "Title"
+            },
+            "description": {
+                "type": "string",
+                "label": "Description"
+            },
+            "calendar_id": {
+                "type": "string",
+                "label": "Calendar ID",
+                "default": "primary"
+            }
+        },
+        "description": "Creates an all-day event for today in your Google Calendar."
+    },
 }
 
 @catalog_router.get("/actions")

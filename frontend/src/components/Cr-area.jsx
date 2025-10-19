@@ -15,7 +15,7 @@ import "reactflow/dist/style.css";
 import styles from '../styles/Cr-area.module.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
-function WorkflowNode({ data, onParamsChange }) {
+function WorkflowNode({ data, onParamsChange, onTest }) {
   const { title, description, params, payload_schema, type, id, service } = data;
   const [editing, setEditing] = useState(false);
   const [localParams, setLocalParams] = useState(params || {});
@@ -52,6 +52,15 @@ function WorkflowNode({ data, onParamsChange }) {
   const handleSave = () => {
     onParamsChange(id, localParams);
     setEditing(false);
+  };
+
+  const handleTestClick = () => {
+    if (onTest) {
+      onTest({
+        ...data,
+        params: editing ? localParams : (params || {})
+      });
+    }
   };
 
   const renderParamsForm = () => {
@@ -93,6 +102,9 @@ function WorkflowNode({ data, onParamsChange }) {
           {editing ? "Close" : (Object.values(params).some(v => v) ? "Modify" : "Set settings")}
         </button>
       )}
+      <button onClick={handleTestClick} className={styles.testNodeButton}>
+        Tester
+      </button>
       {renderParamsForm()}
       <Handle type="source" position="bottom" />
     </div>
@@ -166,13 +178,68 @@ export default function CrArea() {
     handleCloseEditModal();
   }, [setNodes, handleCloseEditModal]);
 
+  const handleNodeParamsChange = useCallback((id, newParams) => {
+    setNodes((nds) => nds.map((node) => node.id === id ? { ...node, data: { ...node.data, params: newParams } } : node));
+  }, [setNodes]);
+
+  const handleTestNode = useCallback(async (nodeData) => {
+    if (!token) {
+      alert("Veuillez vous connecter pour lancer un test.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${API_URL}/workflows/test-step`,
+        {
+          type: nodeData.type,
+          service: nodeData.service,
+          event: nodeData.event,
+          params: nodeData.params || {}
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const result = response.data;
+      const payload = result.result;
+
+      const stringifyPayload = (value) => {
+        if (!value) return "";
+        if (typeof value === "string") return value;
+        if (value.data && value.data.text) {
+          return `Tweet envoyé: ${value.data.text}`;
+        }
+        if (value.error) {
+          const err = value.error;
+          if (typeof err === "string") return err;
+          if (err.detail) return err.detail;
+          if (err.message) return err.message;
+          return JSON.stringify(err);
+        }
+        if (value.detail) return value.detail;
+        return JSON.stringify(value);
+      };
+
+      if (result.success && !(payload && payload.error)) {
+        const message = stringifyPayload(payload) || "Test réussi !";
+        alert(message);
+      } else {
+        const errorMessage = stringifyPayload(payload) || "consultez la console pour plus de détails.";
+        alert(`Test terminé: ${errorMessage}`);
+        console.log("Test result:", payload);
+      }
+    } catch (error) {
+      const message = error?.response?.data?.detail || error?.response?.data?.error || error.message;
+      alert(`Erreur pendant le test: ${message}`);
+      console.error("Test error:", error);
+    }
+  }, [token]);
+
   const nodeTypes = useMemo(() => ({
     workflowNode: (props) => (
-      <WorkflowNode {...props} onParamsChange={(id, newParams) => {
-        setNodes((nds) => nds.map((node) => node.id === id ? { ...node, data: { ...node.data, params: newParams } } : node));
-      }} />
+      <WorkflowNode {...props} onParamsChange={handleNodeParamsChange} onTest={handleTestNode} />
     ),
-  }), [setNodes]);
+  }), [handleNodeParamsChange, handleTestNode]);
 
   useEffect(() => {
     const fetchInitialData = async () => {

@@ -5,6 +5,7 @@ from app.models.models import Workflow, WorkflowStep, User
 from app.schemas.workflows import WorkflowCreate, WorkflowStepCreate, WorkflowOut
 from app.services.auth import get_current_user
 from app.services.twitch import create_twitch_webhook, get_twitch_user_id, delete_twitch_webhook
+from app.services.reactions import execute_reaction
 
 workflows_router = APIRouter(prefix="/workflows", tags=["workflows"])
 
@@ -156,3 +157,22 @@ async def delete_workflow(
     db.delete(workflow)
     db.commit()
     return
+
+@workflows_router.post("/test-step")
+async def test_workflow_step(
+    step: WorkflowStepCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    params = step.params or {}
+
+    if step.type != "reaction":
+        raise HTTPException(status_code=400, detail="Test is only available for reactions pour le moment.")
+
+    try:
+        result = await execute_reaction(step.service, step.event, db, current_user.id, params)
+        return {"success": True, "result": result}
+    except NotImplementedError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc

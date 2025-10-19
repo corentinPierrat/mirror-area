@@ -2,6 +2,7 @@ from app.services.token_storage import get_token_from_db, refresh_oauth_token
 from app.routers.oauth import oauth
 from sqlalchemy.orm import Session
 from typing import Dict, Any, Callable
+from datetime import datetime, timedelta, timezone
 import os
 import requests
 import base64
@@ -11,7 +12,7 @@ async def twitter_tweet_reaction(db: Session, user_id: int, params: dict):
     token = await refresh_oauth_token(db, user_id, "twitter")
     if not token:
         return {"error": "Not logged in to Twitter"}
-    text = params.get("message")
+    text = params.get("message") or params.get("text")
     if not text or not text.strip():
         return {"error": "Missing text"}
     resp = await oauth.twitter.post("tweets", token=token, json={"text": text})
@@ -41,9 +42,52 @@ async def google_send_mail_reaction(db: Session, user_id: int, params: dict):
         except Exception:
             return {"error": resp.text}
 
+async def google_calendar_event_reaction(db: Session, user_id: int, params: dict):
+    token = await refresh_oauth_token(db, user_id, "google")
+    if not token:
+        return {"error": "Not logged in to Google"}
+
+    title = params.get("title")
+    if not title or not title.strip():
+        return {"error": "Missing title"}
+
+    today = datetime.now(timezone.utc).date()
+    tomorrow = today + timedelta(days=1)
+
+    client = oauth.create_client("google")
+    calendar_id = params.get("calendar_id", "primary")
+
+    event_body = {
+        "summary": title,
+        "description": params.get("description"),
+        "start": {"date": today.isoformat()},
+        "end": {"date": tomorrow.isoformat()},
+    }
+
+    event_body = {k: v for k, v in event_body.items() if v is not None}
+
+    response = await client.post(
+        f"calendar/v3/calendars/{calendar_id}/events",
+        json=event_body,
+        token=token
+    )
+
+    if response.status_code in (200, 201):
+        data = response.json()
+        return {
+            "status": "Event created successfully",
+            "event_id": data.get("id"),
+            "htmlLink": data.get("htmlLink")
+        }
+    try:
+        return {"error": response.json()}
+    except Exception:
+        return {"error": response.text}
+
 REACTION_DISPATCH: Dict[tuple[str, str], Callable[[Session, int, dict], Any]] = {
     ("twitter", "tweet"): twitter_tweet_reaction,
     ("google", "send_mail"): google_send_mail_reaction,
+    ("google", "create_calendar_event"): google_calendar_event_reaction,
 }
 
 async def execute_reaction(service: str, event: str, db: Session, user_id: int, params: dict):
