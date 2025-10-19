@@ -30,7 +30,8 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - shared-bundle:/shared
+      # - shared-bundle:/shared
+      - ./backend:/app
     restart: unless-stopped
 
   mobile:
