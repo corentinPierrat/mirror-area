@@ -22,7 +22,7 @@ async def twitter_tweet_reaction(db: Session, user_id: int, params: dict):
         return {"error": resp.json()}
 
 async def google_send_mail_reaction(db: Session, user_id: int, params: dict):
-    token = get_token_from_db(db, user_id, "google")
+    token = await refresh_oauth_token(db, user_id, "google")
     if not token:
         return {"error": "Not logged in to Google"}
 
