@@ -34,7 +34,9 @@ async def trigger_workflows(service: str, event_type: str, data: dict, db: Sessi
                 if step.params is None:
                     step.params = {}
 
-                step.params["message"] = data.get("message", "")
+                incoming_message = data.get("message")
+                if incoming_message:
+                    step.params["message"] = incoming_message
                 if service == "faceit":
                     step.params["faceit_data"] = {
                         "nickname": data.get("nickname"),

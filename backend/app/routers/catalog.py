@@ -81,14 +81,29 @@ ACTIONS_CATALOG = {
         },
         "description": "Triggers when someone subscribes to the channel."
     },
-    "faceit.stats": {
-        "title": "FACEIT – My lifetime stats",
-        "service": "faceit",
-        "event": "stats",
+    "discord.list_guilds": {
+        "title": "List my Discord servers",
+        "service": "discord",
+        "event": "list_guilds",
+        "payload_schema": {},
+        "description": "Retrieves the list of Discord servers linked to your account."
+    },
+    "google.recent_emails_from_sender": {
+        "title": "Fetch recent emails from a sender",
+        "service": "google",
+        "event": "recent_emails_from_sender",
         "payload_schema": {
-            "game": { "type": "string", "label": "Game", "default": "cs2" }
+            "sender": {
+                "type": "string (email)",
+                "label": "Sender email"
+            },
+            "limit": {
+                "type": "number",
+                "label": "Number of messages",
+                "default": 20
+            }
         },
-        "description": "Fetches YOUR lifetime stats (wins, ELO, skill level, etc.) from your connected FACEIT account."
+        "description": "Returns up to N recent emails received from the specified sender."
     },
 }
 
@@ -150,6 +165,38 @@ REACTIONS_CATALOG = {
             }
         },
         "description": "Creates an all-day event for today in your Google Calendar."
+    },
+    "discord.send_channel_message": {
+        "title": "Send a message to a Discord channel",
+        "service": "discord",
+        "event": "send_channel_message",
+        "payload_schema": {
+            "channel_id": {
+                "type": "string",
+                "label": "Channel ID"
+            },
+            "message": {
+                "type": "string",
+                "label": "Message content"
+            }
+        },
+        "description": "Sends a message to the specified Discord channel using the connected bot."
+    },
+    "faceit.send_room_message": {
+        "title": "Send a message to a FACEIT room",
+        "service": "faceit",
+        "event": "send_room_message",
+        "payload_schema": {
+            "room_id": {
+                "type": "string",
+                "label": "Room ID"
+            },
+            "body": {
+                "type": "string",
+                "label": "Message body"
+            }
+        },
+        "description": "Posts a message in the specified FACEIT chat room."
     },
 }
 

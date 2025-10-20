@@ -102,8 +102,8 @@ function WorkflowNode({ data, onParamsChange, onTest }) {
           {editing ? "Close" : (Object.values(params).some(v => v) ? "Modify" : "Set settings")}
         </button>
       )}
-      <button onClick={handleTestClick} className={styles.testNodeButton}>
-        Tester
+      <button onClick={handleTestClick} className={styles.editParamsBtn}>
+        Test
       </button>
       {renderParamsForm()}
       <Handle type="source" position="bottom" />
@@ -200,34 +200,38 @@ export default function CrArea() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      const result = response.data;
-      const payload = result.result;
+      const { success, result: actionResult, message: infoMessage, error } = response.data;
 
-      const stringifyPayload = (value) => {
-        if (!value) return "";
+      const formatValue = (value, fallback = "") => {
+        if (value === null || value === undefined) return fallback;
         if (typeof value === "string") return value;
-        if (value.data && value.data.text) {
-          return `Tweet envoyé: ${value.data.text}`;
+        try {
+          return JSON.stringify(value, null, 2);
+        } catch (err) {
+          console.error("Failed to stringify value", err);
+          return fallback || String(value);
         }
-        if (value.error) {
-          const err = value.error;
-          if (typeof err === "string") return err;
-          if (err.detail) return err.detail;
-          if (err.message) return err.message;
-          return JSON.stringify(err);
-        }
-        if (value.detail) return value.detail;
-        return JSON.stringify(value);
       };
 
-      if (result.success && !(payload && payload.error)) {
-        const message = stringifyPayload(payload) || "Test réussi !";
-        alert(message);
-      } else {
-        const errorMessage = stringifyPayload(payload) || "consultez la console pour plus de détails.";
-        alert(`Test terminé: ${errorMessage}`);
-        console.log("Test result:", payload);
+      if (nodeData.type === "action") {
+        if (success) {
+          const message = formatValue(actionResult, "Test réussi (aucune donnée retournée)");
+          alert(message);
+        } else {
+          const failure = infoMessage || error || actionResult;
+          alert(`Action échouée: ${formatValue(failure, "Erreur inconnue")}`);
+        }
+        console.log("Action test result:", response.data);
+        return;
       }
+
+      const message = infoMessage || error;
+      if (success) {
+        alert(message || "Réaction exécutée avec succès.");
+      } else {
+        alert(message || "Erreur pendant la réaction.");
+      }
+      console.log("Reaction test result:", response.data);
     } catch (error) {
       const message = error?.response?.data?.detail || error?.response?.data?.error || error.message;
       alert(`Erreur pendant le test: ${message}`);

@@ -6,6 +6,7 @@ from app.schemas.workflows import WorkflowCreate, WorkflowStepCreate, WorkflowOu
 from app.services.auth import get_current_user
 from app.services.twitch import create_twitch_webhook, get_twitch_user_id, delete_twitch_webhook
 from app.services.reactions import execute_reaction
+from app.services.actions import execute_action
 
 workflows_router = APIRouter(prefix="/workflows", tags=["workflows"])
 
@@ -166,13 +167,32 @@ async def test_workflow_step(
 ):
     params = step.params or {}
 
-    if step.type != "reaction":
-        raise HTTPException(status_code=400, detail="Test is only available for reactions pour le moment.")
+    if step.type == "action":
+        try:
+            result = await execute_action(step.service, step.event, db, current_user.id, params)
+            return {"success": True, "result": result}
+        except NotImplementedError as exc:
+            return {"success": False, "message": str(exc)}
+        except Exception as exc:
+            return {"success": False, "message": str(exc)}
 
-    try:
-        result = await execute_reaction(step.service, step.event, db, current_user.id, params)
-        return {"success": True, "result": result}
-    except NotImplementedError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    if step.type == "reaction":
+        try:
+            result = await execute_reaction(step.service, step.event, db, current_user.id, params)
+        except NotImplementedError as exc:
+            return {"success": False, "message": str(exc)}
+        except Exception as exc:
+            return {"success": False, "message": str(exc)}
+
+        if isinstance(result, dict):
+            error_payload = result.get("error") or result.get("detail")
+            if error_payload:
+                return {"success": False, "message": str(error_payload)}
+
+            success_message = result.get("status") or result.get("detail") or result.get("message")
+            if success_message:
+                return {"success": True, "message": str(success_message)}
+
+        return {"success": True, "message": "Réaction exécutée avec succès."}
+
+    return {"success": False, "message": f"Type de step non géré pour les tests: {step.type}"}

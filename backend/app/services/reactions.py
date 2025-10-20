@@ -3,10 +3,10 @@ from app.routers.oauth import oauth
 from sqlalchemy.orm import Session
 from typing import Dict, Any, Callable
 from datetime import datetime, timedelta, timezone
-import os
-import requests
+import httpx
 import base64
 from email.mime.text import MIMEText
+from app.config import settings
 
 async def twitter_tweet_reaction(db: Session, user_id: int, params: dict):
     token = await refresh_oauth_token(db, user_id, "twitter")
@@ -84,10 +84,78 @@ async def google_calendar_event_reaction(db: Session, user_id: int, params: dict
     except Exception:
         return {"error": response.text}
 
+async def discord_send_message_reaction(db: Session, user_id: int, params: dict):
+    channel_id = params.get("channel_id")
+    message = params.get("message") or params.get("content")
+    if not channel_id:
+        return {"error": "Missing channel_id"}
+    if not message or not message.strip():
+        return {"error": "Missing message"}
+
+    bot_token = settings.TOKEN_BOT_DISCORD
+    if not bot_token:
+        return {"error": "Discord bot token not configured"}
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"https://discord.com/api/channels/{channel_id}/messages",
+            headers={
+                "Authorization": f"Bot {bot_token}",
+                "Content-Type": "application/json"
+            },
+            json={"content": message},
+            timeout=10.0
+        )
+
+    if response.status_code in (200, 201):
+        data = response.json()
+        return {"status": "Message envoyé", "message_id": data.get("id")}
+    try:
+        return {"error": response.json()}
+    except Exception:
+        return {"error": response.text}
+
+async def faceit_send_message_reaction(db: Session, user_id: int, params: dict):
+    room_id = params.get("room_id")
+    message_body = params.get("body") or params.get("message")
+    if not room_id:
+        return {"error": "Missing room_id"}
+    if not message_body or not message_body.strip():
+        return {"error": "Missing body"}
+    token_data = get_token_from_db(db, user_id, "faceit")
+    if not token_data:
+        return {"error": "Not logged in to Faceit"}
+    access_token = token_data.get("access_token")
+    if not access_token:
+        return {"error": "Faceit access token missing"}
+    payload = {"body": message_body}
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"https://open.faceit.com/data/v4/chat/rooms/{room_id}/messages",
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "Content-Type": "application/json",
+            },
+            json=payload,
+            timeout=10.0,
+        )
+    if response.status_code in (200, 201):
+        data = response.json()
+        return {
+            "status": "Message sent",
+            "message_id": data.get("id")
+        }
+    try:
+        return {"error": response.json()}
+    except Exception:
+        return {"error": response.text}
+
 REACTION_DISPATCH: Dict[tuple[str, str], Callable[[Session, int, dict], Any]] = {
     ("twitter", "tweet"): twitter_tweet_reaction,
     ("google", "send_mail"): google_send_mail_reaction,
     ("google", "create_calendar_event"): google_calendar_event_reaction,
+    ("discord", "send_channel_message"): discord_send_message_reaction,
+    ("faceit", "send_room_message"): faceit_send_message_reaction,
 }
 
 async def execute_reaction(service: str, event: str, db: Session, user_id: int, params: dict):
