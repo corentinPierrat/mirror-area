@@ -150,12 +150,49 @@ async def faceit_send_message_reaction(db: Session, user_id: int, params: dict):
     except Exception:
         return {"error": response.text}
 
+async def spotify_play_playlist_reaction(db: Session, user_id: int, params: dict):
+    token = await refresh_oauth_token(db, user_id, "spotify")
+    if not token:
+        return {"error": "Not logged in to Spotify"}
+    playlist_id = params.get("playlist_id")
+    if not playlist_id:
+        return {"error": "Missing playlist_id"}
+    playlist_uri = f"spotify:playlist:{playlist_id}"
+    resp = await oauth.spotify.put(
+        "me/player/play",
+        token=token,
+        json={"context_uri": playlist_uri}
+    )
+    if resp.status_code in (200, 204):
+        return resp.json()
+    else:
+        return {"error": resp.json()}
+
+async def spotify_play_track_reaction(db: Session, user_id: int, params: dict):
+    token = await refresh_oauth_token(db, user_id, "spotify")
+    if not token:
+        return {"error": "Not logged in to Spotify"}
+    track_id = params.get("track_id")
+    if not track_id:
+        return {"error": "Missing track_id"}
+    track_uri = f"spotify:track:{track_id}"
+    resp = await oauth.spotify.put(
+        "me/player/play",
+        token=token,
+        json={"uris": [track_uri]}
+    )
+    if resp.status_code in (200, 204):
+        return resp.json()
+    else:
+        return {"error": resp.json()}
+
 REACTION_DISPATCH: Dict[tuple[str, str], Callable[[Session, int, dict], Any]] = {
     ("twitter", "tweet"): twitter_tweet_reaction,
     ("google", "send_mail"): google_send_mail_reaction,
     ("google", "create_calendar_event"): google_calendar_event_reaction,
     ("discord", "send_channel_message"): discord_send_message_reaction,
     ("faceit", "send_room_message"): faceit_send_message_reaction,
+    ("spotify", "play_playlist"): spotify_play_playlist_reaction,
 }
 
 async def execute_reaction(service: str, event: str, db: Session, user_id: int, params: dict):
