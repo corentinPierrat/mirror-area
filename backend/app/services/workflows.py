@@ -8,7 +8,6 @@ from app.services.actions import execute_action
 from app.services.twitch import get_twitch_user_id, create_twitch_webhook, delete_twitch_webhook
 from fastapi import HTTPException
 
-
 def value_from_path(payload: Any, path: str):
     if payload is None:
         return None
@@ -64,8 +63,6 @@ def prepare_step_params(raw_params: dict | None, context: Dict[Any, Any], trigge
 
 
 async def trigger_workflows(service: str, event_type: str, data: dict, db: Session):
-    """Fonction générique pour déclencher les workflows"""
-
     filter_conditions = [
         WorkflowStep.event == event_type,
         WorkflowStep.service == service,
@@ -91,8 +88,6 @@ async def trigger_workflows(service: str, event_type: str, data: dict, db: Sessi
     for workflow in workflows:
         ordered_steps = sorted(workflow.steps, key=lambda s: s.step_order)
         context: Dict[Any, Any] = {"trigger": data}
-
-        # pré-remplir le contexte avec le payload du trigger
         for step in ordered_steps:
             if step.type == "action" and step.service == service and step.event == event_type:
                 context[step.step_order] = data
@@ -131,14 +126,6 @@ async def trigger_workflows(service: str, event_type: str, data: dict, db: Sessi
                 continue
 
             resolved_params = prepare_step_params(step.params, context, data, include_message_fallback=True)
-            if service == "faceit":
-                resolved_params["faceit_data"] = {
-                    "nickname": data.get("nickname"),
-                    "skill_level": data.get("skill_level"),
-                    "faceit_elo": data.get("faceit_elo"),
-                    "game": data.get("game"),
-                    "lifetime_stats": data.get("lifetime_stats", {})
-                }
             try:
                 result = await execute_reaction(step.service, step.event, db, workflow.user_id, resolved_params)
                 results.append({
@@ -163,9 +150,6 @@ async def trigger_workflows(service: str, event_type: str, data: dict, db: Sessi
 
 
 async def create_steps_for_workflow(db: Session, workflow_id: int, steps: list, user_id: int):
-    """
-    Crée tous les steps d’un workflow, avec gestion des webhooks Twitch.
-    """
     created_steps = []
     id_to_index: Dict[str, int] = {}
 
@@ -240,9 +224,6 @@ async def create_steps_for_workflow(db: Session, workflow_id: int, steps: list, 
 
 
 async def delete_steps_for_workflow(db: Session, workflow, user_id: int):
-    """
-    Supprime tous les steps d’un workflow, et nettoie les webhooks Twitch.
-    """
     for step in workflow.steps:
         if step.type == "action" and step.service == "twitch":
             webhook_id = step.params.get("webhook_id") if step.params else None
