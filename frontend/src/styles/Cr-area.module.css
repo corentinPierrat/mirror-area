@@ -218,12 +218,18 @@
 }
 
 .nodeBase {
-  padding: 10px;
+  padding: 12px;
   border-radius: 8px;
   color: #fff;
-  min-width: 220px;
-  text-align: center;
+  min-width: 240px;
+  text-align: left;
   border: 2px solid #ffffff18;
+  background-clip: padding-box;
+}
+
+.nodeTitle {
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .react-flow__controls-button.react-flow__controls-zoomin{
@@ -241,6 +247,57 @@
 .nodeDescription {
   font-size: 12px;
   margin-bottom: 8px;
+}
+
+.handleSection {
+  margin-top: 12px;
+}
+
+.handleSectionTitle {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 6px;
+  opacity: 0.8;
+}
+
+.handleRow {
+  position: relative;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.handleRowLinked {
+  border: 1px solid rgba(0, 196, 107, 0.4);
+  background: rgba(0, 196, 107, 0.12);
+}
+
+.handleContent {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.handleLabel {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.handleInfo {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.linkedHint {
+  font-size: 10px;
+  color: #82f6c6;
+  margin-top: 4px;
 }
 
 .paramsFormContainer {

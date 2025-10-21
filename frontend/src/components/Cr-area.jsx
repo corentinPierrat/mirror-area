@@ -9,6 +9,8 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
   Handle,
+  Position,
+  applyEdgeChanges,
 } from "reactflow";
 import axios from "axios";
 import "reactflow/dist/style.css";
@@ -16,7 +18,18 @@ import styles from '../styles/Cr-area.module.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
 function WorkflowNode({ data, onParamsChange, onTest }) {
-  const { title, description, params, payload_schema, type, id, service } = data;
+  const {
+    title,
+    description,
+    params = {},
+    payload_schema,
+    output_schema,
+    type,
+    id,
+    service,
+    links = {},
+    action_kind = "trigger",
+  } = data;
   const [editing, setEditing] = useState(false);
   const [localParams, setLocalParams] = useState(params || {});
   const [dynamicOptions, setDynamicOptions] = useState({});
@@ -63,6 +76,17 @@ function WorkflowNode({ data, onParamsChange, onTest }) {
     }
   };
 
+  const formatValue = (value) => {
+    if (value === null || value === undefined || value === "") return "Aucune valeur";
+    if (typeof value === "string") return value;
+    try {
+      const serialized = JSON.stringify(value);
+      return serialized.length > 60 ? `${serialized.slice(0, 57)}...` : serialized;
+    } catch (err) {
+      return String(value);
+    }
+  };
+
   const renderParamsForm = () => {
     if (!payload_schema || !editing) return null;
     if (isLoadingOptions) {
@@ -72,9 +96,15 @@ function WorkflowNode({ data, onParamsChange, onTest }) {
       <div className={styles.paramsFormContainer}>
         {Object.entries(payload_schema).map(([key, param]) => {
           const options = dynamicOptions[key] || param.options;
+          const linked = !!links[key];
           return (
             <div key={key} className={styles.paramItem}>
               <label>{param.label}:</label>
+              {linked && (
+                <div className={styles.linkedHint}>
+                  Relié à {links[key].sourceTitle || "une action"} — cette valeur sera utilisée comme secours.
+                </div>
+              )}
               {options ? (
                 <select value={localParams[key] || ""} onChange={(e) => handleChange(key, e.target.value)} className={styles.input}>
                   <option value="">Sélectionne...</option>
@@ -92,10 +122,67 @@ function WorkflowNode({ data, onParamsChange, onTest }) {
     );
   };
 
+  const renderReactionInputs = () => {
+    if (type !== "reaction" || !payload_schema || Object.keys(payload_schema).length === 0) return null;
+    return (
+      <div className={styles.handleSection}>
+        <div className={styles.handleSectionTitle}>Entrées</div>
+        {Object.entries(payload_schema).map(([key, param]) => {
+          const linkInfo = links[key];
+          const manualValue = params[key];
+          return (
+            <div key={key} className={`${styles.handleRow} ${linkInfo ? styles.handleRowLinked : ""}`}>
+              <Handle type="target" position={Position.Left} id={`input-${key}`} />
+              <div className={styles.handleContent}>
+                <span className={styles.handleLabel}>{param.label || key}</span>
+                {linkInfo ? (
+                  <span className={styles.handleInfo}>
+                    Relié à {linkInfo.sourceTitle || "action"} · {linkInfo.label || linkInfo.field}
+                  </span>
+                ) : (
+                  <span className={styles.handleInfo}>
+                    {(manualValue !== undefined && manualValue !== null && manualValue !== "")
+                      ? formatValue(manualValue)
+                      : "Valeur manuelle requise"}
+                  </span>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const renderActionOutputs = () => {
+    if (type !== "action" || !output_schema || Object.keys(output_schema).length === 0) return null;
+    return (
+      <div className={styles.handleSection}>
+        <div className={styles.handleSectionTitle}>Sorties</div>
+        {Object.entries(output_schema).map(([key, meta]) => (
+          <div key={key} className={styles.handleRow}>
+            <div className={styles.handleContent}>
+              <span className={styles.handleLabel}>{meta.label || key}</span>
+              {meta?.path && meta.path !== key && (
+                <span className={styles.handleInfo}>chemin: {meta.path}</span>
+              )}
+            </div>
+            <Handle type="source" position={Position.Right} id={`output-${key}`} />
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className={`${styles.nodeBase} ${type === "action" ? styles.nodeAction : styles.nodeReaction}`}>
-      <Handle type="target" position="top" />
-      <strong>{title}</strong>
+      {type === "reaction" && (
+        <Handle type="target" position={Position.Top} id="general-in" />
+      )}
+      {type === "action" && action_kind !== "getter" && (
+        <Handle type="source" position={Position.Bottom} id="general-out" />
+      )}
+      <strong className={styles.nodeTitle}>{title}</strong>
       <div className={styles.nodeDescription}>{description}</div>
       {payload_schema && Object.keys(payload_schema).length > 0 && (
         <button onClick={() => setEditing(!editing)} className={styles.editParamsBtn}>
@@ -106,7 +193,8 @@ function WorkflowNode({ data, onParamsChange, onTest }) {
         Test
       </button>
       {renderParamsForm()}
-      <Handle type="source" position="bottom" />
+      {renderReactionInputs()}
+      {renderActionOutputs()}
     </div>
   );
 };
@@ -164,7 +252,7 @@ export default function CrArea() {
   const [connectedServices, setConnectedServices] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [edges, setEdges] = useEdgesState([]);
   const [workflowName, setWorkflowName] = useState("");
   const [menuType, setMenuType] = useState(null);
   const [editingNode, setEditingNode] = useState(null);
@@ -255,8 +343,11 @@ export default function CrArea() {
           axios.get(`${API_URL}/oauth/services`, { headers: { Authorization: `Bearer ${token}` } })
         ]);
 
-        setActions(Object.values(actionsRes.data || {}).flat());
-        setReactions(Object.values(reactionsRes.data || {}).flat());
+        const actionsData = actionsRes.data || {};
+        const reactionsData = reactionsRes.data || {};
+
+        setActions(Object.entries(actionsData).map(([key, meta]) => ({ ...meta, catalogKey: key })));
+        setReactions(Object.entries(reactionsData).map(([key, meta]) => ({ ...meta, catalogKey: key })));
 
         const serviceProviders = servicesListRes.data.services.map(s => s.provider);
 
@@ -289,19 +380,125 @@ export default function CrArea() {
     const newNode = {
       id: newNodeId, type: "workflowNode",
       position: { x: type === "action" ? 100 : 500, y: 100 + (nodes.length % 5) * 100 },
-      data: { id: newNodeId, title: item.title, description: item.description, service: item.service, event: item.event, type, payload_schema: item.payload_schema || null, params: {} },
+      data: {
+        id: newNodeId,
+        title: item.title,
+        description: item.description,
+        service: item.service,
+        event: item.event,
+        type,
+        payload_schema: item.payload_schema || null,
+        output_schema: item.output_schema || null,
+        action_kind: item.action_kind || "trigger",
+        params: {},
+        links: {}
+      },
     };
     setNodes((prev) => [...prev, newNode]);
     setMenuType(null);
   }, [nodes.length, setNodes]);
 
-  const onConnect = useCallback((params) => setEdges((eds) => addEdge({ ...params, animated: true }, eds)), [setEdges]);
+  const onConnect = useCallback((params) => {
+    const sourceNode = nodes.find((n) => n.id === params.source);
+    const targetNode = nodes.find((n) => n.id === params.target);
+    if (!sourceNode || !targetNode) {
+      return;
+    }
+
+    const isFieldConnection =
+      params.sourceHandle?.startsWith("output-") && params.targetHandle?.startsWith("input-");
+    const isGeneralConnection =
+      params.sourceHandle === "general-out" && params.targetHandle === "general-in";
+
+    if (!isFieldConnection && !isGeneralConnection) {
+      return;
+    }
+
+    if (isFieldConnection && (sourceNode.data.type !== "action" || targetNode.data.type !== "reaction")) {
+      return;
+    }
+    if (isGeneralConnection && (sourceNode.data.type !== "action" || sourceNode.data.action_kind === "getter")) {
+      return;
+    }
+
+    setEdges((eds) => {
+      const filtered = eds.filter(
+        (edge) => !(edge.target === params.target && edge.targetHandle === params.targetHandle)
+      );
+      return addEdge({ ...params, animated: true }, filtered);
+    });
+
+    if (isFieldConnection) {
+      const sourceField = params.sourceHandle.replace("output-", "");
+      const targetField = params.targetHandle.replace("input-", "");
+      const outputMeta = sourceNode.data.output_schema ? sourceNode.data.output_schema[sourceField] : null;
+
+      setNodes((nds) => nds.map((node) => {
+        if (node.id !== targetNode.id) return node;
+        const currentLinks = node.data.links || {};
+        const updatedLinks = {
+          ...currentLinks,
+          [targetField]: {
+            source: params.source,
+            field: sourceField,
+            path: outputMeta?.path || sourceField,
+            label: outputMeta?.label || sourceField,
+            sourceTitle: sourceNode.data.title
+          }
+        };
+        return { ...node, data: { ...node.data, links: updatedLinks } };
+      }));
+    }
+  }, [nodes, setEdges, setNodes]);
+
+  const onEdgesChange = useCallback((changes) => {
+    const removedEdges = changes
+      .filter((change) => change.type === "remove")
+      .map((change) => edges.find((edge) => edge.id === change.id))
+      .filter(Boolean);
+
+    if (removedEdges.length > 0) {
+      setNodes((nds) => nds.map((node) => {
+        let updatedLinks = node.data.links;
+        removedEdges.forEach((edge) => {
+          if (edge.target === node.id && edge.targetHandle?.startsWith("input-")) {
+            const field = edge.targetHandle.replace("input-", "");
+            if (updatedLinks && updatedLinks[field]) {
+              updatedLinks = { ...updatedLinks };
+              delete updatedLinks[field];
+            }
+          }
+        });
+        if (updatedLinks !== node.data.links) {
+          return { ...node, data: { ...node.data, links: updatedLinks } };
+        }
+        return node;
+      }));
+    }
+
+    setEdges((eds) => applyEdgeChanges(changes, eds));
+  }, [edges, setEdges, setNodes]);
 
   const handleCreateWorkflow = async () => {
     if (!workflowName) return alert("Give your workflow a name");
     if (edges.length === 0) return alert("Match at least one action to a reaction!");
-    const linkedNodes = nodes.filter((n) => edges.some((e) => e.source === n.id || e.target === n.id));
-    const steps = linkedNodes.map((n) => ({ type: n.data.type, service: n.data.service, event: n.data.event, params: n.data.params || {} }));
+    const linkedNodes = nodes
+      .filter((n) => edges.some((e) => e.source === n.id || e.target === n.id))
+      .sort((a, b) => {
+        const orderMap = { action: 0, reaction: 1, transformation: 2 };
+        const aOrder = orderMap[a.data.type] ?? 99;
+        const bOrder = orderMap[b.data.type] ?? 99;
+        if (aOrder !== bOrder) return aOrder - bOrder;
+        return a.id.localeCompare(b.id);
+      });
+    const steps = linkedNodes.map((n) => ({
+      client_id: n.id,
+      type: n.data.type,
+      service: n.data.service,
+      event: n.data.event,
+      params: n.data.params || {},
+      links: Object.keys(n.data.links || {}).length > 0 ? n.data.links : undefined
+    }));
     const payload = { name: workflowName, description: "Workflow created from ReactFlow", visibility: "private", steps };
     try {
       await axios.post(`${API_URL}/workflows/`, payload, { headers: { Authorization: `Bearer ${token}` } });

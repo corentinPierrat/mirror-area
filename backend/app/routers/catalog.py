@@ -12,86 +12,213 @@ ACTIONS_CATALOG = {
         "title": "A member joins the Discord server",
         "service": "discord",
         "event": "member_join",
+        "action_kind": "trigger",
         "payload_schema": {
             "guild_id": {
                 "type": "string",
                 "label": "Server ID"
             }
         },
-        "description": "Triggers when a member joins the specified Discord server."
+        "description": "Triggers when a member joins the specified Discord server.",
+        "output_schema": {
+            "guild_id": {
+                "type": "string",
+                "label": "Server ID",
+                "path": "guild_id"
+            },
+            "member_id": {
+                "type": "string",
+                "label": "Member ID",
+                "path": "user.id"
+            },
+            "member_username": {
+                "type": "string",
+                "label": "Member Username",
+                "path": "user.username"
+            }
+        }
     },
     "discord.member_remove": {
         "title": "A member leaves the Discord server",
         "service": "discord",
         "event": "member_remove",
+        "action_kind": "trigger",
         "payload_schema": {
             "guild_id": {
                 "type": "string",
                 "label": "Server ID"
             }
         },
-        "description": "Triggers when a member leaves the specified Discord server."
+        "description": "Triggers when a member leaves the specified Discord server.",
+        "output_schema": {
+            "guild_id": {
+                "type": "string",
+                "label": "Server ID",
+                "path": "guild_id"
+            },
+            "member_id": {
+                "type": "string",
+                "label": "Member ID",
+                "path": "user.id"
+            },
+            "member_username": {
+                "type": "string",
+                "label": "Member Username",
+                "path": "user.username"
+            }
+        }
     },
     "discord.member_update": {
         "title": "A member updates their nickname",
         "service": "discord",
 
         "event": "member_update",
+        "action_kind": "trigger",
         "payload_schema": {
             "guild_id": {
                 "type": "string",
                 "label": "Server ID"
             }
         },
-        "description": "Triggers when a member changes their nickname in the specified Discord server."
+        "description": "Triggers when a member changes their nickname in the specified Discord server.",
+        "output_schema": {
+            "guild_id": {
+                "type": "string",
+                "label": "Server ID",
+                "path": "guild_id"
+            },
+            "member_id": {
+                "type": "string",
+                "label": "Member ID",
+                "path": "user.id"
+            },
+            "new_nickname": {
+                "type": "string",
+                "label": "New Nickname",
+                "path": "new_nick"
+            },
+            "old_nickname": {
+                "type": "string",
+                "label": "Old Nickname",
+                "path": "old_nick"
+            }
+        }
     },
     "twitch.stream_online": {
         "title": "Stream goes live",
         "service": "twitch",
         "event": "stream.online",
+        "action_kind": "trigger",
         "payload_schema": {
             "username_streamer": {
                 "type": "string",
                 "label": "Streamer Username"
             }
         },
-        "description": "Triggers when a Twitch stream goes live."
+        "description": "Triggers when a Twitch stream goes live.",
+        "output_schema": {
+            "broadcaster_user_id": {
+                "type": "string",
+                "label": "Broadcaster ID",
+                "path": "broadcaster_user_id"
+            },
+            "broadcaster_user_name": {
+                "type": "string",
+                "label": "Broadcaster Name",
+                "path": "broadcaster_user_name"
+            },
+            "message": {
+                "type": "string",
+                "label": "Message",
+                "path": "message"
+            }
+        }
     },
     "twitch.new_follow": {
         "title": "New follower",
         "service": "twitch",
         "event": "channel.follow",
+        "action_kind": "trigger",
         "payload_schema": {
             "username_streamer": {
                 "type": "string",
                 "label": "Streamer Username"
             }
         },
-        "description": "Triggers when someone follows the channel."
+        "description": "Triggers when someone follows the channel.",
+        "output_schema": {
+            "broadcaster_user_id": {
+                "type": "string",
+                "label": "Broadcaster ID",
+                "path": "broadcaster_user_id"
+            },
+            "follower_name": {
+                "type": "string",
+                "label": "Follower Name",
+                "path": "follower_name"
+            },
+            "message": {
+                "type": "string",
+                "label": "Message",
+                "path": "message"
+            }
+        }
     },
     "twitch.new_subscriber": {
         "title": "New subscriber",
         "service": "twitch",
         "event": "channel.subscribe",
+        "action_kind": "trigger",
         "payload_schema": {
             "username_streamer": {
                 "type": "string",
                 "label": "Streamer Username"
             }
         },
-        "description": "Triggers when someone subscribes to the channel."
+        "description": "Triggers when someone subscribes to the channel.",
+        "output_schema": {
+            "broadcaster_user_id": {
+                "type": "string",
+                "label": "Broadcaster ID",
+                "path": "broadcaster_user_id"
+            },
+            "subscriber_name": {
+                "type": "string",
+                "label": "Subscriber Name",
+                "path": "subscriber_name"
+            },
+            "tier": {
+                "type": "string",
+                "label": "Subscription Tier",
+                "path": "tier"
+            },
+            "message": {
+                "type": "string",
+                "label": "Message",
+                "path": "message"
+            }
+        }
     },
     "discord.list_guilds": {
         "title": "List my Discord servers",
         "service": "discord",
         "event": "list_guilds",
+        "action_kind": "getter",
         "payload_schema": {},
-        "description": "Retrieves the list of Discord servers linked to your account."
+        "description": "Retrieves the list of Discord servers linked to your account.",
+        "output_schema": {
+            "text": {
+                "type": "string",
+                "label": "Guild names (one per line)",
+                "path": "text"
+            }
+        }
     },
     "google.recent_emails_from_sender": {
         "title": "Fetch recent emails from a sender",
         "service": "google",
         "event": "recent_emails_from_sender",
+        "action_kind": "getter",
         "payload_schema": {
             "sender": {
                 "type": "string (email)",
@@ -103,7 +230,19 @@ ACTIONS_CATALOG = {
                 "default": 20
             }
         },
-        "description": "Returns up to N recent emails received from the specified sender."
+        "description": "Returns up to N recent emails received from the specified sender.",
+        "output_schema": {
+            "count": {
+                "type": "number",
+                "label": "Email count",
+                "path": "count"
+            },
+            "messages": {
+                "type": "array",
+                "label": "Messages",
+                "path": "messages"
+            }
+        }
     },
 }
 

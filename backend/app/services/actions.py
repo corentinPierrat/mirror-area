@@ -20,17 +20,14 @@ async def discord_list_guilds_action(db: Session, user_id: int, params: dict) ->
     if response.status_code != 200:
         raise ValueError(f"Failed to fetch guilds: {response.text}")
     guilds = response.json()
-    simplified = [
-        {
-            "id": guild.get("id"),
-            "name": guild.get("name"),
-            "icon": guild.get("icon"),
-            "owner": guild.get("owner"),
-            "permissions": guild.get("permissions"),
-        }
-        for guild in guilds
-    ]
-    return {"guilds": simplified, "total": len(simplified)}
+    lines = []
+    for guild in guilds:
+        name = guild.get("name") or "Unknown guild"
+        if guild.get("owner"):
+            name = f"{name} (owner)"
+        lines.append(name)
+
+    return {"text": "\n".join(lines)}
 
 
 async def google_recent_emails_action(db: Session, user_id: int, params: dict) -> dict[str, Any]:
@@ -89,7 +86,14 @@ async def google_recent_emails_action(db: Session, user_id: int, params: dict) -
             "to": headers.get("To"),
             "snippet": snippet,
         })
-    return {"count": len(results), "messages": results}
+    if not results:
+        return {"text": "Aucun email trouvé."}
+    lines = []
+    for msg in results:
+        subject = msg.get("subject") or "(Sans objet)"
+        date = msg.get("date") or "Date inconnue"
+        lines.append(f"- {subject} ({date})")
+    return {"text": "\n".join(lines)}
 
 
 ACTION_DISPATCH: Dict[tuple[str, str], Callable[[Session, int, dict], Awaitable[Any]]] = {
