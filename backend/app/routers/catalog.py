@@ -136,11 +136,6 @@ REACTIONS_CATALOG = {
             "content": {
                 "type": "string",
                 "label": "Body"
-            },
-            "content_type": {
-                "type": "string (HTML|Text)",
-                "default": "HTML",
-                "label": "Format"
             }
         },
         "description": "Sends an email using the Gmail API."

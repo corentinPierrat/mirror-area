@@ -27,7 +27,7 @@ async def google_send_mail_reaction(db: Session, user_id: int, params: dict):
         return {"error": "Not logged in to Google"}
 
     client = oauth.create_client("google")
-    mime_message = MIMEText(params["content"], params.get("content_type", "html").lower())
+    mime_message = MIMEText(params["content"], "plain", "utf-8")
     mime_message["to"] = params["to"]
     mime_message["subject"] = params["subject"]
     raw_message = base64.urlsafe_b64encode(mime_message.as_bytes()).decode()
