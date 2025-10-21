@@ -193,6 +193,30 @@ REACTIONS_CATALOG = {
         },
         "description": "Posts a message in the specified FACEIT chat room."
     },
+    "spotify.play_playlist": {
+        "title": "Play a Spotify playlist",
+        "service": "spotify",
+        "event": "play_playlist",
+        "payload_schema": {
+            "playlist_id": {
+                "type": "string",
+                "label": "Playlist ID"
+            }
+        },
+        "description": "Plays the specified playlist on the user's active Spotify device."
+    },
+    "spotify.play_track": {
+        "title": "Play a Spotify track",
+        "service": "spotify",
+        "event": "play_track",
+        "payload_schema": {
+            "track_id": {
+                "type": "string",
+                "label": "Track ID"
+            }
+        },
+        "description": "Plays the specified track on the user's active Spotify device."
+    },
 }
 
 @catalog_router.get("/actions")

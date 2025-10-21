@@ -72,7 +72,16 @@ async def about(request: Request):
         {
             "name": "spotify",
             "actions": [],
-            "reactions": []
+            "reactions": [
+                {
+                    "name": "play_playlist",
+                    "description": "Joue une playlist spécifique sur Spotify."
+                },
+                {
+                    "name": "play_track",
+                    "description": "Joue une piste spécifique sur Spotify."
+                }
+            ]
         }
     ]
 

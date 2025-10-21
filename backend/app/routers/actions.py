@@ -14,7 +14,6 @@ actions_router = APIRouter(prefix="/actions", tags=["actions"])
 @actions_router.post("/discord")
 async def discord_action(request: Request, db: Session = Depends(get_db), bot_token: str = Header(None)):
     if bot_token != settings.BOT_SECRET:
-        print(bot_token, settings.BOT_SECRET)
         return JSONResponse(status_code=403, content={"detail": "Forbidden"})
 
     data = await request.json()

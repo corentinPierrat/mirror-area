@@ -23,7 +23,6 @@ class Settings:
         self.DISCORD_CLIENT_SECRET: str = os.getenv("DISCORD_CLIENT_SECRET")
         self.FACEIT_CLIENT_ID: str = os.getenv("FACEIT_CLIENT_ID")
         self.FACEIT_CLIENT_SECRET: str = os.getenv("FACEIT_CLIENT_SECRET")
-        self.TOKEN_BOT: str = os.getenv("TOKEN_BOT")
         self.GOOGLE_CLIENT_ID: str = os.getenv("GOOGLE_CLIENT_ID")
         self.GOOGLE_CLIENT_SECRET: str = os.getenv("GOOGLE_CLIENT_SECRET")
         self.TWITCH_CLIENT_ID: str = os.getenv("TWITCH_CLIENT_ID")
