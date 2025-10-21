@@ -1,9 +1,16 @@
 import React, { useEffect, useState } from "react";
-import Header from "./Header";
 import styles from "../styles/Hero.module.css";
 
 export default function Hero() {
   const [scrollY, setScrollY] = useState(0);
+  const [svgContent, setSvgContent] = useState("");
+
+  useEffect(() => {
+    // Charger le SVG inline depuis public
+    fetch("/arrow.svg")
+      .then((res) => res.text())
+      .then((text) => setSvgContent(text));
+  }, []);
 
   useEffect(() => {
     let ticking = false;
@@ -45,8 +52,6 @@ export default function Hero() {
         padding: `${currentPadding}px 20px 20px`,
       }}
     >
-      <Header />
-
       <div
         className={styles["hero-main"]}
         style={{
@@ -79,7 +84,16 @@ export default function Hero() {
             opacity: 1 - progress * 0.5,
           }}
         >
-          <img src="/arrow.PNG" alt="arrow" />
+          {svgContent && (
+            <span
+              dangerouslySetInnerHTML={{
+                __html: svgContent.replace(
+                  /strokeDashoffset="[^"]*"/g,
+                  `stroke-dasharray="200" stroke-dashoffset="${200 - 200 * progress}"`
+                ),
+              }}
+            />
+          )}
         </div>
       </div>
     </section>

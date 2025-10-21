@@ -1,7 +1,41 @@
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import styles from "../styles/Header.module.css";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Header() {
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("userToken");
+
+    if (token) {
+      const fetchUser = async () => {
+        try {
+          const res = await axios.get(`${API_URL}/auth/me`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setUser(res.data);
+        } catch (err) {
+          console.error("Token invalide ou expiré, déconnexion...", err);
+          localStorage.removeItem("userToken");
+        }
+      };
+      fetchUser();
+    }
+  }, []);
+
+  const handleDisconnect = () => {
+    localStorage.removeItem("userToken");
+    setUser(null);
+    navigate("/");
+  };
+  
+  const avatarUrl = user ? `https://api.dicebear.com/7.x/identicon/svg?seed=${user.username}` : '';
+
   return (
     <header className={styles.header}>
       <nav className={styles.navbar}>
@@ -14,8 +48,24 @@ export default function Header() {
           </ul>
         </div>
         <div className={styles['nav-right']}>
-          <Link to="/login" className={styles['signin-btn']}>Sign in</Link>
-          <Link to="/register" className={styles['signup-btn']}>Sign up</Link>
+          {user ? (
+            <>
+              <Link to="/Account" className={styles.userProfileBtn}>
+                <img src={avatarUrl} alt="Avatar" className={styles.userAvatar} />
+                {user.username}
+              </Link>
+
+
+              <button onClick={handleDisconnect} className={styles.disconnectBtn}>
+                Disconnect
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className={styles['signin-btn']}>Sign in</Link>
+              <Link to="/register" className={styles['signup-btn']}>Sign up</Link>
+            </>
+          )}
         </div>
       </nav>
     </header>

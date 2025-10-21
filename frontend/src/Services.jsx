@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Header from "./components/Header";
 import HeaderDashboard from "./components/HeaderDashboard";
 import Footer from "./components/Footer";
+import videoBg from "../public/bg-video.mp4";
 import styles from "./styles/Services.module.css";
 import axios from "axios";
 
@@ -94,13 +95,23 @@ export default function Services() {
 
   return (
     <div className={styles.dashboardContainer}>
+      <video
+        className={styles.videoBackground}
+        src={videoBg}
+        autoPlay
+        loop
+        muted
+        playsInline
+      />
       <div className={styles.dashboardBody}>
         <aside className={styles.sidebar}>
           <HeaderDashboard />
         </aside>
 
         <div className={styles.mainContent}>
-          <Header />
+          <div style={{ width: '0%' }}>
+            <Header />
+          </div>
 
           <div className={styles.servicesContainer}>
             <h2 className={styles.servicesTitle}>My connections</h2>

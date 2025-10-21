@@ -7,14 +7,14 @@ function ProfileSettings() {
   const [password, setPassword] = useState("");
 
   const handleSave = () => {
-    console.log("Profil mis à jour:", { email, username, password });
+    console.log("Updated profile:", { email, username, password });
     alert("profil changes saved in console log");
   };
 
   return (
     <div className="page-container">
       <div className="card">
-        <h2>Mon Profil</h2>
+        <h2>My Profile</h2>
 
         <label>Email</label>
         <input
@@ -23,14 +23,14 @@ function ProfileSettings() {
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <label>Nom d'utilisateur</label>
+        <label>Username</label>
         <input
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
 
-        <label>Nouveau mot de passe</label>
+        <label>New Password</label>
         <input
           type="password"
           value={password}
@@ -38,7 +38,7 @@ function ProfileSettings() {
         />
 
         <button className="btn" onClick={handleSave}>
-          Sauvegarder
+          Save
         </button>
       </div>
     </div>
