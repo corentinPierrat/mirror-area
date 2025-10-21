@@ -3,6 +3,7 @@
   flex-direction: column;
   height: 80vh;
   padding: 20px;
+  margin-top: 50%;
   gap: 10px;
 }
 
@@ -79,6 +80,8 @@
   background: #2a2a40;
   color: #fff;
   outline: none;
+  position: relative;
+  z-index: 2;
 }
 
 .headerRight {
@@ -220,7 +223,7 @@
   color: #fff;
   min-width: 220px;
   text-align: center;
-  border: 2px solid #fff;
+  border: 2px solid #ffffff18;
 }
 
 .react-flow__controls-button.react-flow__controls-zoomin{
@@ -228,11 +231,11 @@
 }
 
 .nodeAction {
-  background: #2a72a2;
+  background: #2a40a260;
 }
 
 .nodeReaction {
-  background: #2a2a72;
+  background: #2a2a726e;
 }
 
 .nodeDescription {

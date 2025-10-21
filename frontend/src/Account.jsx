@@ -22,8 +22,8 @@ export default function Account() {
       });
       setUser(res.data);
     } catch (err) {
-      console.error("Erreur récupération profil:", err);
-      setMessage("Impossible de récupérer vos informations.");
+      console.error("Profile recovery error:", err);
+      setMessage("Unable to retrieve your information.");
     }
   };
 
@@ -35,18 +35,18 @@ export default function Account() {
         { old_password: oldPassword, new_password: newPassword },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setMessage("Mot de passe mis à jour avec succès !");
+      setMessage("Password updated successfully");
       setShowPasswordForm(false);
       setOldPassword("");
       setNewPassword("");
     } catch (err) {
-      console.error("Erreur changement mot de passe:", err);
-      setMessage("Erreur lors du changement de mot de passe.");
+      console.error("Password change error:", err);
+      setMessage("Error changing password.");
     }
   };
 
   const handleDeleteAccount = async () => {
-    if (!window.confirm("⚠️ Êtes-vous sûr de vouloir supprimer votre compte ?")) return;
+    if (!window.confirm("Are you sure you want to delete your account? ?")) return;
     try {
       await axios.delete(`${API_URL}/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -54,8 +54,8 @@ export default function Account() {
       localStorage.removeItem("userToken");
       window.location.href = "/login";
     } catch (err) {
-      console.error("Erreur suppression compte:", err);
-      setMessage("Erreur lors de la suppression du compte.");
+      console.error("Account deletion error:", err);
+      setMessage("Error deleting account.");
     }
   };
 
@@ -65,7 +65,6 @@ export default function Account() {
 
   return (
     <div className={styles.pageContainer}>
-      <Header />
 
       <div className={styles.contentWrapper}>
         <aside className={styles.sidebar}>
@@ -73,6 +72,7 @@ export default function Account() {
         </aside>
 
         <main className={styles.mainContent}>
+        <Header />
           <div className={styles.accountContainer}>
             {message && <p className={styles.message}>{message}</p>}
 
@@ -84,23 +84,23 @@ export default function Account() {
 
             {showPasswordForm && (
               <form className={styles.passwordForm} onSubmit={handleChangePassword}>
-                <h3>Modifier le mot de passe</h3>
+                <h3>Change password</h3>
                 <input
                   type="password"
-                  placeholder="Ancien mot de passe"
+                  placeholder="Old Password"
                   value={oldPassword}
                   onChange={(e) => setOldPassword(e.target.value)}
                   required
                 />
                 <input
                   type="password"
-                  placeholder="Nouveau mot de passe"
+                  placeholder="New Password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
                 />
                 <button type="submit" className={styles.saveBtn}>
-                  Enregistrer
+                  Save
                 </button>
               </form>
             )}

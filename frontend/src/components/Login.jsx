@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styles from "../styles/Login.module.css";
+import videoBg from "../../public/bg-video.mp4";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -61,8 +62,15 @@ export default function Login() {
 
   return (
     <div className={styles.container}>
+      <video
+              className={styles.videoBackground}
+              src={videoBg}
+              autoPlay
+              loop
+              muted
+              playsInline
+            />
       <div className={styles.card}>
-        <h1 className={styles.title}>Connection</h1>
 
         <form onSubmit={handleLogin}>
           <input
@@ -80,15 +88,15 @@ export default function Login() {
             onChange={(e) => setPassword(e.target.value)}
           />
           {message && <p className={styles.message}>{message}</p>}
-          <button type="submit" className={styles.button} disabled={loading}>
+          <button type="submit" className={styles.buttons} disabled={loading}>
             {loading ? "Connection..." : "Connection"}
           </button>
         </form>
 
+      </div>
         <p className={styles.linkText}>
         No account? <span onClick={goToRegister} className={styles.link}>Register</span>
         </p>
-      </div>
     </div>
   );
 }

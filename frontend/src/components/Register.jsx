@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import videoBg from "../../public/bg-video.mp4";
 import axios from "axios";
 import styles from "../styles/Register.module.css";
 
@@ -43,7 +44,14 @@ export default function Register() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Create an account</h1>
+      <video
+                    className={styles.videoBackground}
+                    src={videoBg}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                  />
       <form onSubmit={handleRegister} className={styles.form}>
         <input
           type="text"

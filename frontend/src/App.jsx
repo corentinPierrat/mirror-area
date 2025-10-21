@@ -11,6 +11,8 @@ import Services from "./Services"
 import CreationPage from "./CreationPage"
 import Account from "./Account"
 import EditWorkflowModal from "./components/EditWorkflow"
+import ThreeBackground from "./components/ThreeBackground"
+
 
 
 function App() {
@@ -30,8 +32,10 @@ function App() {
         <Route path="/CreationPage" element={<CreationPage />} />
         <Route path="/Account" element={<Account />} />
         <Route path="/EditWorkflowModal" element={<EditWorkflowModal />} />
+        <Route path="/ThreeBackground" element={<ThreeBackground />} />
       </Routes>
     </Router>
+    
   );
 }
 

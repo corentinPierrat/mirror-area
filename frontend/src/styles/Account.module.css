@@ -2,6 +2,8 @@
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+  background: linear-gradient(135deg, #171542 0%, #2f339e 100%);
+
   }
   
   .contentWrapper {
@@ -10,26 +12,24 @@
     /* background: #0d0d0d; */
   }
   
-  /* Barre latérale à gauche */
   .sidebar {
     width: 250px;
-    background: #1a1a1a;
+    /* background: #1a1a1a; */
     /* border-right: 2px solid #00ff88; */
     padding: 2rem 1rem;
   }
   
-  /* Contenu principal centré */
   .mainContent {
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: flex-start;
     padding: 3rem;
+    margin-top: 150px;
   }
   
-  /* Conteneur du compte */
   .accountContainer {
-    background: #141414;
+    /* background: #141414; */
     border-radius: 16px;
     padding: 2rem 3rem;
     display: flex;
@@ -39,9 +39,10 @@
     width: 100%;
     max-width: 600px;
     /* box-shadow: 0 0 10px rgba(0, 255, 136, 0.2); */
+
+    
   }
   
-  /* Formulaire de mot de passe */
   .passwordForm {
     display: flex;
     flex-direction: column;

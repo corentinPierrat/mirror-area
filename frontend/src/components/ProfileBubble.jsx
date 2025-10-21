@@ -16,8 +16,8 @@ export default function ProfileBubble() {
         });
         setUser(res.data);
       } catch (err) {
-        console.error("Erreur chargement profil:", err);
-        setError("Impossible de charger le profil.");
+        console.error("Error loading profile:", err);
+        setError("Unable to load profile.");
       }
     };
     fetchUser();
