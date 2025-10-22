@@ -4,9 +4,9 @@ import { BlurView } from 'expo-blur';
 import { useTranslation } from "react-i18next";
 import { Ionicons } from '@expo/vector-icons';
 
-const Workflows = ({ Name, ActionLogo, ReactionLogo, onDelete, onEdit }) => {
+const Workflows = ({ Name, ActionLogo, ReactionLogo, onDelete, onEdit, isActive }) => {
   const { t } = useTranslation();
-  const [isEnabled, setIsEnabled] = useState(false);
+  const [isEnabled, setIsEnabled] = useState(isActive);
   const toggleSwitch = () => setIsEnabled(prev => !prev);
 
   const handleDelete = () => {

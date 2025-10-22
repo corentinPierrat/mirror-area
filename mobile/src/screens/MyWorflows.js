@@ -62,6 +62,7 @@ export default function MyWorkflowScreen({ navigation }) {
         headers: { Authorization: `Bearer ${token}` },
       });
       setWorkflows(response.data);
+      console.log('Workflows récupérés :', response.data);
     } catch (error) {
       console.error('Erreur lors de la récupération des workflows :', error);
     }
@@ -286,6 +287,7 @@ export default function MyWorkflowScreen({ navigation }) {
                 ReactionLogo={reactionLogo}
                 onDelete={() => handleDeleteWorkflow(workflow.id)}
                 onEdit={() => handleEditWorkflow(workflow)}
+                isActive={workflow.active}
               />
             );
           })
