@@ -324,10 +324,12 @@ export default function MyWorkflowScreen({ navigation }) {
                 >
                   <View style={styles.serviceSelectorContent}>
                     {selectedAction && (
-                      <Image
-                        source={{ uri: URLs.find(u => u.provider === selectedAction.service)?.logo_url }}
-                        style={styles.serviceLogo}
-                      />
+                      <View style={styles.logoContainer}>
+                        <Image
+                          source={{ uri: URLs.find(u => u.provider === selectedAction.service)?.logo_url }}
+                          style={styles.logo}
+                        />
+                      </View>
                     )}
                     <Text style={styles.serviceName}>
                       {selectedAction?.event || t("Sélectionner une action")}
@@ -346,10 +348,12 @@ export default function MyWorkflowScreen({ navigation }) {
                 >
                   <View style={styles.serviceSelectorContent}>
                     {selectedReaction && (
-                      <Image
-                        source={{ uri: URLs.find(u => u.provider === selectedReaction.service)?.logo_url }}
-                        style={styles.serviceLogo}
-                      />
+                      <View style={styles.logoContainer}>
+                        <Image
+                          source={{ uri: URLs.find(u => u.provider === selectedReaction.service)?.logo_url }}
+                          style={styles.logo}
+                        />
+                      </View>
                     )}
                     <Text style={styles.serviceName}>
                       {selectedReaction?.event || t("Sélectionner une réaction")}
@@ -549,6 +553,26 @@ export default function MyWorkflowScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  logo: {
+    width: 32,
+    height: 32,
+    resizeMode: 'contain',
+    borderRadius: 4,
+  },
+  logoContainer: {
+    width: 52,
+    height: 52,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    shadowColor: 'rgba(0,0,0,0.1)',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
   container: {
     flex: 1,
   },
@@ -651,6 +675,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 15,
     flex: 1,
+    marginLeft: 8,
   },
   paramsButton: {
     backgroundColor: 'rgba(59,130,246,0.2)',
