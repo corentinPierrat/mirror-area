@@ -66,7 +66,8 @@ async def trigger_workflows(service: str, event_type: str, data: dict, db: Sessi
     filter_conditions = [
         WorkflowStep.event == event_type,
         WorkflowStep.service == service,
-        WorkflowStep.type == "action"
+        WorkflowStep.type == "action",
+        Workflow.active == True
     ]
 
     if service == "discord" and "guild_id" in data:

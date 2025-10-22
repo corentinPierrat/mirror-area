@@ -22,7 +22,8 @@ async def create_workflow(
             user_id=current_user.id,
             name=workflow.name,
             description=workflow.description,
-            visibility=workflow.visibility
+            visibility=workflow.visibility,
+            active=workflow.active
         )
         db.add(db_workflow)
         db.commit()
@@ -120,6 +121,7 @@ async def update_workflow(
         db_workflow.name = workflow_update.name
         db_workflow.description = workflow_update.description
         db_workflow.visibility = workflow_update.visibility
+        db_workflow.active = workflow_update.active
 
         await delete_steps_for_workflow(db, db_workflow, current_user.id)
         await create_steps_for_workflow(db, db_workflow.id, workflow_update.steps, current_user.id)
@@ -135,3 +137,20 @@ async def update_workflow(
         db.rollback()
         print(f"Failed to update workflow: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to update workflow: {e}")
+
+@workflows_router.patch("/{workflow_id}/toggle", response_model=WorkflowOut)
+async def toggle_workflow_status(
+    workflow_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Basculer le statut actif/inactif d'un workflow"""
+    workflow = db.query(Workflow).filter_by(id=workflow_id, user_id=current_user.id).first()
+    if not workflow:
+        raise HTTPException(status_code=404, detail="Workflow not found")
+
+    workflow.active = not workflow.active
+    db.commit()
+    db.refresh(workflow)
+
+    return workflow

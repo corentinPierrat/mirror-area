@@ -13,6 +13,7 @@ class WorkflowCreate(BaseModel):
     name: str
     description: Optional[str] = None
     visibility: str = "private"
+    active: bool = True
     steps: List[WorkflowStepCreate]
 
 class WorkflowOut(BaseModel):
@@ -20,6 +21,7 @@ class WorkflowOut(BaseModel):
     name: str
     description: Optional[str]
     visibility: str
+    active: bool
     steps: List[WorkflowStepCreate]
 
     class Config:
