@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { act, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Alert, TextInput } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
@@ -161,9 +161,11 @@ export default function CreateWorkflowScreen() {
       const res = await axios.get(`${API_URL}/oauth/services`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+      console.log(res.data)
       const urls = res.data.services.map(s => ({
         provider: s.provider,
         logo_url: s.logo_url,
+        connected: s.connected,
       }));
       console.log('Liste des URLs :', urls);
       setURLs(urls);
@@ -239,7 +241,6 @@ useEffect(() => {
           </View>
         </Modal>
 
-
           <Modal visible={isActionModalVisible} transparent animationType="fade">
             <View style={styles.modalContainer}>
               <View style={styles.modalContentWrapper}>
@@ -259,10 +260,14 @@ useEffect(() => {
                         <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700', marginVertical: 10 }}>{service.charAt(0).toUpperCase() + service.slice(1)}</Text>
                         {serviceActions.map((action, index) => (
                           <TouchableOpacity
-                            key={index}
-                            style={styles.modalItemWrapper}
-                            onPress={() => handleSelectAction(action)}
-                          >
+                              key={index}
+                              style={[
+                                styles.modalItemWrapper,
+                                !URLs.find(u => u.provider === action?.service)?.connected && styles.modalItemDisabled
+                              ]}
+                              onPress={() => handleSelectAction(action)}
+                              disabled={!URLs.find(u => u.provider === action?.service)?.connected}
+                            >
                             <BlurView style={styles.modalItemBlur} intensity={50} tint="systemUltraThinMaterialDark" />
                             <View style={styles.modalItemOverlay} />
                             <View style={styles.modalItemContent}>
@@ -284,7 +289,6 @@ useEffect(() => {
               </View>
             </View>
           </Modal>
-
 
           <View style={styles.connectorWrapper}>
             <View style={styles.connectorLine} />
@@ -357,9 +361,12 @@ useEffect(() => {
                         {serviceReactions.map((reaction, index) => (
                           <TouchableOpacity
                             key={index}
-                            style={styles.modalItemWrapper}
+                            style={[styles.modalItemWrapper, !URLs.find(u => u.provider === reaction?.service)?.connected && styles.modalItemDisabled
+                            ]}
                             onPress={() => handleSelectReaction(reaction)}
+                            disabled={!URLs.find(u => u.provider === reaction?.service)?.connected}
                           >
+
                             <BlurView style={styles.modalItemBlur} intensity={50} tint="systemUltraThinMaterialDark" />
                             <View style={styles.modalItemOverlay} />
                             <View style={styles.modalItemContent}>
@@ -581,4 +588,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 15,
   },
+  modalItemDisabled: {
+  opacity: 0.4,
+  backgroundColor: 'rgba(255,255,255,0.05)',
+},
 });
