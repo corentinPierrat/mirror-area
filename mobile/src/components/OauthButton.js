@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Text, Image, StyleSheet, View, Alert } from 'react-native';
+import { TouchableOpacity, Text, Image, StyleSheet, View } from 'react-native';
 import { BlurView } from 'expo-blur';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -7,7 +7,7 @@ import * as Linking from 'expo-linking';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from "react-i18next";
 
-const OAuthButton = ({ logo, apiRoute, onSuccess, connected }) => {
+const OAuthButton = ({ logo, apiRoute, onSuccess, connected, provider }) => {
   const navigation = useNavigation();
   const { t } = useTranslation();
 
@@ -25,7 +25,14 @@ const OAuthButton = ({ logo, apiRoute, onSuccess, connected }) => {
         });
         if (onSuccess) onSuccess();
       } else {
-        const authUrl = `${apiRoute}?token=${encodeURIComponent(token)}`;
+        if (!provider) {
+          console.warn('Provider manquant pour le bouton OAuth');
+          return;
+        }
+        const redirectUri = Linking.createURL('oauth/callback', {
+          queryParams: { provider },
+        });
+        const authUrl = `${apiRoute}?token=${encodeURIComponent(token)}&redirect_uri=${encodeURIComponent(redirectUri)}`;
         await Linking.openURL(authUrl);
       }
     } catch (error) {

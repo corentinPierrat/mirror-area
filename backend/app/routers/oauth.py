@@ -98,7 +98,13 @@ oauth.register(
 )
 
 @oauth_router.get("/{provider}/login")
-async def oauth_login(provider: str, request: Request, token: str = Query(None), db: Session = Depends(get_db)):
+async def oauth_login(
+    provider: str,
+    request: Request,
+    token: str = Query(None),
+    redirect_uri_param: str | None = Query(None, alias="redirect_uri"),
+    db: Session = Depends(get_db)
+):
     if provider not in oauth._clients:
         return JSONResponse({"error": "Provider inconnu"}, status_code=400)
 
@@ -117,6 +123,7 @@ async def oauth_login(provider: str, request: Request, token: str = Query(None),
         return JSONResponse({"error": "Token invalide"}, status_code=401)
 
     request.session['oauth_user_id'] = user.id
+    request.session['oauth_redirect_uri'] = redirect_uri_param or "http://localhost:8081/Services"
     redirect_uri = f"https://trigger.ink/oauth/{provider}/callback"
     return await oauth.create_client(provider).authorize_redirect(request, redirect_uri, redirect_popup="true")
 
@@ -130,7 +137,8 @@ async def oauth_callback(provider: str, request: Request, db: Session = Depends(
         user_id = request.session.get('oauth_user_id')
         if user_id:
             save_token_to_db(db, user_id, provider, token)
-        return RedirectResponse("http://localhost:8081/Services")
+        final_redirect = request.session.pop('oauth_redirect_uri', None) or "http://localhost:8081/Services"
+        return RedirectResponse(final_redirect)
     except Exception as e:
         print(f"Erreur OAuth callback: {e}")
         return JSONResponse({
