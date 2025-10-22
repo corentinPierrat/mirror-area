@@ -2,14 +2,19 @@ import React, { useState } from 'react';
 import { TouchableOpacity, Text, Image, StyleSheet, View, Switch } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { useTranslation } from "react-i18next";
+import { Ionicons } from '@expo/vector-icons';
 
-const Workflows = ({ Name, ActionLogo, ReactionLogo, onDelete }) => {
+const Workflows = ({ Name, ActionLogo, ReactionLogo, onDelete, onEdit, isActive }) => {
   const { t } = useTranslation();
-  const [isEnabled, setIsEnabled] = useState(false);
+  const [isEnabled, setIsEnabled] = useState(isActive);
   const toggleSwitch = () => setIsEnabled(prev => !prev);
 
   const handleDelete = () => {
     if (onDelete) onDelete();
+  };
+
+  const handleEdit = () => {
+    if (onEdit) onEdit();
   };
 
   return (
@@ -80,8 +85,12 @@ const Workflows = ({ Name, ActionLogo, ReactionLogo, onDelete }) => {
             style={styles.switch}
           />
 
+          <TouchableOpacity onPress={handleEdit} activeOpacity={0.7} style={styles.editButton}>
+            <Ionicons name="pencil" size={24} color="white" />
+          </TouchableOpacity>
+
           <TouchableOpacity onPress={handleDelete} activeOpacity={0.7} style={styles.deleteButton}>
-            <Text style={styles.deleteIcon}>🗑️</Text>
+            <Ionicons name="trash" size={24} color="white" />
           </TouchableOpacity>
         </View>
       </View>
@@ -221,6 +230,20 @@ const styles = StyleSheet.create({
   },
   switch: {
     marginHorizontal: 12,
+  },
+  editButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: 'rgba(59,130,246,0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(59,130,246,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  editIcon: {
+    fontSize: 18,
   },
   deleteButton: {
     width: 40,
