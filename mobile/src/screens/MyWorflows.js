@@ -281,13 +281,13 @@ export default function MyWorkflowScreen({ navigation }) {
 
             return (
               <Workflows
-                key={workflow.id}
                 Name={workflow.name}
                 ActionLogo={actionLogo}
                 ReactionLogo={reactionLogo}
                 onDelete={() => handleDeleteWorkflow(workflow.id)}
                 onEdit={() => handleEditWorkflow(workflow)}
                 isActive={workflow.active}
+                workflowId={workflow.id}
               />
             );
           })

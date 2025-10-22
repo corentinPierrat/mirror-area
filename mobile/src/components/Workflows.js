@@ -3,11 +3,15 @@ import { TouchableOpacity, Text, Image, StyleSheet, View, Switch } from 'react-n
 import { BlurView } from 'expo-blur';
 import { useTranslation } from "react-i18next";
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { API_URL } from "../../config";
 
-const Workflows = ({ Name, ActionLogo, ReactionLogo, onDelete, onEdit, isActive }) => {
+const Workflows = ({ Name, ActionLogo, ReactionLogo, onDelete, onEdit, isActive, workflowId }) => {
+  const navigation = useNavigation();
   const { t } = useTranslation();
   const [isEnabled, setIsEnabled] = useState(isActive);
-  const toggleSwitch = () => setIsEnabled(prev => !prev);
 
   const handleDelete = () => {
     if (onDelete) onDelete();
@@ -15,6 +19,25 @@ const Workflows = ({ Name, ActionLogo, ReactionLogo, onDelete, onEdit, isActive 
 
   const handleEdit = () => {
     if (onEdit) onEdit();
+  };
+
+  const handleToggle = async () => {
+    setIsEnabled(prev => !prev);
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) {
+      navigation.replace('Login');
+      return;
+    }
+    try {
+      const response = await axios.patch(`${API_URL}/workflows/${workflowId}/toggle`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.status === 200) {
+        setIsEnabled(response.data.active);
+      }
+    } catch (error) {
+      console.log('Erreur lors du changement de statut du workflow:', error.response?.data || error.message);
+    }
   };
 
   return (
@@ -80,7 +103,7 @@ const Workflows = ({ Name, ActionLogo, ReactionLogo, onDelete, onEdit, isActive 
             trackColor={{ false: 'rgba(148,163,184,0.3)', true: 'rgba(16,185,129,0.4)' }}
             thumbColor={isEnabled ? '#34d399' : '#94a3b8'}
             ios_backgroundColor="rgba(148,163,184,0.2)"
-            onValueChange={toggleSwitch}
+            onValueChange={handleToggle}
             value={isEnabled}
             style={styles.switch}
           />
