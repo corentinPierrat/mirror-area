@@ -1,4 +1,4 @@
-from app.services.token_storage import get_token_from_db, refresh_oauth_token
+from app.services.token_storage import refresh_oauth_token
 from app.routers.oauth import oauth
 from sqlalchemy.orm import Session
 from typing import Dict, Any, Callable
@@ -122,10 +122,10 @@ async def faceit_send_message_reaction(db: Session, user_id: int, params: dict):
         return {"error": "Missing room_id"}
     if not message_body or not message_body.strip():
         return {"error": "Missing body"}
-    token_data = get_token_from_db(db, user_id, "faceit")
-    if not token_data:
+    token = await refresh_oauth_token(db, user_id, "faceit")
+    if not token:
         return {"error": "Not logged in to Faceit"}
-    access_token = token_data.get("access_token")
+    access_token = token.get("access_token")
     if not access_token:
         return {"error": "Faceit access token missing"}
     payload = {"body": message_body}

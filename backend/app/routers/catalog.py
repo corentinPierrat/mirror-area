@@ -244,6 +244,113 @@ ACTIONS_CATALOG = {
             }
         }
     },
+    "faceit.retrieve_player_stats": {
+        "title": "Retrieve FACEIT player statistics",
+        "service": "faceit",
+        "event": "retrieve_player_stats",
+        "action_kind": "getter",
+        "payload_schema": {
+            "player_id": {
+                "type": "string",
+                "label": "Player ID"
+            },
+            "game_id": {
+                "type": "string",
+                "label": "Game ID",
+                "default": "csgo"
+            },
+            "limit": {
+                "type": "number",
+                "label": "Limit",
+                "default": 20,
+                "optional": True
+            },
+            "from": {
+                "type": "number",
+                "label": "From (epoch ms)",
+                "optional": True
+            },
+            "to": {
+                "type": "number",
+                "label": "To (epoch ms)",
+                "optional": True
+            }
+        },
+        "description": "Fetches aggregated statistics for a player over recent FACEIT matches.",
+        "output_schema": {
+            "stats": {
+                "type": "object",
+                "label": "Statistics payload",
+                "path": "stats"
+            }
+        }
+    },
+    "faceit.retrieve_player_ranking": {
+        "title": "Retrieve FACEIT player ranking",
+        "service": "faceit",
+        "event": "retrieve_player_ranking",
+        "action_kind": "getter",
+        "payload_schema": {
+            "player_id": {
+                "type": "string",
+                "label": "Player ID"
+            },
+            "game_id": {
+                "type": "string",
+                "label": "Game ID",
+                "default": "cs2"
+            },
+            "region": {
+                "type": "string",
+                "label": "Region",
+                "default": "EU"
+            },
+            "country": {
+                "type": "string",
+                "label": "Country (ISO code)",
+                "optional": True
+            },
+            "limit": {
+                "type": "number",
+                "label": "Limit",
+                "default": 20,
+                "optional": True
+            }
+        },
+        "description": "Retrieves the player ranking details within the specified FACEIT game region.",
+        "output_schema": {
+            "ranking": {
+                "type": "object",
+                "label": "Ranking payload",
+                "path": "ranking"
+            }
+        }
+    },
+    "faceit.retrieve_hub_details": {
+        "title": "Retrieve FACEIT hub details",
+        "service": "faceit",
+        "event": "retrieve_hub_details",
+        "action_kind": "getter",
+        "payload_schema": {
+            "hub_id": {
+                "type": "string",
+                "label": "Hub ID"
+            },
+            "expanded": {
+                "type": "string[]",
+                "label": "Expand entities (organizer, game)",
+                "optional": True
+            }
+        },
+        "description": "Fetches information about a FACEIT hub.",
+        "output_schema": {
+            "hub": {
+                "type": "object",
+                "label": "Hub payload",
+                "path": "hub"
+            }
+        }
+    },
 }
 
 REACTIONS_CATALOG = {
