@@ -16,8 +16,8 @@ def run_tests():
     test_user = {
         "username": f"testuser_{unique_id}",
         "email": f"test_{unique_id}@example.com",
-        "password": "StrongPassword123!",
-        "new_password": "EvenStrongerPassword456!"
+        "password": "Password123!",
+        "new_password": "Password456!"
     }
     jwt_token = None
 
