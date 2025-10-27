@@ -244,6 +244,37 @@ ACTIONS_CATALOG = {
             }
         }
     },
+    "faceit.get_player_id": {
+        "title": "Lookup FACEIT player ID",
+        "service": "faceit",
+        "event": "get_player_id",
+        "action_kind": "getter",
+        "payload_schema": {
+            "nickname": {
+                "type": "string",
+                "label": "Player nickname"
+            }
+        },
+        "description": "Retrieves the unique FACEIT player ID associated with the provided nickname.",
+        "output_schema": {
+            "player_id": {
+                "type": "string",
+                "label": "Player ID",
+                "path": "player_id"
+            },
+            "nickname": {
+                "type": "string",
+                "label": "Nickname",
+                "path": "nickname"
+            },
+            "country": {
+                "type": "string",
+                "label": "Country",
+                "path": "country",
+                "optional": True
+            }
+        }
+    },
     "faceit.retrieve_player_stats": {
         "title": "Retrieve FACEIT player statistics",
         "service": "faceit",
@@ -326,28 +357,38 @@ ACTIONS_CATALOG = {
             }
         }
     },
-    "faceit.retrieve_hub_details": {
-        "title": "Retrieve FACEIT hub details",
+    "faceit.match_finished": {
+        "title": "FACEIT match finished",
         "service": "faceit",
-        "event": "retrieve_hub_details",
-        "action_kind": "getter",
+        "event": "match_finished",
+        "action_kind": "trigger",
         "payload_schema": {
-            "hub_id": {
+            "player_id": {
                 "type": "string",
-                "label": "Hub ID"
-            },
-            "expanded": {
-                "type": "string[]",
-                "label": "Expand entities (organizer, game)",
-                "optional": True
+                "label": "Player ID"
             }
         },
-        "description": "Fetches information about a FACEIT hub.",
+        "description": "Triggers when the specified FACEIT player finishes a match.",
         "output_schema": {
-            "hub": {
+            "team_score": {
+                "type": "number",
+                "label": "Team score",
+                "path": "team_score"
+            },
+            "opponent_score": {
+                "type": "number",
+                "label": "Opponent score",
+                "path": "opponent_score"
+            },
+            "is_winner": {
+                "type": "boolean",
+                "label": "Win",
+                "path": "is_winner"
+            },
+            "player_stats": {
                 "type": "object",
-                "label": "Hub payload",
-                "path": "hub"
+                "label": "Player stats",
+                "path": "player_stats"
             }
         }
     },
@@ -448,22 +489,6 @@ REACTIONS_CATALOG = {
             }
         },
         "description": "Sends a message to the specified Discord channel using the connected bot."
-    },
-    "faceit.send_room_message": {
-        "title": "Send a message to a FACEIT room",
-        "service": "faceit",
-        "event": "send_room_message",
-        "payload_schema": {
-            "room_id": {
-                "type": "string",
-                "label": "Room ID"
-            },
-            "body": {
-                "type": "string",
-                "label": "Message body"
-            }
-        },
-        "description": "Posts a message in the specified FACEIT chat room."
     },
     "spotify.play_playlist": {
         "title": "Play a Spotify playlist",

@@ -219,7 +219,6 @@ async def create_steps_for_workflow(db: Session, workflow_id: int, steps: list, 
                 broadcaster_id = await get_twitch_user_id(username)
                 webhook_id = await create_twitch_webhook(step.event, broadcaster_id)
                 db_step.params["webhook_id"] = webhook_id
-
             created_steps.append(db_step)
         except Exception as exc:
             raise HTTPException(

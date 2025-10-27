@@ -155,6 +155,44 @@ async def faceit_player_stats_action(db: Session, user_id: int, params: dict) ->
         "stats": data,
     }
 
+async def faceit_get_player_id_action(db: Session, user_id: int, params: dict) -> dict[str, Any]:
+    api_key = settings.FACEIT_API_KEY
+    if not api_key:
+        raise ValueError("FACEIT_API_KEY not configured")
+
+    nickname = params.get("nickname") or params.get("player_nickname") or params.get("playerNickname")
+    if not nickname or not str(nickname).strip():
+        raise ValueError("Missing nickname")
+    nickname = str(nickname).strip()
+
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        response = await client.get(
+            "https://open.faceit.com/data/v4/players",
+            params={"nickname": nickname},
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Accept": "application/json",
+            },
+        )
+    if response.status_code != 200:
+        try:
+            detail = response.json()
+        except Exception:
+            detail = response.text
+        raise ValueError(f"Failed to fetch player: {detail}")
+
+    data = response.json()
+    player_id = data.get("player_id")
+    if not player_id:
+        raise ValueError(f"Player '{nickname}' not found")
+
+    return {
+        "player_id": player_id,
+        "nickname": data.get("nickname") or nickname,
+        "country": data.get("country"),
+        "game_id": data.get("game_id") or data.get("games", {}).get("cs2", {}).get("game_id"),
+    }
+
 
 async def faceit_player_ranking_action(db: Session, user_id: int, params: dict) -> dict[str, Any]:
     api_key = settings.FACEIT_API_KEY
@@ -212,53 +250,6 @@ async def faceit_player_ranking_action(db: Session, user_id: int, params: dict) 
     }
 
 
-async def faceit_hub_details_action(db: Session, user_id: int, params: dict) -> dict[str, Any]:
-    api_key = settings.FACEIT_API_KEY
-    if not api_key:
-        raise ValueError("FACEIT_API_KEY not configured")
-
-    hub_id = params.get("hub_id") or params.get("hubId")
-    if not hub_id:
-        raise ValueError("Missing hub_id")
-
-    query_params: dict[str, Any] = {}
-    expanded_param = params.get("expanded")
-    if expanded_param not in (None, "", [], {}):
-        if isinstance(expanded_param, str):
-            expanded_values = [item.strip() for item in expanded_param.split(",") if item.strip()]
-        elif isinstance(expanded_param, (list, tuple, set)):
-            expanded_values = [str(item).strip() for item in expanded_param if str(item).strip()]
-        else:
-            raise ValueError("Invalid expanded parameter")
-
-        if expanded_values:
-            query_params["expanded"] = expanded_values
-
-    async with httpx.AsyncClient() as client:
-        response = await client.get(
-            f"https://open.faceit.com/data/v4/hubs/{hub_id}",
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Accept": "application/json",
-            },
-            params=query_params or None,
-            timeout=10.0,
-        )
-    if response.status_code != 200:
-        try:
-            detail = response.json()
-        except Exception:
-            detail = response.text
-        raise ValueError(f"Failed to fetch hub: {detail}")
-
-    data = response.json()
-    return {
-        "hub_id": hub_id,
-        "query": query_params,
-        "hub": data,
-    }
-
-
 async def timer_interval_action(db: Session, user_id: int, params: dict) -> dict[str, Any]:
     payload = params or {}
     interval_minutes = parse_interval_minutes(payload)
@@ -278,9 +269,9 @@ async def timer_interval_action(db: Session, user_id: int, params: dict) -> dict
 ACTION_DISPATCH: Dict[tuple[str, str], Callable[[Session, int, dict], Awaitable[Any]]] = {
     ("discord", "list_guilds"): discord_list_guilds_action,
     ("google", "recent_emails_from_sender"): google_recent_emails_action,
+    ("faceit", "get_player_id"): faceit_get_player_id_action,
     ("faceit", "retrieve_player_stats"): faceit_player_stats_action,
     ("faceit", "retrieve_player_ranking"): faceit_player_ranking_action,
-    ("faceit", "retrieve_hub_details"): faceit_hub_details_action,
     ("timer", "interval"): timer_interval_action,
 }
 

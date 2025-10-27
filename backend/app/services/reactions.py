@@ -115,41 +115,6 @@ async def discord_send_message_reaction(db: Session, user_id: int, params: dict)
     except Exception:
         return {"error": response.text}
 
-async def faceit_send_message_reaction(db: Session, user_id: int, params: dict):
-    room_id = params.get("room_id")
-    message_body = params.get("body") or params.get("message")
-    if not room_id:
-        return {"error": "Missing room_id"}
-    if not message_body or not message_body.strip():
-        return {"error": "Missing body"}
-    token = await refresh_oauth_token(db, user_id, "faceit")
-    if not token:
-        return {"error": "Not logged in to Faceit"}
-    access_token = token.get("access_token")
-    if not access_token:
-        return {"error": "Faceit access token missing"}
-    payload = {"body": message_body}
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            f"https://open.faceit.com/data/v4/chat/rooms/{room_id}/messages",
-            headers={
-                "Authorization": f"Bearer {access_token}",
-                "Content-Type": "application/json",
-            },
-            json=payload,
-            timeout=10.0,
-        )
-    if response.status_code in (200, 201):
-        data = response.json()
-        return {
-            "status": "Message sent",
-            "message_id": data.get("id")
-        }
-    try:
-        return {"error": response.json()}
-    except Exception:
-        return {"error": response.text}
-
 async def spotify_play_playlist_reaction(db: Session, user_id: int, params: dict):
     token = await refresh_oauth_token(db, user_id, "spotify")
     if not token:
@@ -191,7 +156,6 @@ REACTION_DISPATCH: Dict[tuple[str, str], Callable[[Session, int, dict], Any]] = 
     ("google", "send_mail"): google_send_mail_reaction,
     ("google", "create_calendar_event"): google_calendar_event_reaction,
     ("discord", "send_channel_message"): discord_send_message_reaction,
-    ("faceit", "send_room_message"): faceit_send_message_reaction,
     ("spotify", "play_playlist"): spotify_play_playlist_reaction,
 }
 
