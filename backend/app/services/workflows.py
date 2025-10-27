@@ -82,6 +82,13 @@ async def trigger_workflows(service: str, event_type: str, data: dict, db: Sessi
         filter_conditions.append(
             func.JSON_EXTRACT(WorkflowStep.params, '$.player_id') == data["player_id"]
         )
+    elif service == "timer":
+        step_id = data.get("step_id")
+        workflow_id = data.get("workflow_id")
+        if step_id:
+            filter_conditions.append(WorkflowStep.id == step_id)
+        if workflow_id:
+            filter_conditions.append(WorkflowStep.workflow_id == workflow_id)
 
     workflows = db.query(Workflow).join(WorkflowStep).filter(*filter_conditions).all()
 

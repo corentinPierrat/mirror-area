@@ -9,6 +9,7 @@ from app.routers.catalog import catalog_router
 from app.routers.workflow import workflows_router
 from app.routers.about import about_router
 from app.config import settings
+from app.services.timer_scheduler import scheduler as timer_scheduler
 
 app = FastAPI()
 
@@ -37,6 +38,17 @@ app.include_router(actions_router)
 app.include_router(catalog_router)
 app.include_router(workflows_router)
 app.include_router(about_router)
+
+
+@app.on_event("startup")
+async def start_background_services():
+    timer_scheduler.start()
+
+
+@app.on_event("shutdown")
+async def stop_background_services():
+    await timer_scheduler.shutdown()
+
 
 @app.get("/")
 def read_root():

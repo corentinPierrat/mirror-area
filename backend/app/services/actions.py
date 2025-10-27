@@ -4,6 +4,7 @@ import httpx
 from app.config import settings
 from app.services.token_storage import refresh_oauth_token
 from app.routers.oauth import oauth
+from app.services.timer_utils import parse_interval_minutes
 
 async def discord_list_guilds_action(db: Session, user_id: int, params: dict) -> dict[str, Any]:
     token = await refresh_oauth_token(db, user_id, "discord")
@@ -258,12 +259,29 @@ async def faceit_hub_details_action(db: Session, user_id: int, params: dict) -> 
     }
 
 
+async def timer_interval_action(db: Session, user_id: int, params: dict) -> dict[str, Any]:
+    payload = params or {}
+    interval_minutes = parse_interval_minutes(payload)
+    if interval_minutes is None:
+        raise ValueError(
+            "Paramètre d'intervalle manquant. Fournissez par exemple 'interval_minutes', 'minutes' ou 'every' (en minutes)."
+        )
+
+    interval_minutes = max(1, interval_minutes)
+    return {
+        "status": "timer_configured",
+        "interval_minutes": interval_minutes,
+        "interval_seconds": interval_minutes * 60,
+    }
+
+
 ACTION_DISPATCH: Dict[tuple[str, str], Callable[[Session, int, dict], Awaitable[Any]]] = {
     ("discord", "list_guilds"): discord_list_guilds_action,
     ("google", "recent_emails_from_sender"): google_recent_emails_action,
     ("faceit", "retrieve_player_stats"): faceit_player_stats_action,
     ("faceit", "retrieve_player_ranking"): faceit_player_ranking_action,
     ("faceit", "retrieve_hub_details"): faceit_hub_details_action,
+    ("timer", "interval"): timer_interval_action,
 }
 
 

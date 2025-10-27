@@ -351,6 +351,32 @@ ACTIONS_CATALOG = {
             }
         }
     },
+    "timer.interval": {
+        "title": "Timer every N minutes",
+        "service": "timer",
+        "event": "interval",
+        "action_kind": "trigger",
+        "payload_schema": {
+            "minutes": {
+                "type": "number",
+                "label": "Interval (minutes)",
+                "default": 5
+            }
+        },
+        "description": "Triggers the workflow periodically after the specified number of minutes.",
+        "output_schema": {
+            "triggered_at": {
+                "type": "string",
+                "label": "Last trigger timestamp",
+                "path": "triggered_at"
+            },
+            "interval_minutes": {
+                "type": "number",
+                "label": "Interval (minutes)",
+                "path": "interval_minutes"
+            }
+        }
+    },
 }
 
 REACTIONS_CATALOG = {

@@ -137,7 +137,7 @@ async def oauth_callback(provider: str, request: Request, db: Session = Depends(
         user_id = request.session.get('oauth_user_id')
         if user_id:
             save_token_to_db(db, user_id, provider, token)
-        final_redirect = request.session.pop('oauth_redirect_uri', None) or "http://localhost:8081/Services"
+        final_redirect = request.session.pop('oauth_redirect_uri', None) or "http://127.0.0.1:8081/Services"
         return RedirectResponse(final_redirect)
     except Exception as e:
         print(f"Erreur OAuth callback: {e}")
@@ -149,6 +149,8 @@ async def oauth_callback(provider: str, request: Request, db: Session = Depends(
 
 @oauth_router.get("/{provider}/status")
 async def oauth_status(provider: str, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    if provider == "timer":
+        return JSONResponse({"logged_in": True})
     token = get_token_from_db(db, current_user.id, provider)
     if not token:
         return JSONResponse({"logged_in": False})
@@ -197,6 +199,10 @@ SERVICES_INFO = {
     "twitch": {
         "name": "Twitch",
         "logo_url": "https://static.twitchcdn.net/assets/favicon-32-e29e246c157142c94346.png"
+    },
+    "timer": {
+        "name": "Timer",
+        "logo_url": "https://cdn-icons-png.flaticon.com/512/2088/2088617.png"
     }
 }
 
@@ -204,11 +210,15 @@ SERVICES_INFO = {
 async def get_services(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     services = []
     for provider, info in SERVICES_INFO.items():
-        token = get_token_from_db(db, current_user.id, provider)
+        if provider == "timer":
+            connected = True
+        else:
+            token = get_token_from_db(db, current_user.id, provider)
+            connected = bool(token)
         services.append({
             "provider": provider,
             "name": info["name"],
             "logo_url": info["logo_url"],
-            "connected": bool(token)
+            "connected": connected
         })
     return JSONResponse({"services": services})

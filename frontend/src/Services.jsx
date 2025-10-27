@@ -20,7 +20,10 @@ export default function Services() {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (Array.isArray(res.data.services)) {
-        setServices(res.data.services);
+        const filteredServices = res.data.services.filter(
+          (service) => service.provider?.toLowerCase() !== "timer"
+        );
+        setServices(filteredServices);
       }
     } catch (err) {
       console.error("Error loading services:", err);
