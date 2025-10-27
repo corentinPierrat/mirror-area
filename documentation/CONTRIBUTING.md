@@ -171,7 +171,7 @@ Avant de soumettre votre PR, assurez-vous que **tous les tests passent**.
 2. Exécutez le script de test d'intégration :
 
    ```bash
-   python mytest.py
+   python3 mytest.py
    ```
 
 > Vous devrez récupérer manuellement le **code de vérification** dans votre base de données pour le premier test.
