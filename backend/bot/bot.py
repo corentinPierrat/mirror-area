@@ -18,8 +18,13 @@ async def on_member_join(member):
     payload = {
         "event": "member_join",
         "guild_id": str(member.guild.id),
-        "user_id": str(member.id),
-        "message": f"Welcome, {member.name}!"
+        "user": {
+            "id": str(member.id),
+            "username": member.name,
+            "display_name": member.display_name,
+            "nickname": member.nick
+        },
+        "message": f"Welcome, {member.display_name}!"
     }
     headers = {"bot-token": settings.BOT_SECRET}
     try:
@@ -33,8 +38,13 @@ async def on_member_remove(member):
     payload = {
         "event": "member_remove",
         "guild_id": str(member.guild.id),
-        "user_id": str(member.id),
-        "message": f"Goodbye, {member.name}!"
+        "user": {
+            "id": str(member.id),
+            "username": member.name,
+            "display_name": member.display_name,
+            "nickname": member.nick
+        },
+        "message": f"Goodbye, {member.display_name}!"
     }
     headers = {"bot-token": settings.BOT_SECRET}
     try:
@@ -45,48 +55,91 @@ async def on_member_remove(member):
 
 @client.event
 async def on_member_update(before, after):
-    changes = []
+    change_records = []
+    summary_parts = []
 
     if before.nick != after.nick:
-        changes.append(f"nickname: {before.nick or 'None'} → {after.nick or 'None'}")
+        old_nick = before.nick or before.name
+        new_nick = after.nick or after.name
+        change_records.append({
+            "type": "nickname",
+            "old_value": old_nick,
+            "new_value": new_nick
+        })
+        summary_parts.append(f"nickname: {old_nick} → {new_nick}")
 
     if before.roles != after.roles:
-        added_roles = set(after.roles) - set(before.roles)
-        removed_roles = set(before.roles) - set(after.roles)
+        added_roles = sorted({role.name for role in set(after.roles) - set(before.roles)})
+        removed_roles = sorted({role.name for role in set(before.roles) - set(after.roles)})
 
-        if added_roles:
-            changes.append(f"added roles: {[r.name for r in added_roles]}")
-        if removed_roles:
-            changes.append(f"removed roles: {[r.name for r in removed_roles]}")
+        if added_roles or removed_roles:
+            change_records.append({
+                "type": "roles",
+                "added": added_roles,
+                "removed": removed_roles
+            })
+
+            if added_roles:
+                summary_parts.append(f"added roles: {added_roles}")
+            if removed_roles:
+                summary_parts.append(f"removed roles: {removed_roles}")
 
     if before.activity != after.activity:
         before_activity = before.activity.name if before.activity else "None"
         after_activity = after.activity.name if after.activity else "None"
-        changes.append(f"activity: {before_activity} → {after_activity}")
+        change_records.append({
+            "type": "activity",
+            "old_value": before_activity,
+            "new_value": after_activity
+        })
+        summary_parts.append(f"activity: {before_activity} → {after_activity}")
 
     if before.avatar != after.avatar:
-        changes.append("avatar changed")
+        change_records.append({
+            "type": "avatar",
+            "changed": True
+        })
+        summary_parts.append("avatar changed")
 
     if before.name != after.name:
-        changes.append(f"username: {before.name} → {after.name}")
-
-    if before.discriminator != after.discriminator:
-        changes.append(f"discriminator: #{before.discriminator} → #{after.discriminator}")
+        change_records.append({
+            "type": "username",
+            "old_value": before.name,
+            "new_value": after.name
+        })
+        summary_parts.append(f"username: {before.name} → {after.name}")
 
     if before.timed_out_until != after.timed_out_until:
+        change_records.append({
+            "type": "timeout",
+            "until": after.timed_out_until.isoformat() if after.timed_out_until else None
+        })
         if after.timed_out_until:
-            changes.append(f"timed out until: {after.timed_out_until}")
+            summary_parts.append(f"timed out until: {after.timed_out_until}")
         else:
-            changes.append("timeout removed")
-    print("Detected member update:", changes)
-    if changes:
+            summary_parts.append("timeout removed")
+
+    print("Detected member update:", change_records)
+    if change_records:
         payload = {
             "event": "member_update",
             "guild_id": str(after.guild.id),
-            "user_id": str(after.id),
-            "changes": changes,
-            "message": f"{after.display_name} updated: {', '.join(changes)}"
+            "user": {
+                "id": str(after.id),
+                "username": after.name,
+                "display_name": after.display_name
+            },
+            "changes": change_records
         }
+
+        nickname_change = next((change for change in change_records if change["type"] == "nickname"), None)
+        if nickname_change:
+            payload["old_nick"] = nickname_change["old_value"]
+            payload["new_nick"] = nickname_change["new_value"]
+
+        if summary_parts:
+            payload["message"] = ", ".join(summary_parts)
+
         headers = {"bot-token": settings.BOT_SECRET}
         try:
             response = requests.post(BACKEND_URL, json=payload, headers=headers, timeout=5)
