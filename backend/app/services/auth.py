@@ -6,6 +6,8 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta, timezone
 from email.message import EmailMessage
 import smtplib
+import secrets
+import string
 
 from app.config import settings
 from app.models.models import User
@@ -21,6 +23,10 @@ def get_user_by_email(db: Session, email: str):
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
+def random_password(length: int = 32) -> str:
+    chars = string.ascii_letters + string.digits
+    return ''.join(secrets.choice(chars) for _ in range(length))
+
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
@@ -33,18 +39,18 @@ def create_jwt_token(data: dict):
 
 def send_verification_email(to_email: str, code: str):
     msg = EmailMessage()
-    msg["Subject"] = "Votre code de vérification 3Triggers"
-    msg["From"] = "3Triggers <3triggers12@gmail.com>"
+    msg["Subject"] = "Votre code de vérification Triggers"
+    msg["From"] = "Triggers <3triggers12@gmail.com>"
     msg["Reply-To"] = "3triggers12@gmail.com"
     msg["To"] = to_email
 
     msg["X-Priority"] = "3"
-    msg["X-Mailer"] = "3Triggers Verification System"
+    msg["X-Mailer"] = "Triggers Verification System"
 
     msg.set_content(f"""
         Bonjour,
 
-        Voici le code de vérification pour activer votre compte 3Triggers.
+        Voici le code de vérification pour activer votre compte Triggers.
 
         Votre code de vérification : {code}
 
@@ -53,7 +59,7 @@ def send_verification_email(to_email: str, code: str):
         Si vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message.
 
         Cordialement,
-        L'équipe 3Triggers
+        L'équipe Triggers
 
         ---
         Cet email est un message automatique, merci de ne pas y répondre directement.
@@ -66,9 +72,9 @@ def send_verification_email(to_email: str, code: str):
             </head>
             <body style="font-family: Arial, sans-serif; color:#333; max-width:600px; margin:0 auto;">
                 <div style="background-color:#f8f9fa; padding:20px; border-radius:5px;">
-                    <h1 style="color:#2F855A;">3Triggers</h1>
+                    <h1 style="color:#2F855A;">Triggers</h1>
                     <p>Bonjour,</p>
-                    <p>Voici le code de vérification pour activer votre compte 3Triggers.</p>
+                    <p>Voici le code de vérification pour activer votre compte Triggers.</p>
 
                     <div style="background-color:white; padding:20px; border-radius:5px; text-align:center; margin:20px 0;">
                         <p style="margin:0; color:#666;">Votre code de vérification :</p>
@@ -84,7 +90,7 @@ def send_verification_email(to_email: str, code: str):
 
                     <p style="color:#999; font-size:12px;">
                         Cordialement,<br>
-                        L'équipe 3Triggers<br>
+                        L'équipe Triggers<br>
                         <br>
                         <em>Cet email est un message automatique, merci de ne pas y répondre directement.</em>
                     </p>

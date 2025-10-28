@@ -7,7 +7,7 @@ from app.config import settings
 from app.database import get_db
 from app.models.models import UserService
 from app.services.token_storage import save_token_to_db, get_token_from_db
-from app.services.auth import get_current_user
+from app.services.auth import get_current_user, hash_password, create_jwt_token, random_password
 from jose import JWTError, jwt
 from app.models.models import User
 
@@ -108,22 +108,29 @@ async def oauth_login(
     if provider not in oauth._clients:
         return JSONResponse({"error": "Provider inconnu"}, status_code=400)
 
-    if not token:
-        return JSONResponse({"error": "Token manquant"}, status_code=401)
-
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
-        email: str = payload.get("sub")
-        if not email:
+    context = "auth"
+    user = None
+    if token:
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+            email: str = payload.get("sub")
+            if not email:
+                return JSONResponse({"error": "Token invalide"}, status_code=401)
+            user = db.query(User).filter(User.email == email).first()
+            if not user:
+                return JSONResponse({"error": "Utilisateur introuvable"}, status_code=404)
+            request.session['oauth_user_id'] = user.id
+            context = "link"
+        except JWTError:
             return JSONResponse({"error": "Token invalide"}, status_code=401)
-        user = db.query(User).filter(User.email == email).first()
-        if not user:
-            return JSONResponse({"error": "Utilisateur introuvable"}, status_code=404)
-    except JWTError:
-        return JSONResponse({"error": "Token invalide"}, status_code=401)
+    redirect_front = ""
+    if context == "link":
+        redirect_front = "http://localhost:8081/Services"
+    else:
+        redirect_front = "http://localhost:8081/oauth/success"
 
-    request.session['oauth_user_id'] = user.id
-    request.session['oauth_redirect_uri'] = redirect_uri_param or "http://localhost:8081/Services"
+    request.session['oauth_context'] = context
+    request.session['oauth_redirect_uri'] = redirect_uri_param or redirect_front
     redirect_uri = f"https://trigger.ink/oauth/{provider}/callback"
     return await oauth.create_client(provider).authorize_redirect(request, redirect_uri, redirect_popup="true")
 
@@ -131,14 +138,64 @@ async def oauth_login(
 async def oauth_callback(provider: str, request: Request, db: Session = Depends(get_db)):
     if provider not in oauth._clients:
         return JSONResponse({"error": "Provider inconnu"}, status_code=400)
+
     try:
         client = oauth.create_client(provider)
-        token = await client.authorize_access_token(request, grant_type="authorization_code")
-        user_id = request.session.get('oauth_user_id')
-        if user_id:
+        token = await client.authorize_access_token(request)
+
+        context = request.session.get('oauth_context', 'auth')
+        stored_redirect = request.session.pop('oauth_redirect_uri', None)
+        print(f"OAuth context: {context}, stored redirect: {stored_redirect}")
+
+        if context == "link":
+            user_id = request.session.get('oauth_user_id')
+            if not user_id:
+                return JSONResponse({"error": "Utilisateur introuvable pour le lien"}, status_code=400)
+
             save_token_to_db(db, user_id, provider, token)
-        final_redirect = request.session.pop('oauth_redirect_uri', None) or "http://localhost:8081/Services"
-        return RedirectResponse(final_redirect)
+
+            request.session.pop('oauth_context', None)
+            request.session.pop('oauth_user_id', None)
+
+            final_redirect = stored_redirect or "http://localhost:8081/Services"
+            return RedirectResponse(final_redirect)
+
+
+        user_info = token.get('userinfo')
+        if not user_info:
+            user_info = await client.userinfo(token=token)
+
+        email = user_info.get('email')
+        name = user_info.get('name') or user_info.get('username') or "Utilisateur"
+
+        if not email:
+            return JSONResponse({"error": "Impossible de récupérer l'email depuis le provider"}, status_code=400)
+
+        user = db.query(User).filter(User.email == email).first()
+
+        if not user:
+            user = User(
+                username=name,
+                email=email,
+                password_hash=hash_password(random_password()),
+                role="user",
+                is_verified=True
+            )
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+
+        save_token_to_db(db, user.id, provider, token)
+
+        access_token = create_jwt_token({"sub": user.email})
+
+        request.session.pop('oauth_context', None)
+        request.session.pop('oauth_user_id', None)
+        final_redirect = stored_redirect or "http://localhost:8081/oauth/success"
+        print(f"Final redirect: {final_redirect}")
+        redirect_url = f"{final_redirect}?token={access_token}"
+        return RedirectResponse(redirect_url)
+
     except Exception as e:
         print(f"Erreur OAuth callback: {e}")
         return JSONResponse({
