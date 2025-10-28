@@ -137,7 +137,7 @@ async def oauth_callback(provider: str, request: Request, db: Session = Depends(
         user_id = request.session.get('oauth_user_id')
         if user_id:
             save_token_to_db(db, user_id, provider, token)
-        final_redirect = request.session.pop('oauth_redirect_uri', None) or "http://127.0.0.1:8081/Services"
+        final_redirect = request.session.pop('oauth_redirect_uri', None) or "http://localhost:8081/Services"
         return RedirectResponse(final_redirect)
     except Exception as e:
         print(f"Erreur OAuth callback: {e}")
