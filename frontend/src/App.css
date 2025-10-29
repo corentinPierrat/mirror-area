@@ -8,6 +8,5 @@ body {
 }
 
 #root {
-  /* On laisse #root vide pour qu'il ne contraigne rien */
   /* width: 100%; */
 }

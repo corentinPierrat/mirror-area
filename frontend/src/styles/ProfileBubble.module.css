@@ -26,7 +26,6 @@
     font-size: 20px;
   }
 
-  /* Superposition du voile violet + flou */
   .overlay {
     position: absolute;
     inset: 0;
@@ -35,7 +34,6 @@
     border-radius: inherit;
   }
   
-  /* Texte au-dessus */
   .info {
     position: relative;
     z-index: 2;

@@ -13,7 +13,7 @@ export default function EditWorkflowModal({ workflowId, onClose, onSave }) {
     const fetchWorkflowDetails = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${API_URL}/workflow/${workflowId}`, {
+        const res = await axios.get(`${API_URL}/workflows/${workflowId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setWorkflowData(res.data);

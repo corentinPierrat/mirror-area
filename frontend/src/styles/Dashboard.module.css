@@ -16,7 +16,6 @@
   object-fit: cover;
   z-index: 0;
   opacity: 0.4;
-  /* filter: blur(8px); */
   filter: blur(8px) brightness(0.8) contrast(1.1);
 }
 
@@ -28,8 +27,6 @@
 
 .sidebar {
   width: 12%;
-  /* background: #1e1e1e; */
-  /* border-right: 2px solid #2a2a2a; */
   padding: 20px;
   display: flex;
   flex-direction: column;

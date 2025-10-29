@@ -101,6 +101,8 @@
   margin-top: 20px;
   color: rgba(255, 255, 255, 0.8);
   font-size: 0.95rem;
+  position: relative;
+  z-index: 2;
 }
 
 .link {
