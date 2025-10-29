@@ -43,7 +43,7 @@ async def create_twitch_webhook(event_type: str, broadcaster_id: str, db: Sessio
     if event_type == "stream.online":
         app_token = await get_app_access_token()
     else:
-        app_token = refresh_oauth_token(db, user_id, "twitch")
+        app_token = await refresh_oauth_token(db, user_id, "twitch")
 
     headers = {
         "Authorization": f"Bearer {app_token}",
