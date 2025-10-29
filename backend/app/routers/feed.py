@@ -30,7 +30,16 @@ async def get_public_workflows(
             "description": w.description,
             "author": w.user.username if w.user else None,
             "created_at": w.created_at,
-            "steps_count": len(w.steps),
+            "steps": [
+                {
+                    "step_order": s.step_order,
+                    "type": s.type,
+                    "service": s.service,
+                    "event": s.event,
+                    "params": s.params,
+                }
+                for s in sorted(w.steps, key=lambda s: s.step_order)
+            ],
         }
         for w in workflows
     ]
