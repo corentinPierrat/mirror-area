@@ -5,14 +5,15 @@ from app.services.token_storage import refresh_oauth_token
 from fastapi import HTTPException
 
 async def get_app_access_token() -> str:
-    response = requests.post(
-        "https://id.twitch.tv/oauth2/token",
-        params={
-            "client_id": settings.TWITCH_CLIENT_ID,
-            "client_secret": settings.TWITCH_CLIENT_SECRET,
-            "grant_type": "client_credentials"
-        }
-    )
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            "https://id.twitch.tv/oauth2/token",
+            params={
+                "client_id": settings.TWITCH_CLIENT_ID,
+                "client_secret": settings.TWITCH_CLIENT_SECRET,
+                "grant_type": "client_credentials"
+            }
+        )
     if response.status_code != 200:
         raise Exception(f"Failed to get app access token: {response.text}")
     data = response.json()
@@ -28,7 +29,11 @@ async def get_twitch_user_id(username_streamer: str) -> str:
         "Client-Id": settings.TWITCH_CLIENT_ID
     }
 
-    response = requests.get(f"https://api.twitch.tv/helix/users?login={username_streamer}", headers=headers)
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"https://api.twitch.tv/helix/users?login={username_streamer}",
+            headers=headers
+        )
     if response.status_code != 200:
         raise HTTPException(status_code=500, detail=f"Erreur Twitch API: {response.text}")
 
@@ -38,9 +43,6 @@ async def get_twitch_user_id(username_streamer: str) -> str:
 
     user = data["data"][0]
     return user["id"]
-
-import httpx
-from fastapi import HTTPException
 
 async def create_twitch_webhook(event_type: str, broadcaster_id: str, db: Session, user_id: int) -> str:
     if event_type == "stream.online":
@@ -100,10 +102,11 @@ async def delete_twitch_webhook(db: Session, user_id: int, webhook_id: str):
         "Client-Id": settings.TWITCH_CLIENT_ID
     }
 
-    response = requests.delete(
-        f"https://api.twitch.tv/helix/eventsub/subscriptions?id={webhook_id}",
-        headers=headers
-    )
+    async with httpx.AsyncClient() as client:
+        response = await client.delete(
+            f"https://api.twitch.tv/helix/eventsub/subscriptions?id={webhook_id}",
+            headers=headers
+        )
 
     if response.status_code != 204:
         raise HTTPException(status_code=500, detail=f"Failed to delete webhook: {response.text}")
