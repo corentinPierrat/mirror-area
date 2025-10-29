@@ -74,7 +74,7 @@ async def create_twitch_webhook(event_type: str, broadcaster_id: str):
         raise Exception(f"Failed to create webhook: {response.text}")
 
 async def delete_twitch_webhook(db: Session, user_id: int, webhook_id: str):
-    token = await refresh_oauth_token(db, user_id, "twitch")
+    token = await get_app_access_token()
     if not token:
         raise HTTPException(status_code=401, detail="User not connected to Twitch")
 
