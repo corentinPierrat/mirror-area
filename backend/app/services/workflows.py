@@ -111,8 +111,15 @@ async def trigger_workflows(service: str, event_type: str, data: dict, db: Sessi
         ).all()
         for s in steps:
             print(f"[DEBUG] Step id={s.id} workflow_id={s.workflow_id} params={s.params}")
+            # Affiche la valeur extraite pour la comparaison
+            try:
+                import json
+                params = s.params if isinstance(s.params, dict) else json.loads(s.params)
+                val = params.get("broadcaster_user_id")
+                print(f"[DEBUG] Step {s.id} broadcaster_user_id in params: {val} (type: {type(val)})")
+            except Exception as e:
+                print(f"[DEBUG] Erreur lecture params step {s.id}: {e}")
         print(f"[DEBUG] Comparé à broadcaster_user_id attendu: {data['broadcaster_user_id']} (type: {type(data['broadcaster_user_id'])})")
-
     workflows = query.all()
     print(f"[DEBUG] Workflows trouvés: {len(workflows)}")
     results = []
