@@ -6,7 +6,6 @@ export default function Hero() {
   const [svgContent, setSvgContent] = useState("");
 
   useEffect(() => {
-    // Charger le SVG inline depuis public
     fetch("/arrow.svg")
       .then((res) => res.text())
       .then((text) => setSvgContent(text));

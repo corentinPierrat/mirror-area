@@ -7,19 +7,6 @@
   border-radius: 40px 40px;
 }
 
-/* .header {
-  position: fixed;
-  top: 50px;
-  width: 90%;
-  z-index: 1000;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.13);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(2.2px);
-  -webkit-backdrop-filter: blur(4.2px);
-  border: 1px solid rgba(255, 255, 255, 0.26);
-} */
-
 .header {
   position: fixed;
   top: 50px;
@@ -124,7 +111,6 @@
   background-repeat: no-repeat;
   background-position: 10px center;
   border: 1px solid #6b708d;
-  /* min-width: 100px; */
   justify-content: flex-start;
 }
 
@@ -137,7 +123,6 @@
   text-decoration: none;
   font-weight: 600;
   border-radius: 25px;
-  /* background: linear-gradient(rgba(0, 89, 255, 0.5), rgba(3, 98, 206, 0.6)); */
   border: 1px solid #6b708d;
   transition: background-color 0.2s ease;
 }

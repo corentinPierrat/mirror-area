@@ -1,9 +1,15 @@
 import React from "react";
 import styles from "../styles/Workflows.module.css";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
-export default function Workflows({ Name, Action, Reactions = [], workflowId, onDelete, onEdit }) {
+
+export default function Workflows({ Name, Action, Reactions = [], workflowId, onDelete }) {
+  const navigate = useNavigate();
+
+  console.log("Workflow reçu :", { Name, Action, Reactions, workflowId });
+
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this workflow?")) return;
     try {
@@ -37,7 +43,16 @@ export default function Workflows({ Name, Action, Reactions = [], workflowId, on
           : "No reaction"}
       </p>
       <div className={styles.buttonContainer}>
-        <button className={styles.editButton} onClick={() => onEdit(workflowId)}>
+        <button
+          className={styles.editButton}
+          onClick={() =>
+            navigate(`/edit/${workflowId}`, {
+              state: {
+                workflow: { Name, Action, Reactions, workflowId }
+              }
+            })
+          }
+        >
           Modifier
         </button>
         <button className={styles.deleteButton} onClick={handleDelete}>

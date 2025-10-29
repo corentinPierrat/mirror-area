@@ -1,12 +1,15 @@
 import React from "react";
-import Header from './components/Header';
-import HeaderDashboard from './components/HeaderDashboard';
-import Footer from './components/Footer';
-import videoBg from "../public/bg-video.mp4";
-import Crarea from './components/Cr-area';
-import styles from "./styles/CreationPage.module.css";
+import { useParams } from "react-router-dom";
+import Header from './Header';
+import HeaderDashboard from './HeaderDashboard';
+import Footer from './Footer';
+import videoBg from "../../public/bg-video.mp4";
+import Crarea from './Cr-area';
+import styles from "../styles/CreationPage.module.css";
 
-export default function CreationPage() {
+export default function EditPage() {
+  const { id } = useParams();
+
   return (
     <div className={styles.dashboardContainer}>
       <video
@@ -25,12 +28,11 @@ export default function CreationPage() {
         <main className={styles.mainContent}>
           <Header />
           <div className={styles.CrareaContainer}>
-            <Crarea />
+            <Crarea workflowId={id} isEditing />
           </div>
         </main>
       </div>
       <Footer />
-
     </div>
   );
 }

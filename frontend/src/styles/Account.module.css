@@ -9,13 +9,10 @@
   .contentWrapper {
     flex: 1;
     display: flex;
-    /* background: #0d0d0d; */
   }
   
   .sidebar {
     width: 250px;
-    /* background: #1a1a1a; */
-    /* border-right: 2px solid #00ff88; */
     padding: 2rem 1rem;
   }
   
@@ -29,7 +26,6 @@
   }
   
   .accountContainer {
-    /* background: #141414; */
     border-radius: 16px;
     padding: 2rem 3rem;
     display: flex;
@@ -38,9 +34,6 @@
     gap: 2rem;
     width: 100%;
     max-width: 600px;
-    /* box-shadow: 0 0 10px rgba(0, 255, 136, 0.2); */
-
-    
   }
   
   .passwordForm {

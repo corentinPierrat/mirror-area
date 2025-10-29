@@ -6,7 +6,6 @@ export default function HeaderDashboard() {
     <header className={styles.header}>
       <nav className={styles.navbar}>
         <div className={styles['nav-left']}>
-          {/* <a href="#" className={styles.logo}>Triggers.</a> */}
           <div className={styles.ul_elem}>
             <ul className={styles['nav-links']}>
           <li><img src="/arrow.PNG" className={styles.navicons} alt="arrow" /><a href="/dashboard">Dashboard</a></li>

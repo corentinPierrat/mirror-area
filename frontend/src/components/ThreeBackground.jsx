@@ -13,8 +13,8 @@ const FlowFieldBackground = ({ width = 800, height = 600, color1 = "#6b5bff", co
     canvas.height = height;
 
     let particles = [];
-    const numParticles = 200; // moins de particules = plus discret
-    const tail = 50; // longueur de traînée
+    const numParticles = 200;
+    const tail = 50;
     let time = 0;
 
     class Particle {
@@ -28,7 +28,7 @@ const FlowFieldBackground = ({ width = 800, height = 600, color1 = "#6b5bff", co
       }
       update() {
         const angle = Math.sin(this.y * 0.01 + time * 0.002) * Math.PI * 2;
-        const speed = 0.2; // plus lent
+        const speed = 0.2;
         this.vx += Math.cos(angle) * 0.01;
         this.vy += Math.sin(angle) * 0.01;
         this.x += this.vx * speed;

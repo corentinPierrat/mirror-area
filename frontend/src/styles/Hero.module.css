@@ -6,7 +6,6 @@
   width: 100%;
   margin: auto;
   max-width: 98%;
-  /* background-color: #070b27; */
   overflow: visible;
   z-index: 1000;
   transition: height 0.3s ease, border-radius 0.3s ease, padding 0.3s ease;

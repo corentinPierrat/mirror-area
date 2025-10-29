@@ -13,10 +13,40 @@ import ReactFlow, {
   applyEdgeChanges,
 } from "reactflow";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
 import "reactflow/dist/style.css";
 import styles from '../styles/Cr-area.module.css';
-
+ 
 const API_URL = import.meta.env.VITE_API_URL;
+
+function extractLinksFromParams(params = {}) {
+  const cleanParams = {};
+  const links = {};
+
+  Object.entries(params).forEach(([key, val]) => {
+    if (val && typeof val === "object" && val.__link) {
+      const linkData = val.__link;
+      const source_step = linkData.source_step;
+      const path = linkData.path;
+
+      const sourceId = (source_step === 0) ? "action-1" : source_step.toString();
+
+      links[key] = {
+        source: sourceId,
+        field: path,
+        sourceTitle: `Step ${source_step}`,
+        label: path,
+        path: path
+      };
+    } else {
+      cleanParams[key] = val;
+    }
+  });
+
+  return { cleanParams, links };
+}
+
+
 function WorkflowNode({ data, onParamsChange, onTest }) {
   const {
     title,
@@ -36,6 +66,7 @@ function WorkflowNode({ data, onParamsChange, onTest }) {
   const [isLoadingOptions, setIsLoadingOptions] = useState(false);
   const token = localStorage.getItem("userToken");
 
+ 
   useEffect(() => {
     if (editing && payload_schema) {
       const fetchDynamicOptions = async () => {
@@ -60,13 +91,13 @@ function WorkflowNode({ data, onParamsChange, onTest }) {
       fetchDynamicOptions();
     }
   }, [editing, payload_schema, token, service]);
-
+ 
   const handleChange = (key, value) => setLocalParams(prev => ({ ...prev, [key]: value }));
   const handleSave = () => {
     onParamsChange(id, localParams);
     setEditing(false);
   };
-
+ 
   const handleTestClick = () => {
     if (onTest) {
       onTest({
@@ -75,7 +106,7 @@ function WorkflowNode({ data, onParamsChange, onTest }) {
       });
     }
   };
-
+ 
   const formatValue = (value) => {
     if (value === null || value === undefined || value === "") return "Aucune valeur";
     if (typeof value === "string") return value;
@@ -86,7 +117,7 @@ function WorkflowNode({ data, onParamsChange, onTest }) {
       return String(value);
     }
   };
-
+ 
   const renderParamsForm = () => {
     if (!payload_schema || !editing) return null;
     if (isLoadingOptions) {
@@ -121,7 +152,7 @@ function WorkflowNode({ data, onParamsChange, onTest }) {
       </div>
     );
   };
-
+ 
   const renderReactionInputs = () => {
     if (type !== "reaction" || !payload_schema || Object.keys(payload_schema).length === 0) return null;
     return (
@@ -153,7 +184,7 @@ function WorkflowNode({ data, onParamsChange, onTest }) {
       </div>
     );
   };
-
+ 
   const renderActionOutputs = () => {
     if (type !== "action" || !output_schema || Object.keys(output_schema).length === 0) return null;
     return (
@@ -173,7 +204,7 @@ function WorkflowNode({ data, onParamsChange, onTest }) {
       </div>
     );
   };
-
+ 
   return (
     <div className={`${styles.nodeBase} ${type === "action" ? styles.nodeAction : styles.nodeReaction}`}>
       {type === "reaction" && (
@@ -198,20 +229,20 @@ function WorkflowNode({ data, onParamsChange, onTest }) {
     </div>
   );
 };
-
+ 
 function ParamEditorModal({ schema, initialParams, nodeId, onClose, onSave }) {
   const [localParams, setLocalParams] = useState(initialParams || {});
-
+ 
   useEffect(() => { setLocalParams(initialParams || {}); }, [initialParams]);
-
+ 
   const handleChange = (key, value) => {
     setLocalParams((prev) => ({ ...prev, [key]: value }));
   };
-
+ 
   const handleSave = () => {
     onSave(nodeId, localParams);
   };
-
+ 
   const modalContent = (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
@@ -240,11 +271,11 @@ function ParamEditorModal({ schema, initialParams, nodeId, onClose, onSave }) {
       </div>
     </div>
   );
-
+ 
   const portalRoot = document.getElementById('modal-root') || document.body;
   return ReactDOM.createPortal(modalContent, portalRoot);
 }
-
+ 
 export default function CrArea() {
   const token = localStorage.getItem("userToken");
   const [actions, setActions] = useState([]);
@@ -257,7 +288,13 @@ export default function CrArea() {
   const [menuType, setMenuType] = useState(null);
   const [editingNode, setEditingNode] = useState(null);
   const menuRef = useRef();
-
+  const location = useLocation();
+  const [isEditing, setIsEditing] = useState(false);
+  const [buttonLabel, setButtonLabel] = useState("Send");
+  const [selectedAction, setSelectedAction] = useState(null);
+  const [selectedReactions, setSelectedReactions] = useState([]);
+  const [workflowSteps, setWorkflowSteps] = useState([]);
+ 
   const handleOpenEditModal = useCallback((id, schema, params) => setEditingNode({ id, schema, params }), []);
   const handleCloseEditModal = useCallback(() => setEditingNode(null), []);
   
@@ -265,17 +302,17 @@ export default function CrArea() {
     setNodes((prev) => prev.map((n) => n.id === nodeId ? { ...n, data: { ...n.data, params: newParams } } : n));
     handleCloseEditModal();
   }, [setNodes, handleCloseEditModal]);
-
+ 
   const handleNodeParamsChange = useCallback((id, newParams) => {
     setNodes((nds) => nds.map((node) => node.id === id ? { ...node, data: { ...node.data, params: newParams } } : node));
   }, [setNodes]);
-
+ 
   const handleTestNode = useCallback(async (nodeData) => {
     if (!token) {
       alert("Veuillez vous connecter pour lancer un test.");
       return;
     }
-
+ 
     try {
       const response = await axios.post(
         `${API_URL}/workflows/test-step`,
@@ -287,9 +324,9 @@ export default function CrArea() {
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
+ 
       const { success, result: actionResult, message: infoMessage, error } = response.data;
-
+ 
       const formatValue = (value, fallback = "") => {
         if (value === null || value === undefined) return fallback;
         if (typeof value === "string") return value;
@@ -300,7 +337,7 @@ export default function CrArea() {
           return fallback || String(value);
         }
       };
-
+ 
       if (nodeData.type === "action") {
         if (success) {
           const message = formatValue(actionResult, "Test réussi (aucune donnée retournée)");
@@ -312,7 +349,7 @@ export default function CrArea() {
         console.log("Action test result:", response.data);
         return;
       }
-
+ 
       const message = infoMessage || error;
       if (success) {
         alert(message || "Réaction exécutée avec succès.");
@@ -326,13 +363,13 @@ export default function CrArea() {
       console.error("Test error:", error);
     }
   }, [token]);
-
+ 
   const nodeTypes = useMemo(() => ({
     workflowNode: (props) => (
       <WorkflowNode {...props} onParamsChange={handleNodeParamsChange} onTest={handleTestNode} />
     ),
   }), [handleNodeParamsChange, handleTestNode]);
-
+ 
   useEffect(() => {
     const fetchInitialData = async () => {
       setIsLoading(true);
@@ -342,15 +379,15 @@ export default function CrArea() {
           axios.get(`${API_URL}/catalog/reactions`, { headers: { Authorization: `Bearer ${token}` } }),
           axios.get(`${API_URL}/oauth/services`, { headers: { Authorization: `Bearer ${token}` } })
         ]);
-
+ 
         const actionsData = actionsRes.data || {};
         const reactionsData = reactionsRes.data || {};
-
+ 
         setActions(Object.entries(actionsData).map(([key, meta]) => ({ ...meta, catalogKey: key })));
         setReactions(Object.entries(reactionsData).map(([key, meta]) => ({ ...meta, catalogKey: key })));
-
+ 
         const serviceProviders = servicesListRes.data.services.map(s => s.provider);
-
+ 
         const statusPromises = serviceProviders.map(provider =>
           axios.get(`${API_URL}/oauth/${provider}/status`, { headers: { Authorization: `Bearer ${token}` } })
         );
@@ -363,17 +400,210 @@ export default function CrArea() {
           }
         });
         setConnectedServices(connected);
-
+ 
       } catch (error) {
         console.error("Error receiving data:", error);
       } finally {
         setIsLoading(false);
       }
     };
-
+ 
     if (token) fetchInitialData();
     else setIsLoading(false);
   }, [token]);
+
+    useEffect(() => {
+    const workflowData = location.state?.workflow;
+
+    if (!workflowData || isLoading || actions.length === 0 || reactions.length === 0) {
+      return;
+    }
+  
+    console.log("Workflow chargé :", workflowData);
+  
+    setIsEditing(true);
+    setButtonLabel("Save");
+    if (workflowData.Name) setWorkflowName(workflowData.Name);
+  
+    const rebuiltNodes = [];
+    const rebuiltEdges = [];
+  
+    const getCatalogMeta = (type, service, event) => {
+      const catalog = type === "action" ? actions : reactions;
+      return catalog.find((c) => c.service === service && c.event === event);
+    };
+  
+    if (workflowData.steps && Array.isArray(workflowData.steps)) {
+      
+      workflowData.steps.forEach((step, index) => {
+        const newNodeId = step.client_id || `${step.type}-${index}-${Date.now()}`;
+        const catalogMeta = getCatalogMeta(step.type, step.service, step.event) || {};
+      
+        if (!catalogMeta.title) {
+          console.warn(`[Debug] Métadonnées introuvables pour l'étape (utilisation des données du step):`, step);
+        }
+
+        const { cleanParams, links: linksFromParams } = extractLinksFromParams(step.params);
+        const finalLinks = { ...(step.links || {}), ...linksFromParams };
+      
+        rebuiltNodes.push({
+          id: newNodeId,
+          type: "workflowNode",
+          position: {
+            x: step.type === "action" ? 100 : 500,
+            y: 100 + index * 120,
+          },
+          data: {
+            id: newNodeId,
+            title: catalogMeta.title || `${step.service} - ${step.event}`,
+            description: catalogMeta.description || step.description || "",
+            service: step.service,
+            event: step.event,
+            type: step.type,
+            payload_schema: catalogMeta.payload_schema || step.payload_schema || {},
+            output_schema: catalogMeta.output_schema || step.output_schema || {},
+            action_kind: catalogMeta.action_kind || "trigger",
+            params: cleanParams,
+            links: finalLinks,
+          },
+        });
+      
+        Object.entries(finalLinks).forEach(([field, link]) => {
+          if (link && (link.source || link.source_step)) {
+            const sourceId = (link.source || link.source_step).toString();
+            const sourceField = link.field || link.path;
+            
+            rebuiltEdges.push({
+              id: `edge-${sourceId}-${newNodeId}-${field}`,
+              source: sourceId,
+              sourceHandle: `output-${sourceField}`,
+              target: newNodeId,
+              targetHandle: `input-${field}`,
+              animated: true,
+            });
+          }
+        });
+      });
+      
+    }
+  
+    else {
+      let actionNodeId = "action-1";
+
+      if (workflowData.Action) {
+        const [actionService = "", actionEvent = ""] = (workflowData.Action || "").split(" - ");
+        const actionMeta = getCatalogMeta("action", actionService, actionEvent) || {};
+        
+        console.log(`[Debug Action] Métadonnées trouvées pour '${workflowData.Action}':`, actionMeta);
+
+        if (!actionMeta.title) {
+          console.warn(`[Debug Legacy] Métadonnées introuvables pour Action:`, workflowData.Action);
+        }
+
+        rebuiltNodes.push({
+          id: actionNodeId,
+          type: "workflowNode",
+          position: { x: 100, y: 200 },
+          data: {
+            id: actionNodeId,
+            title: actionMeta.title || workflowData.Action,
+            description: actionMeta.description || "",
+            service: actionService, 
+            event: actionEvent, 
+            type: "action",
+            payload_schema: actionMeta.payload_schema || {}, 
+            output_schema: actionMeta.output_schema || {},
+            params: {},
+            links: {},
+          },
+        });
+      }
+  
+      if (workflowData.Reactions && Array.isArray(workflowData.Reactions)) {
+        workflowData.Reactions.forEach((r, i) => {
+          const reactionMeta = getCatalogMeta("reaction", r.service, r.event) || {};
+          const reactionId = `reaction-${i + 1}`;
+  
+          const { cleanParams, links } = extractLinksFromParams(r.params);
+
+          rebuiltNodes.push({
+            id: reactionId,
+            type: "workflowNode",
+            position: { x: 500, y: 100 + i * 120 },
+            data: {
+              id: reactionId,
+              title: reactionMeta.title || `${r.service} - ${r.event}`,
+              description: reactionMeta.description || "",
+              service: r.service,
+              event: r.event,
+              type: "reaction",
+              payload_schema: reactionMeta.payload_schema || {},
+              output_schema: reactionMeta.output_schema || {},
+              params: cleanParams, 
+              links: links, 
+            },
+          });
+  
+          Object.entries(links).forEach(([field, link]) => {
+            rebuiltEdges.push({
+              id: `edge-${link.source}-${reactionId}-${field}`,
+              source: link.source,
+              sourceHandle: `output-${link.field}`,
+              target: reactionId,
+              targetHandle: `input-${field}`,
+              animated: true,
+            });
+          });
+        });
+      }
+    }
+  
+    setNodes(rebuiltNodes);
+    setEdges(rebuiltEdges);
+  
+    console.log("Blueprint visuel recréé :", { rebuiltNodes, rebuiltEdges });
+
+  }, [location.state, actions, reactions, isLoading, setNodes, setEdges]);
+
+  const handleUpdateWorkflow = async () => {
+    if (!workflowName) return alert("Workflow name missing");
+    if (edges.length === 0) return alert("No connection between action and reaction");
+  
+    const linkedNodes = nodes
+      .filter((n) => edges.some((e) => e.source === n.id || e.target === n.id))
+      .sort((a, b) => (a.data.type === "action" ? -1 : 1));
+  
+    const steps = linkedNodes.map((n) => ({
+      client_id: n.id,
+      type: n.data.type,
+      service: n.data.service,
+      event: n.data.event,
+      params: n.data.params || {},
+      links: Object.keys(n.data.links || {}).length > 0 ? n.data.links : undefined,
+    }));
+  
+    const payload = {
+      name: workflowName,
+      description: "Updated from ReactFlow",
+      steps,
+    };
+
+    console.log("Payload envoyé à l'API pour l'update :", JSON.stringify(payload, null, 2));
+  
+    try {
+      await axios.put(
+        `${API_URL}/workflows/${location.state.workflow.workflowId}`,
+        payload,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      alert("Workflow updated successfully!");
+    } catch (err) {
+      console.error("ERREUR LORS DE L'UPDATE :", err.response?.data || err.message);
+      alert(`Update failed: ${err.response?.data?.detail || err.message}`);
+    }
+  };
+  
   
   const addNode = useCallback((type, item) => {
     const newNodeId = `${type}-${Date.now()}`;
@@ -397,42 +627,42 @@ export default function CrArea() {
     setNodes((prev) => [...prev, newNode]);
     setMenuType(null);
   }, [nodes.length, setNodes]);
-
+ 
   const onConnect = useCallback((params) => {
     const sourceNode = nodes.find((n) => n.id === params.source);
     const targetNode = nodes.find((n) => n.id === params.target);
     if (!sourceNode || !targetNode) {
       return;
     }
-
+ 
     const isFieldConnection =
       params.sourceHandle?.startsWith("output-") && params.targetHandle?.startsWith("input-");
     const isGeneralConnection =
       params.sourceHandle === "general-out" && params.targetHandle === "general-in";
-
+ 
     if (!isFieldConnection && !isGeneralConnection) {
       return;
     }
-
+ 
     if (isFieldConnection && (sourceNode.data.type !== "action" || targetNode.data.type !== "reaction")) {
       return;
     }
     if (isGeneralConnection && (sourceNode.data.type !== "action" || sourceNode.data.action_kind === "getter")) {
       return;
     }
-
+ 
     setEdges((eds) => {
       const filtered = eds.filter(
         (edge) => !(edge.target === params.target && edge.targetHandle === params.targetHandle)
       );
       return addEdge({ ...params, animated: true }, filtered);
     });
-
+ 
     if (isFieldConnection) {
       const sourceField = params.sourceHandle.replace("output-", "");
       const targetField = params.targetHandle.replace("input-", "");
       const outputMeta = sourceNode.data.output_schema ? sourceNode.data.output_schema[sourceField] : null;
-
+ 
       setNodes((nds) => nds.map((node) => {
         if (node.id !== targetNode.id) return node;
         const currentLinks = node.data.links || {};
@@ -450,13 +680,13 @@ export default function CrArea() {
       }));
     }
   }, [nodes, setEdges, setNodes]);
-
+ 
   const onEdgesChange = useCallback((changes) => {
     const removedEdges = changes
       .filter((change) => change.type === "remove")
       .map((change) => edges.find((edge) => edge.id === change.id))
       .filter(Boolean);
-
+ 
     if (removedEdges.length > 0) {
       setNodes((nds) => nds.map((node) => {
         let updatedLinks = node.data.links;
@@ -475,10 +705,10 @@ export default function CrArea() {
         return node;
       }));
     }
-
+ 
     setEdges((eds) => applyEdgeChanges(changes, eds));
   }, [edges, setEdges, setNodes]);
-
+ 
   const handleCreateWorkflow = async () => {
     if (!workflowName) return alert("Give your workflow a name");
     if (edges.length === 0) return alert("Match at least one action to a reaction!");
@@ -509,23 +739,23 @@ export default function CrArea() {
       alert("Error creating workflow");
     }
   };
-
+ 
   useEffect(() => {
     const handleClickOutside = (e) => { if (menuRef.current && !menuRef.current.contains(e.target)) setMenuType(null); };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
+ 
   const groupItemsByService = (items) => items.reduce((acc, item) => {
       const service = item.service || 'autre';
       if (!acc[service]) { acc[service] = []; }
       acc[service].push(item);
       return acc;
   }, {});
-
+ 
   const menuItems = menuType === "action" ? actions : reactions;
   const groupedMenuItems = groupItemsByService(menuItems);
-
+ 
   return (
     <div className={styles.pageContainer}>
       {editingNode && <ParamEditorModal schema={editingNode.schema} initialParams={editingNode.params} nodeId={editingNode.id} onClose={handleCloseEditModal} onSave={handleParamSave} />}
@@ -538,10 +768,15 @@ export default function CrArea() {
           <button onClick={() => setMenuType("action")} className={styles.btn}>Actions</button>
           <button onClick={() => setMenuType("reaction")} className={styles.btn}>Reactions</button>
           <button onClick={() => alert("Verification function")} className={`${styles.btn} ${styles.btnCheck}`}>Verify</button>
-          <button onClick={handleCreateWorkflow} className={`${styles.btn} ${styles.btnSubmit}`}>Send</button>
+          <button
+            onClick={isEditing ? handleUpdateWorkflow : handleCreateWorkflow}
+            className={`${styles.btn} ${styles.btnSubmit}`}
+          >
+            {buttonLabel}
+          </button>
           {menuType && (
             <div className={styles.menuContainer}>
-              {isLoading ? ( <div className={styles.menuMessage}>Loading...</div> ) : 
+              {isLoading ? ( <div className={styles.menuMessage}>Loading...</div> ) :
               Object.keys(groupedMenuItems).length > 0 ? (
                 Object.entries(groupedMenuItems).map(([service, items]) => {
                   const isConnected = connectedServices.includes(service);
