@@ -12,11 +12,12 @@ async def twitter_tweet_reaction(db: Session, user_id: int, params: dict):
     token = await refresh_oauth_token(db, user_id, "twitter")
     if not token:
         return {"error": "Not logged in to Twitter"}
-    text = params.get("message") or params.get("text") or params.get("data")
+    text = params.get("text")
     if isinstance(text, (dict, list)):
         text = str(text)
-    if not text or not text.strip():
+    if not text or not str(text).strip():
         return {"error": "Missing text"}
+    text = str(text).strip()
     if len(text) > 273:
         text = text[:273] + "..."
     resp = await oauth.twitter.post("tweets", token=token, json={"text": text})
@@ -29,6 +30,11 @@ async def google_send_mail_reaction(db: Session, user_id: int, params: dict):
     token = await refresh_oauth_token(db, user_id, "google")
     if not token:
         return {"error": "Not logged in to Google"}
+
+    required_fields = ("to", "subject", "content")
+    missing = [field for field in required_fields if field not in params or params[field] in (None, "", [])]
+    if missing:
+        return {"error": f"Missing fields: {', '.join(missing)}"}
 
     client = oauth.create_client("google")
     mime_message = MIMEText(params["content"], "plain", "utf-8")
@@ -52,20 +58,27 @@ async def google_calendar_event_reaction(db: Session, user_id: int, params: dict
         return {"error": "Not logged in to Google"}
 
     title = params.get("title")
-    if not title or not title.strip():
+    if not title or not str(title).strip():
         return {"error": "Missing title"}
+    title = str(title).strip()
 
-    today = datetime.now(timezone.utc).date()
-    tomorrow = today + timedelta(days=1)
+    description = params.get("description")
+    if isinstance(description, str):
+        description = description.strip()
+        if not description:
+            description = None
+
+    start_time = datetime.now(timezone.utc)
+    end_time = start_time
 
     client = oauth.create_client("google")
-    calendar_id = params.get("calendar_id", "primary")
+    calendar_id = "primary"
 
     event_body = {
         "summary": title,
-        "description": params.get("description"),
-        "start": {"date": today.isoformat()},
-        "end": {"date": tomorrow.isoformat()},
+        "description": description,
+        "start": {"dateTime": start_time.isoformat()},
+        "end": {"dateTime": end_time.isoformat()},
     }
 
     event_body = {k: v for k, v in event_body.items() if v is not None}
@@ -90,11 +103,13 @@ async def google_calendar_event_reaction(db: Session, user_id: int, params: dict
 
 async def discord_send_message_reaction(db: Session, user_id: int, params: dict):
     channel_id = params.get("channel_id")
-    message = params.get("message") or params.get("content")
-    if not channel_id:
+    message = params.get("message")
+    if not channel_id or not str(channel_id).strip():
         return {"error": "Missing channel_id"}
-    if not message or not message.strip():
+    channel_id = str(channel_id).strip()
+    if not message or not str(message).strip():
         return {"error": "Missing message"}
+    message = str(message).strip()
 
     bot_token = settings.TOKEN_BOT_DISCORD
     if not bot_token:

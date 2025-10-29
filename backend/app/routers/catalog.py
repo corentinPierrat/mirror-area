@@ -414,38 +414,22 @@ ACTIONS_CATALOG = {
         "event": "retrieve_player_ranking",
         "action_kind": "getter",
         "payload_schema": {
-            "player_id": {
+            "nickname": {
                 "type": "string",
-                "label": "Player ID"
+                "label": "Player nickname"
             },
             "game_id": {
                 "type": "string",
                 "label": "Game ID",
                 "default": "cs2"
-            },
-            "region": {
-                "type": "string",
-                "label": "Region",
-                "default": "EU"
-            },
-            "country": {
-                "type": "string",
-                "label": "Country (ISO code)",
-                "optional": True
-            },
-            "limit": {
-                "type": "number",
-                "label": "Limit",
-                "default": 20,
-                "optional": True
             }
         },
-        "description": "Retrieves the player ranking details within the specified FACEIT game region.",
+        "description": "Récupère la position actuelle d'un joueur FACEIT en se basant sur son pseudo.",
         "output_schema": {
-            "ranking": {
-                "type": "object",
-                "label": "Ranking payload",
-                "path": "ranking"
+            "summary": {
+                "type": "string",
+                "label": "Résumé",
+                "path": "summary"
             }
         }
     },
@@ -544,15 +528,11 @@ REACTIONS_CATALOG = {
             },
             "description": {
                 "type": "string",
-                "label": "Description"
-            },
-            "calendar_id": {
-                "type": "string",
-                "label": "Calendar ID",
-                "default": "primary"
+                "label": "Description",
+                "optional": True
             }
         },
-        "description": "Creates an all-day event for today in your Google Calendar."
+        "description": "Creates a Google Calendar event starting immediately and lasting one hour."
     },
     "discord.send_channel_message": {
         "title": "Send a message to a Discord channel",

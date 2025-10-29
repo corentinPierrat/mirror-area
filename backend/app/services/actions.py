@@ -34,12 +34,16 @@ async def discord_list_guilds_action(db: Session, user_id: int, params: dict) ->
 
 
 async def google_recent_emails_action(db: Session, user_id: int, params: dict) -> dict[str, Any]:
-    sender = params.get("sender") or params.get("email") or params.get("from")
-    if not sender:
+    sender = params.get("sender")
+    if not sender or not str(sender).strip():
         raise ValueError("Missing sender email (expected param 'sender')")
-    limit = params.get("limit") or params.get("count") or 20
+    sender = str(sender).strip()
+
+    limit_raw = params.get("limit")
+    if limit_raw in (None, "", "None"):
+        limit_raw = 20
     try:
-        limit = max(1, min(20, int(limit)))
+        limit = max(1, min(20, int(limit_raw)))
     except (TypeError, ValueError):
         limit = 20
     token = await refresh_oauth_token(db, user_id, "google")
@@ -109,12 +113,14 @@ async def faceit_player_stats_action(db: Session, user_id: int, params: dict) ->
     if not api_key:
         raise ValueError("FACEIT_API_KEY not configured")
 
-    player_id = params.get("player_id") or params.get("playerId")
-    game_id = params.get("game_id") or params.get("gameId")
-    if not player_id:
+    player_id = params.get("player_id")
+    game_id = params.get("game_id")
+    if not player_id or not str(player_id).strip():
         raise ValueError("Missing player_id")
-    if not game_id:
+    if not game_id or not str(game_id).strip():
         raise ValueError("Missing game_id")
+    player_id = str(player_id).strip()
+    game_id = str(game_id).strip()
 
     query_params: dict[str, Any] = {"limit": 1}
 
@@ -183,15 +189,6 @@ async def faceit_player_stats_action(db: Session, user_id: int, params: dict) ->
         if value not in (None, "", "None"):
             filtered_stats[key] = str(value)
 
-    result_code = filtered_stats.get("Result")
-    if result_code is not None:
-        result_mapping = {
-            "1": "Victoire",
-            "2": "Défaite",
-            "3": "Égalité",
-        }
-        filtered_stats["Result"] = result_mapping.get(str(result_code), str(result_code))
-
     formatted_stats: dict[str, str] = {}
     for key, value in filtered_stats.items():
         if value in (None, "", "None"):
@@ -218,7 +215,7 @@ async def faceit_get_player_id_action(db: Session, user_id: int, params: dict) -
     if not api_key:
         raise ValueError("FACEIT_API_KEY not configured")
 
-    nickname = params.get("nickname") or params.get("player_nickname") or params.get("playerNickname")
+    nickname = params.get("nickname")
     if not nickname or not str(nickname).strip():
         raise ValueError("Missing nickname")
     nickname = str(nickname).strip()
@@ -262,55 +259,135 @@ async def faceit_player_ranking_action(db: Session, user_id: int, params: dict) 
     if not api_key:
         raise ValueError("FACEIT_API_KEY not configured")
 
-    player_id = params.get("player_id") or params.get("playerId")
-    game_id = params.get("game_id") or params.get("gameId")
-    region = params.get("region")
-    if not player_id:
-        raise ValueError("Missing player_id")
-    if not game_id:
-        raise ValueError("Missing game_id")
-    if not region:
-        raise ValueError("Missing region")
+    nickname = params.get("nickname")
+    if not nickname or not str(nickname).strip():
+        raise ValueError("Missing nickname")
+    nickname = str(nickname).strip()
 
-    query_params: dict[str, Any] = {}
-    country = params.get("country")
-    if country:
-        query_params["country"] = country
+    raw_game_id = params.get("game_id")
+    if raw_game_id in (None, "", "None"):
+        game_id = "cs2"
+    else:
+        game_id = str(raw_game_id).strip() or "cs2"
 
-    limit_raw = params.get("limit")
-    if limit_raw not in (None, "", []):
-        try:
-            limit_value = int(limit_raw)
-        except (TypeError, ValueError):
-            raise ValueError("Invalid value for limit")
-        limit_value = max(1, min(100, limit_value))
-        query_params["limit"] = limit_value
+    def _normalize_country(value: Any) -> str | None:
+        if value in (None, "", "None"):
+            return None
+        return str(value).strip().upper()
 
-    async with httpx.AsyncClient() as client:
-        response = await client.get(
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Accept": "application/json",
+    }
+
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        player_response = await client.get(
+            "https://open.faceit.com/data/v4/players",
+            params={"nickname": nickname},
+            headers=headers,
+        )
+        if player_response.status_code != 200:
+            try:
+                detail = player_response.json()
+            except Exception:
+                detail = player_response.text
+            raise ValueError(f"Failed to fetch player by nickname: {detail}")
+
+        player_data = player_response.json()
+        if not isinstance(player_data, dict):
+            raise ValueError("Unexpected player payload from FACEIT")
+
+        player_id = player_data.get("player_id")
+        if not player_id:
+            raise ValueError(f"Player '{nickname}' not found on FACEIT")
+
+        resolved_nickname = player_data.get("nickname") or nickname
+
+        games_info = player_data.get("games") or {}
+        game_entry = None
+        for candidate in {game_id, game_id.lower(), game_id.upper()}:
+            if isinstance(games_info, dict) and candidate in games_info:
+                game_entry = games_info[candidate]
+                game_id = candidate  # normalize to existing key
+                break
+        if not isinstance(game_entry, dict):
+            game_entry = {}
+
+        region = game_entry.get("region") or player_data.get("region")
+        if not region:
+            raise ValueError("Impossible de déterminer la région du joueur pour ce jeu")
+        region = str(region).strip()
+
+        country_code = _normalize_country(player_data.get("country"))
+
+        ranking_response = await client.get(
             f"https://open.faceit.com/data/v4/rankings/games/{game_id}/regions/{region}/players/{player_id}",
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Accept": "application/json",
-            },
-            params=query_params,
+            headers=headers,
             timeout=10.0,
         )
-    if response.status_code != 200:
-        try:
-            detail = response.json()
-        except Exception:
-            detail = response.text
-        raise ValueError(f"Failed to fetch ranking: {detail}")
+        if ranking_response.status_code != 200:
+            try:
+                detail = ranking_response.json()
+            except Exception:
+                detail = ranking_response.text
+            raise ValueError(f"Failed to fetch ranking: {detail}")
 
-    data = response.json()
-    return {
-        "player_id": player_id,
-        "game_id": game_id,
-        "region": region,
-        "query": query_params,
-        "ranking": data,
-    }
+        ranking_data = ranking_response.json()
+
+    if not isinstance(ranking_data, dict):
+        raise ValueError("Unexpected FACEIT ranking payload")
+
+    def pick_value(source: Any, *keys: str) -> Any:
+        if not isinstance(source, dict):
+            return None
+        for key in keys:
+            if key in source:
+                value = source[key]
+                if value not in (None, "", "None"):
+                    return value
+        return None
+
+    items = ranking_data.get("items")
+    matching_item = None
+    if isinstance(items, list):
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            candidate_id = pick_value(item, "player_id", "playerId", "id")
+            if candidate_id and str(candidate_id).lower() == str(player_id).lower():
+                matching_item = item
+                break
+        if matching_item is None and items:
+            first_item = items[0]
+            matching_item = first_item if isinstance(first_item, dict) else None
+
+    position = pick_value(ranking_data, "position", "ranking", "rank", "placement")
+    if position is None and matching_item:
+        position = pick_value(matching_item, "position", "ranking", "rank", "placement")
+    if position in (None, "", "None"):
+        raise ValueError("Impossible de déterminer la position du joueur dans le classement")
+
+    position_str = str(position).strip()
+    if not position_str:
+        raise ValueError("Position du joueur vide dans la réponse FACEIT")
+    try:
+        position_clean = str(int(position_str))
+    except (TypeError, ValueError):
+        position_clean = position_str
+
+    if matching_item and not country_code:
+        country_code = _normalize_country(
+            pick_value(matching_item, "country", "country_code", "player_country")
+        )
+    if not country_code:
+        country_code = _normalize_country(
+            pick_value(ranking_data, "country", "country_code")
+        )
+
+    suffix = f" ({country_code})" if country_code else ""
+    summary = f"Le joueur {resolved_nickname} est {position_clean} sur {game_id}{suffix}"
+
+    return {"summary": summary}
 
 
 async def timer_interval_action(db: Session, user_id: int, params: dict) -> dict[str, Any]:
