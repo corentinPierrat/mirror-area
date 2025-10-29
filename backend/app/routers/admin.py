@@ -2,17 +2,17 @@ from fastapi import HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 from app.models.models import User
 from app.database import get_db
-from app.services.auth import get_current_user, hash_password
+from app.services.auth import get_current_admin_user, hash_password
 from app.schemas.admin import UserCreate, UserUpdate
 
 admin_router = APIRouter(prefix="/admin", tags=["admin"])
 
 @admin_router.get("/users")
-async def get_users(db: Session = Depends(get_db), admin_user: User = Depends(get_current_user, admin=True)):
+async def get_users(db: Session = Depends(get_db), admin_user: User = Depends()):
     return db.query(User).all()
 
 @admin_router.post("/users")
-async def create_user(user: UserCreate, db: Session = Depends(get_db), admin_user: User = Depends(get_current_user, admin=True)):
+async def create_user(user: UserCreate, db: Session = Depends(get_db), admin_user: User = Depends(get_current_admin_user)):
     db_user = User(
         username=user.username,
         email=user.email,
@@ -25,7 +25,7 @@ async def create_user(user: UserCreate, db: Session = Depends(get_db), admin_use
     return db_user
 
 @admin_router.delete("/users/{user_id}")
-async def delete_user(user_id: int, db: Session = Depends(get_db), admin_user: User = Depends(get_current_user, admin=True)):
+async def delete_user(user_id: int, db: Session = Depends(get_db), admin_user: User = Depends(get_current_admin_user)):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -34,7 +34,7 @@ async def delete_user(user_id: int, db: Session = Depends(get_db), admin_user: U
     return {"detail": "User deleted"}
 
 @admin_router.put("/users/{user_id}")
-async def update_user(user_id: int, updated_user: UserUpdate, db: Session = Depends(get_db), admin_user: User = Depends(get_current_user, admin=True)):
+async def update_user(user_id: int, updated_user: UserUpdate, db: Session = Depends(get_db), admin_user: User = Depends(get_current_admin_user)):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")

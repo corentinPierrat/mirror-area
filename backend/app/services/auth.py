@@ -120,3 +120,9 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise HTTPException(status_code=403, detail="User is not an admin")
 
     return user
+
+def get_current_admin_user(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db)
+) -> User:
+    return get_current_user(token, db, admin=True)
