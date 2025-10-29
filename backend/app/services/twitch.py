@@ -96,21 +96,21 @@ def parse_twitch_event(event_type: str, event_data: dict):
 
     if event_type == "stream.online":
         payload = {
-            "event": "stream_online",
+            "event": "stream.online",
             "broadcaster_user_id": event_data.get("broadcaster_user_id"),
             "broadcaster_user_name": event_data.get("broadcaster_user_name"),
             "message": f"{event_data.get('broadcaster_user_name')} is now live!"
         }
     elif event_type == "channel.follow":
         payload = {
-            "event": "new_follow",
+            "event": "new.follow",
             "broadcaster_user_id": event_data.get("broadcaster_user_id"),
             "follower_name": event_data.get("user_name"),
             "message": f"{event_data.get('user_name')} just followed {event_data.get('broadcaster_user_name')}!"
         }
     elif event_type == "channel.subscribe":
         payload = {
-            "event": "new_subscriber",
+            "event": "new.subscriber",
             "broadcaster_user_id": event_data.get("broadcaster_user_id"),
             "subscriber_name": event_data.get("user_name"),
             "tier": event_data.get("tier", "1000"),
