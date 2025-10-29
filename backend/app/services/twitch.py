@@ -64,6 +64,9 @@ async def create_twitch_webhook(event_type: str, broadcaster_id: str, db: Sessio
         }
     }
 
+    if event_type == "channel.follow":
+        subscription_data["condition"]["moderator_user_id"] = broadcaster_id
+
     response = requests.post(
         "https://api.twitch.tv/helix/eventsub/subscriptions",
         json=subscription_data,
