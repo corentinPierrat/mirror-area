@@ -116,25 +116,7 @@ async def faceit_player_stats_action(db: Session, user_id: int, params: dict) ->
     if not game_id:
         raise ValueError("Missing game_id")
 
-    query_params: dict[str, Any] = {}
-
-    def add_int_param(name: str, *, minimum: int | None = None, maximum: int | None = None):
-        raw_value = params.get(name)
-        if raw_value in (None, "", []):
-            return
-        try:
-            int_value = int(raw_value)
-        except (TypeError, ValueError):
-            raise ValueError(f"Invalid value for {name}")
-        if minimum is not None:
-            int_value = max(minimum, int_value)
-        if maximum is not None:
-            int_value = min(maximum, int_value)
-        query_params[name] = int_value
-
-    add_int_param("limit", minimum=1, maximum=100)
-    add_int_param("from")
-    add_int_param("to")
+    query_params: dict[str, Any] = {"limit": 1}
 
     async with httpx.AsyncClient() as client:
         response = await client.get(
@@ -154,12 +136,82 @@ async def faceit_player_stats_action(db: Session, user_id: int, params: dict) ->
         raise ValueError(f"Failed to fetch stats: {detail}")
 
     data = response.json()
-    return {
+    matches = data.get("items") if isinstance(data, dict) else None
+    last_match = None
+    if isinstance(matches, list) and matches:
+        last_match = matches[0]
+    elif isinstance(data, dict):
+        last_match = data.get("last_match") or data
+    else:
+        last_match = data
+
+    stats_map: dict[str, Any] = {}
+    if isinstance(last_match, dict):
+        raw_stats = last_match.get("stats")
+        if isinstance(raw_stats, dict):
+            stats_map = {str(k): str(v) if v is not None else "" for k, v in raw_stats.items()}
+        else:
+            stats_map = {str(k): str(v) if v is not None else "" for k, v in last_match.items() if not isinstance(v, (dict, list))}
+
+    allowed_keys = {
+        "Deaths",
+        "Headshots %",
+        "Triple Kills",
+        "Assists",
+        "Game",
+        "Penta Kills",
+        "MVPs",
+        "Final Score",
+        "Quadro Kills",
+        "Result",
+        "Double Kills",
+        "Rounds",
+        "Nickname",
+        "Score",
+        "K/D Ratio",
+        "Kills",
+    }
+
+    filtered_stats: dict[str, str] = {}
+    for key in allowed_keys:
+        value = stats_map.get(key)
+        if value in (None, "", "None"):
+            if isinstance(last_match, dict):
+                alt_value = last_match.get(key)
+                if alt_value not in (None, "", "None"):
+                    value = str(alt_value)
+        if value not in (None, "", "None"):
+            filtered_stats[key] = str(value)
+
+    result_code = filtered_stats.get("Result")
+    if result_code is not None:
+        result_mapping = {
+            "1": "Victoire",
+            "2": "Défaite",
+            "3": "Égalité",
+        }
+        filtered_stats["Result"] = result_mapping.get(str(result_code), str(result_code))
+
+    formatted_stats: dict[str, str] = {}
+    for key, value in filtered_stats.items():
+        if value in (None, "", "None"):
+            continue
+        formatted_stats[key] = f"{key}: {value}"
+
+    summary_text_parts: list[str] = []
+    for value in formatted_stats.values():
+        summary_text_parts.append(value)
+    summary_text = "\n".join(summary_text_parts) if summary_text_parts else None
+
+    payload: dict[str, Any] = {
         "player_id": player_id,
         "game_id": game_id,
-        "query": query_params,
-        "stats": data,
     }
+    payload.update(formatted_stats)
+    if summary_text:
+        payload["summary"] = summary_text
+
+    return payload
 
 async def faceit_get_player_id_action(db: Session, user_id: int, params: dict) -> dict[str, Any]:
     api_key = settings.FACEIT_API_KEY
@@ -192,11 +244,16 @@ async def faceit_get_player_id_action(db: Session, user_id: int, params: dict) -
     if not player_id:
         raise ValueError(f"Player '{nickname}' not found")
 
+    resolved_nickname = data.get("nickname") or nickname
+    resolved_country = data.get("country") or "Unknown"
+    summary_line = f"{player_id}: {resolved_nickname} ({resolved_country})"
+
     return {
         "player_id": player_id,
-        "nickname": data.get("nickname") or nickname,
-        "country": data.get("country"),
+        "nickname": resolved_nickname,
+        "country": resolved_country,
         "game_id": data.get("game_id") or data.get("games", {}).get("cs2", {}).get("game_id"),
+        "text": summary_line,
     }
 
 

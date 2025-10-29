@@ -17,6 +17,8 @@ async def twitter_tweet_reaction(db: Session, user_id: int, params: dict):
         text = str(text)
     if not text or not text.strip():
         return {"error": "Missing text"}
+    if len(text) > 273:
+        text = text[:273] + "..."
     resp = await oauth.twitter.post("tweets", token=token, json={"text": text})
     if resp.status_code in (200, 201):
         return resp.json()

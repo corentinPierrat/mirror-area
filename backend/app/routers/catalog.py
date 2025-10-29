@@ -267,6 +267,12 @@ ACTIONS_CATALOG = {
                 "label": "Country",
                 "path": "country",
                 "optional": True
+            },
+            "text": {
+                "type": "string",
+                "label": "Summary",
+                "path": "text",
+                "optional": True
             }
         }
     },
@@ -284,20 +290,121 @@ ACTIONS_CATALOG = {
                 "type": "string",
                 "label": "Game ID",
                 "default": "cs2"
-            },
-            "limit": {
-                "type": "number",
-                "label": "Limit",
-                "default": 20,
-                "optional": True
             }
         },
-        "description": "Fetches aggregated statistics for a player over recent FACEIT matches.",
+        "description": "Fetches statistics for the player's most recent FACEIT match.",
         "output_schema": {
-            "stats": {
-                "type": "object",
-                "label": "Statistics payload",
-                "path": "stats"
+            "player_id": {
+                "type": "string",
+                "label": "Player ID",
+                "path": "player_id"
+            },
+            "game_id": {
+                "type": "string",
+                "label": "Game ID",
+                "path": "game_id"
+            },
+            "Nickname": {
+                "type": "string",
+                "label": "Nickname",
+                "path": "Nickname",
+                "optional": True
+            },
+            "Score": {
+                "type": "string",
+                "label": "Score",
+                "path": "Score",
+                "optional": True
+            },
+            "Kills": {
+                "type": "string",
+                "label": "Kills",
+                "path": "Kills",
+                "optional": True
+            },
+            "Deaths": {
+                "type": "string",
+                "label": "Deaths",
+                "path": "Deaths",
+                "optional": True
+            },
+            "Assists": {
+                "type": "string",
+                "label": "Assists",
+                "path": "Assists",
+                "optional": True
+            },
+            "K/D Ratio": {
+                "type": "string",
+                "label": "K/D Ratio",
+                "path": "K/D Ratio",
+                "optional": True
+            },
+            "Headshots %": {
+                "type": "string",
+                "label": "Headshots %",
+                "path": "Headshots %",
+                "optional": True
+            },
+            "MVPs": {
+                "type": "string",
+                "label": "MVPs",
+                "path": "MVPs",
+                "optional": True
+            },
+            "Rounds": {
+                "type": "string",
+                "label": "Rounds",
+                "path": "Rounds",
+                "optional": True
+            },
+            "Final Score": {
+                "type": "string",
+                "label": "Final Score",
+                "path": "Final Score",
+                "optional": True
+            },
+            "Result": {
+                "type": "string",
+                "label": "Result",
+                "path": "Result",
+                "optional": True
+            },
+            "Double Kills": {
+                "type": "string",
+                "label": "Double Kills",
+                "path": "Double Kills",
+                "optional": True
+            },
+            "Triple Kills": {
+                "type": "string",
+                "label": "Triple Kills",
+                "path": "Triple Kills",
+                "optional": True
+            },
+            "Quadro Kills": {
+                "type": "string",
+                "label": "Quadro Kills",
+                "path": "Quadro Kills",
+                "optional": True
+            },
+            "Penta Kills": {
+                "type": "string",
+                "label": "Penta Kills",
+                "path": "Penta Kills",
+                "optional": True
+            },
+            "Game": {
+                "type": "string",
+                "label": "Game",
+                "path": "Game",
+                "optional": True
+            },
+            "summary": {
+                "type": "string",
+                "label": "Sommaire",
+                "path": "summary",
+                "optional": True
             }
         }
     },
