@@ -1,17 +1,19 @@
 from fastapi import HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
-from app.models.models import User
+from app.models.models import User, Workflow, UserService
 from app.database import get_db
 from app.services.auth import get_current_admin_user, hash_password
 from app.schemas.admin import UserCreate, UserUpdate
+from app.schemas.auth import UserInfo
+from sqlalchemy import func, text
 
 admin_router = APIRouter(prefix="/admin", tags=["admin"])
 
-@admin_router.get("/users")
+@admin_router.get("/users", response_model=list[UserInfo])
 async def get_users(db: Session = Depends(get_db), admin_user: User = Depends(get_current_admin_user)):
     return db.query(User).all()
 
-@admin_router.post("/users")
+@admin_router.post("/users", response_model=UserInfo)
 async def create_user(user: UserCreate, db: Session = Depends(get_db), admin_user: User = Depends(get_current_admin_user)):
     db_user = User(
         username=user.username,
@@ -34,15 +36,34 @@ async def delete_user(user_id: int, db: Session = Depends(get_db), admin_user: U
     db.commit()
     return {"detail": "User deleted"}
 
-@admin_router.put("/users/{user_id}")
-async def update_user(user_id: int, updated_user: UserUpdate, db: Session = Depends(get_db), admin_user: User = Depends(get_current_admin_user)):
+@admin_router.patch("/users/{user_id}", response_model=UserInfo)
+async def patch_user(user_id: int, updated_user: UserUpdate, db: Session = Depends(get_db), admin_user: User = Depends(get_current_admin_user)):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    user.username = updated_user.username
-    user.email = updated_user.email
-    user.role = updated_user.role
-    user.password_hash = hash_password(updated_user.password)
+    if updated_user.username:
+        user.username = updated_user.username
+    if updated_user.email:
+        user.email = updated_user.email
+    if updated_user.role:
+        user.role = updated_user.role
+    if updated_user.password:
+        user.password_hash = hash_password(updated_user.password)
     db.commit()
     db.refresh(user)
     return user
+
+@admin_router.get("/stats")
+async def get_stats(db: Session = Depends(get_db), admin_user: User = Depends(get_current_admin_user)):
+    user_count = db.query(User).count()
+    workflow_count = db.query(Workflow).count()
+    services_count = db.query(UserService).count()
+    signups_last_7d = db.query(User).filter(
+        User.created_at >= func.now() - text("INTERVAL '7 days'")
+    ).count()
+    return {
+        "user_count": user_count,
+        "workflow_count": workflow_count,
+        "services_count": services_count,
+        "signups_last_7d": signups_last_7d
+    }
