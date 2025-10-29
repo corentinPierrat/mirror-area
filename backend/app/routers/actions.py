@@ -32,8 +32,9 @@ async def twitch_webhook(
     twitch_eventsub_message_id: str = Header(None, alias="Twitch-Eventsub-Message-Id"),
     twitch_eventsub_message_timestamp: str = Header(None, alias="Twitch-Eventsub-Message-Timestamp")
 ):
+    print("Received Twitch webhook")
     body = await request.body()
-
+    print(f"Body: {body.decode('utf-8')}")
     if twitch_eventsub_message_signature:
         message = twitch_eventsub_message_id + twitch_eventsub_message_timestamp + body.decode('utf-8')
         expected_signature = 'sha256=' + hmac.new(
@@ -44,9 +45,9 @@ async def twitch_webhook(
 
         if not hmac.compare_digest(expected_signature, twitch_eventsub_message_signature):
             return JSONResponse(status_code=403, content={"detail": "Invalid signature"})
-
+    print("Signature verified")
     data = json.loads(body)
-
+    print(f"Parsed data: {data}")
     if twitch_eventsub_message_type == "webhook_callback_verification":
         return Response(content=data["challenge"], media_type="text/plain")
 
