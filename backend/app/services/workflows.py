@@ -69,34 +69,59 @@ async def trigger_workflows(service: str, event_type: str, data: dict, db: Sessi
         WorkflowStep.type == "action",
         Workflow.active == True
     ]
-    print(f"Triggering workflows for service: {service}, event: {event_type}, data: {data}")
+    print(f"\n=== [DEBUG] Triggering workflows for service: {service}, event: {event_type}, data: {data}")
+
     if service == "discord" and "guild_id" in data:
+        print(f"[DEBUG] Ajout filtre guild_id: {data['guild_id']}")
         filter_conditions.append(
             func.JSON_EXTRACT(WorkflowStep.params, '$.guild_id') == data["guild_id"]
         )
     elif service == "twitch" and "broadcaster_user_id" in data:
+        print(f"[DEBUG] Ajout filtre broadcaster_user_id: {data['broadcaster_user_id']}")
         filter_conditions.append(
             func.JSON_EXTRACT(WorkflowStep.params, '$.broadcaster_user_id') == data["broadcaster_user_id"]
         )
     elif service == "faceit" and "player_id" in data:
+        print(f"[DEBUG] Ajout filtre player_id: {data['player_id']}")
         filter_conditions.append(
             func.JSON_EXTRACT(WorkflowStep.params, '$.player_id') == data["player_id"]
         )
     elif service == "timer":
         step_id = data.get("step_id")
         workflow_id = data.get("workflow_id")
+        print(f"[DEBUG] Ajout filtres timer: step_id={step_id}, workflow_id={workflow_id}")
         if step_id:
             filter_conditions.append(WorkflowStep.id == step_id)
         if workflow_id:
             filter_conditions.append(WorkflowStep.workflow_id == workflow_id)
 
-    workflows = db.query(Workflow).join(WorkflowStep).filter(*filter_conditions).all()
+    for cond in filter_conditions:
+        print(f"[DEBUG] Filter condition: {cond}")
 
+    query = db.query(Workflow).join(WorkflowStep).filter(*filter_conditions)
+    print("[DEBUG] SQL:", str(query.statement.compile(compile_kwargs={'literal_binds': True})))
+
+    # DEBUG Twitch: Affiche tous les steps candidats et leur params
+    if service == "twitch" and "broadcaster_user_id" in data:
+        print("[DEBUG] Tous les steps Twitch avec event =", event_type)
+        steps = db.query(WorkflowStep).filter(
+            WorkflowStep.event == event_type,
+            WorkflowStep.service == service,
+            WorkflowStep.type == "action"
+        ).all()
+        for s in steps:
+            print(f"[DEBUG] Step id={s.id} workflow_id={s.workflow_id} params={s.params}")
+        print(f"[DEBUG] Comparé à broadcaster_user_id attendu: {data['broadcaster_user_id']} (type: {type(data['broadcaster_user_id'])})")
+
+    workflows = query.all()
+    print(f"[DEBUG] Workflows trouvés: {len(workflows)}")
     results = []
     for workflow in workflows:
+        print(f"[DEBUG] Workflow id={workflow.id} user_id={workflow.user_id} name={workflow.name}")
         ordered_steps = sorted(workflow.steps, key=lambda s: s.step_order)
         context: Dict[Any, Any] = {"trigger": data}
         for step in ordered_steps:
+            print(f"[DEBUG] Step order={step.step_order} type={step.type} service={step.service} event={step.event}")
             if step.type == "action" and step.service == service and step.event == event_type:
                 context[step.step_order] = data
 
@@ -105,16 +130,20 @@ async def trigger_workflows(service: str, event_type: str, data: dict, db: Sessi
                 if step.service == service and step.event == event_type:
                     continue
 
+                print(f"[DEBUG] Execution action: {step.service}.{step.event} (step_order={step.step_order})")
                 resolved_params = prepare_step_params(step.params, context, data, include_message_fallback=False)
+                print(f"[DEBUG] Params résolus: {resolved_params}")
                 try:
                     action_output = await execute_action(step.service, step.event, db, workflow.user_id, resolved_params)
                     context[step.step_order] = action_output
+                    print(f"[DEBUG] Action output: {action_output}")
                     results.append({
                         "success": True,
                         "step": f"{step.service}.{step.event}",
                         "result": action_output
                     })
                 except NotImplementedError as exc:
+                    print(f"[DEBUG] NotImplementedError: {exc}")
                     context[step.step_order] = None
                     results.append({
                         "success": False,
@@ -122,6 +151,7 @@ async def trigger_workflows(service: str, event_type: str, data: dict, db: Sessi
                         "error": f"Not implemented: {exc}"
                     })
                 except Exception as exc:
+                    print(f"[DEBUG] Exception: {exc}")
                     context[step.step_order] = None
                     results.append({
                         "success": False,
@@ -133,27 +163,33 @@ async def trigger_workflows(service: str, event_type: str, data: dict, db: Sessi
             if step.type != "reaction":
                 continue
 
+            print(f"[DEBUG] Execution reaction: {step.service}.{step.event} (step_order={step.step_order})")
             resolved_params = prepare_step_params(step.params, context, data, include_message_fallback=True)
+            print(f"[DEBUG] Params résolus (reaction): {resolved_params}")
             try:
                 result = await execute_reaction(step.service, step.event, db, workflow.user_id, resolved_params)
+                print(f"[DEBUG] Reaction output: {result}")
                 results.append({
                     "success": True,
                     "step": f"{step.service}.{step.event}",
                     "result": result
                 })
             except NotImplementedError as exc:
+                print(f"[DEBUG] NotImplementedError (reaction): {exc}")
                 results.append({
                     "success": False,
                     "step": f"{step.service}.{step.event}",
                     "error": f"Not implemented: {exc}"
                 })
             except Exception as exc:
+                print(f"[DEBUG] Exception (reaction): {exc}")
                 results.append({
                     "success": False,
                     "step": f"{step.service}.{step.event}",
                     "error": str(exc)
                 })
 
+    print(f"[DEBUG] Résultats finaux: {results}\n")
     return results
 
 
