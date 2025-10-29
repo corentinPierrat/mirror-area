@@ -39,10 +39,11 @@ async def get_twitch_user_id(username_streamer: str) -> str:
     user = data["data"][0]
     return user["id"]
 
-async def create_twitch_webhook(event_type: str, broadcaster_id: str):
-    print(f"[logs] Creating Twitch webhook: event_type={event_type} broadcaster_id={broadcaster_id}")
-    app_token = await get_app_access_token()
-    print(f"[logs] Obtained Twitch app token for webhook creation (length={len(app_token) if app_token else 0})")
+async def create_twitch_webhook(event_type: str, broadcaster_id: str, db: Session, user_id: int) -> str:
+    if event_type == "stream.online":
+        app_token = await get_app_access_token()
+    else:
+        app_token = refresh_oauth_token(db, user_id, "twitch")
 
     headers = {
         "Authorization": f"Bearer {app_token}",
@@ -52,7 +53,7 @@ async def create_twitch_webhook(event_type: str, broadcaster_id: str):
 
     subscription_data = {
         "type": event_type,
-        "version": "1",
+        "version": "2",
         "condition": {
             "broadcaster_user_id": broadcaster_id
         },
