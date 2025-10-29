@@ -59,7 +59,7 @@ async def get_stats(db: Session = Depends(get_db), admin_user: User = Depends(ge
     workflow_count = db.query(Workflow).filter(Workflow.active == True).count()
     services_count = db.query(UserService).count()
     signups_last_7d = db.query(User).filter(
-        User.created_at >= func.now() - text("INTERVAL '7 days'")
+        User.created_at >= func.now() - text("INTERVAL 7 DAY")
     ).count()
     return {
         "total_users": user_count,
