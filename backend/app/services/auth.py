@@ -103,7 +103,7 @@ def send_verification_email(to_email: str, code: str):
         smtp.login(settings.USER_SMTP_EMAIL, settings.USER_SMTP_PASSWORD)
         smtp.send_message(msg)
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db), admin: bool = False) -> User:
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
         email: str = payload.get("sub")
@@ -115,5 +115,8 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     user = db.query(User).filter(User.email == email).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+
+    if admin and not user.role == "admin":
+        raise HTTPException(status_code=403, detail="User is not an admin")
 
     return user
