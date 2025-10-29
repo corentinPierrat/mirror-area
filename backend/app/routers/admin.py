@@ -56,7 +56,7 @@ async def patch_user(user_id: int, updated_user: UserUpdate, db: Session = Depen
 @admin_router.get("/stats")
 async def get_stats(db: Session = Depends(get_db), admin_user: User = Depends(get_current_admin_user)):
     user_count = db.query(User).count()
-    workflow_count = db.query(Workflow).filter(Workflow.is_active == True).count()
+    workflow_count = db.query(Workflow).filter(Workflow.active == True).count()
     services_count = db.query(UserService).count()
     signups_last_7d = db.query(User).filter(
         User.created_at >= func.now() - text("INTERVAL '7 days'")
