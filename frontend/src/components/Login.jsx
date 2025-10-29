@@ -8,7 +8,6 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Login() {
   const navigate = useNavigate();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,8 +23,6 @@ export default function Login() {
 
     setLoading(true);
     setMessage("");
-
-    console.log('test', API_URL);
 
     try {
       const response = await axios.post(`${API_URL}/auth/login`, { email, password });
@@ -60,18 +57,21 @@ export default function Login() {
     navigate("/register");
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = `${API_URL}/oauth/google/login`;
+  };
+
   return (
     <div className={styles.container}>
       <video
-              className={styles.videoBackground}
-              src={videoBg}
-              autoPlay
-              loop
-              muted
-              playsInline
-            />
+        className={styles.videoBackground}
+        src={videoBg}
+        autoPlay
+        loop
+        muted
+        playsInline
+      />
       <div className={styles.card}>
-
         <form onSubmit={handleLogin}>
           <input
             type="email"
@@ -93,10 +93,20 @@ export default function Login() {
           </button>
         </form>
 
+        <div className={styles.divider}>OR</div>
+
+        <button onClick={handleGoogleLogin} className={styles.googleButton}>
+          <img src="../public/google.png" alt="Google" className={styles.googleIcon} />
+          Continue with Google
+        </button>
       </div>
-        <p className={styles.linkText}>
-        No account? <span onClick={goToRegister} className={styles.link}>Register</span>
-        </p>
+
+      <p className={styles.linkText}>
+        No account?{" "}
+        <span onClick={goToRegister} className={styles.link}>
+          Register
+        </span>
+      </p>
     </div>
   );
 }

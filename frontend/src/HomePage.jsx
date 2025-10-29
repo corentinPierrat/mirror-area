@@ -23,7 +23,9 @@ function HomePage() {
           <div className={styles.containerText}>
             <LiquidText />
           </div>
-          <Footer />
+            <div className={styles.footercontainer}>
+            <Footer />
+            </div>
         </div>
       </main>
     </>

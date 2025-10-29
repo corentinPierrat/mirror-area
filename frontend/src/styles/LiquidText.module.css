@@ -42,7 +42,6 @@
 }
 
 .wrapper {
-  /* background: rgba(255, 255, 255, 0.1); */
   backdrop-filter: blur(8px);
   transform: translate(-50%, -50%) scale(2);
   -webkit-backdrop-filter: blur(8px);

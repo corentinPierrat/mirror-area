@@ -1,17 +1,18 @@
 .profileCard {
-    /* background: #1c1c1c; */
     padding: 2rem;
     border-radius: 1.5rem;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
     text-align: center;
     color: #fff;
     width: 350px;
     margin: 0 auto;
 
-  background-color: rgba(255, 255, 255, 0.2);
+    position: relative;
+    z-index: 2;
+
+  background-color: rgba(255, 255, 255, 0.01);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   }
   
   .title {

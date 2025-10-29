@@ -42,15 +42,14 @@ export default function Header() {
         <div className={styles['nav-left']}>
           <Link to="/" className={styles.logo}>Triggers.</Link>
           <ul className={styles['nav-links']}>
-            <li><Link to="/dashboard">Features</Link></li>
-            <li><a href="#">Pricing</a></li>
-            <li><a href="#">Docs</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="https://trigger.ink/docs#/">Docs</a></li>
           </ul>
         </div>
         <div className={styles['nav-right']}>
           {user ? (
             <>
-              <Link to="/Account" className={styles.userProfileBtn}>
+              <Link to="/dashboard" className={styles.userProfileBtn}>
                 <img src={avatarUrl} alt="Avatar" className={styles.userAvatar} />
                 {user.username}
               </Link>

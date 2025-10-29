@@ -5,6 +5,7 @@ import axios from "axios";
 import styles from "../styles/Register.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Register() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -35,23 +36,28 @@ export default function Register() {
       }
     } catch (error) {
       if (error.response?.status === 422) setMessage("Password must be at least 8 characters long");
-      else if (error.response?.status === 400) setMessage("This email is already in useé");
+      else if (error.response?.status === 400) setMessage("This email is already in use");
       else setMessage("Network error, please try again");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleGoogleRegister = () => {
+    window.location.href = `${API_URL}/oauth/google/login`;
+  };
+
   return (
     <div className={styles.container}>
       <video
-                    className={styles.videoBackground}
-                    src={videoBg}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                  />
+        className={styles.videoBackground}
+        src={videoBg}
+        autoPlay
+        loop
+        muted
+        playsInline
+      />
+
       <form onSubmit={handleRegister} className={styles.form}>
         <input
           type="text"
@@ -81,15 +87,25 @@ export default function Register() {
           onChange={(e) => setConfirmPassword(e.target.value)}
           className={styles.input}
         />
+
         {message && <p className={styles.message}>{message}</p>}
+
         <button type="submit" disabled={loading} className={styles.button}>
           {loading ? "Registration..." : "Register"}
         </button>
+      <div className={styles.divider}>OR</div>
+
+      <button onClick={handleGoogleRegister} className={styles.googleButton}>
+        <img src="../public/google.png" alt="Google" className={styles.googleIcon} />
+        Sign up with Google
+      </button>
       </form>
+
+
       <p>
-      Already an account ?{" "}
+        Already have an account?{" "}
         <span onClick={() => navigate("/login")} className={styles.link}>
-        Log in
+          Log in
         </span>
       </p>
     </div>

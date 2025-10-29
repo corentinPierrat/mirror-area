@@ -16,12 +16,12 @@ export default function HeaderDashboard() {
             <ul className={styles['nav-links']}>
               <li><img src="/arrow.PNG" className={styles.navicons} alt="arrow" /><a href="/Account">Profile</a></li>
               <li><img src="/arrow.PNG" className={styles.navicons} alt="arrow" /><a href="#">Feeds</a></li>
-              <li><img src="/arrow.PNG" className={styles.navicons} alt="arrow" /><a href="#">Sign-out</a></li>
+              <li><img src="/arrow.PNG" className={styles.navicons} alt="arrow" /><a href="#">Abonments</a></li>
             </ul>
             <div className={styles['doc-section']}>
               <h2>Needs help?</h2>
               <p>Please check our docs</p>
-              <a href="/docs">DOCUMENTATION</a>
+              <a href="https://trigger.ink/docs#/">DOCUMENTATION</a>
             </div>
           </div>
         </div>
