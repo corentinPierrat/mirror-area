@@ -60,7 +60,7 @@ async def create_twitch_webhook(event_type: str, broadcaster_id: str, db: Sessio
 
     subscription_data = {
         "type": event_type,
-        "version": "2",
+        "version": "2" if event_type == "channel.follow" else "1",
         "condition": {
             "broadcaster_user_id": broadcaster_id
         },
@@ -87,15 +87,19 @@ async def create_twitch_webhook(event_type: str, broadcaster_id: str, db: Sessio
             raise HTTPException(status_code=500, detail="Empty response from Twitch.")
         return data[0]["id"]
     else:
+        error_detail = response.json() if response.text else response.text
         raise HTTPException(
             status_code=response.status_code,
-            detail=f"Failed to create webhook: {response.text}"
+            detail=f"Failed to create webhook: {error_detail}"
         )
 
-async def delete_twitch_webhook(db: Session, user_id: int, webhook_id: str):
-    token = await get_app_access_token()
-    if not token:
-        raise HTTPException(status_code=401, detail="User not connected to Twitch")
+async def delete_twitch_webhook(db: Session, user_id: int, webhook_id: str, event_type: str):
+    if event_type == "stream.online":
+        token = await get_app_access_token()
+    else:
+        token = await refresh_oauth_token(db, user_id, "twitch")
+        if not token:
+            raise HTTPException(status_code=401, detail="User not connected to Twitch")
 
     headers = {
         "Authorization": f"Bearer {token}",
