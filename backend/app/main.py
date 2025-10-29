@@ -8,6 +8,7 @@ from app.routers.actions import actions_router
 from app.routers.catalog import catalog_router
 from app.routers.workflow import workflows_router
 from app.routers.about import about_router
+from app.routers.admin import admin_router
 from app.config import settings
 from app.services.timer_scheduler import scheduler as timer_scheduler
 
@@ -38,6 +39,7 @@ app.include_router(actions_router)
 app.include_router(catalog_router)
 app.include_router(workflows_router)
 app.include_router(about_router)
+app.include_router(admin_router)
 
 
 @app.on_event("startup")

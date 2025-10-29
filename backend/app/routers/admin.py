@@ -17,7 +17,8 @@ async def create_user(user: UserCreate, db: Session = Depends(get_db), admin_use
         username=user.username,
         email=user.email,
         password_hash=hash_password(user.password),
-        role=user.role
+        role=user.role,
+        is_verified=True
     )
     db.add(db_user)
     db.commit()
