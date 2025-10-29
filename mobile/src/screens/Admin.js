@@ -117,7 +117,7 @@ export default function AdminScreen({ navigation }) {
         >
         <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView contentContainerStyle={[styles.scroll, { flexGrow: 1 }]} showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>{t('Admin')}</Text>
 
         <View style={styles.statsRow}>

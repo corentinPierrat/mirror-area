@@ -8,7 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { API_URL } from "../../config";
 
-const Workflows = ({ Name, ActionLogo, ReactionLogo, onDelete, onEdit, isActive, workflowId }) => {
+const Workflows = ({ Name, ActionLogo, ReactionLogo, onDelete, onEdit, isActive, workflowId, visibility }) => {
   const navigation = useNavigation();
   const { t } = useTranslation();
   const [isEnabled, setIsEnabled] = useState(isActive);
@@ -51,6 +51,11 @@ const Workflows = ({ Name, ActionLogo, ReactionLogo, onDelete, onEdit, isActive,
       <View style={styles.overlayContainer} />
 
       <View style={styles.content}>
+      <Ionicons
+        name={visibility === 'private' ? 'lock-closed' : 'lock-open'}
+        size={22}
+        color="#fff"
+      />
         <View style={styles.servicesRow}>
           {ActionLogo && (
             <View style={styles.serviceContainer}>

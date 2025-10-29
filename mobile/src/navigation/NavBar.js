@@ -7,6 +7,7 @@ import Profils from '../screens/profils';
 import CreateWorkflowScreen from '../screens/CreateWorflow';
 import MyWorkflowScreen from '../screens/MyWorflows';
 import ServiceScreen from '../screens/Services';
+import FeedScreen from '../screens/Feed';
 import "../components/i18n";
 import { useTranslation } from "react-i18next";
 
@@ -29,6 +30,8 @@ export default function TabNavigator() {
             iconName = focused ? 'folder' : 'folder-outline';
           } else if (route.name === 'Services') {
             iconName = focused ? 'settings' : 'settings-outline';
+          } else if (route.name === 'Feed') {
+            iconName = focused ? 'newspaper' : 'newspaper-outline';
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
@@ -74,6 +77,11 @@ export default function TabNavigator() {
         name="Services"
         component={ServiceScreen}
         options={{ title: t("Services") }}
+      />
+      <Tab.Screen
+        name="Feed"
+        component={FeedScreen}
+        options={{ title: t("Feed") }}
       />
     </Tab.Navigator>
   );

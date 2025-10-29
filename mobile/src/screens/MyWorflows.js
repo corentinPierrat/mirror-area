@@ -28,6 +28,7 @@ export default function MyWorkflowScreen({ navigation }) {
   const [isReactionModalVisible, setIsReactionModalVisible] = useState(false);
   const [isActionParamsModalVisible, setIsActionParamsModalVisible] = useState(false);
   const [isReactionParamsModalVisible, setIsReactionParamsModalVisible] = useState(false);
+  const [visibility, setVisibility] = useState('private');
 
   const getURLs = async () => {
     try {
@@ -145,6 +146,7 @@ export default function MyWorkflowScreen({ navigation }) {
   const handleEditWorkflow = async (workflow) => {
     setSelectedWorkflow(workflow);
     setWorkflowName(workflow.name);
+    setVisibility(workflow.visibility || 'private');
 
     await fetchActions();
     await fetchReactions();
@@ -210,6 +212,7 @@ export default function MyWorkflowScreen({ navigation }) {
     try {
       const payload = {
         name: workflowName,
+        visibility: visibility,
         steps: [
           {
             type: "action",
@@ -289,6 +292,7 @@ export default function MyWorkflowScreen({ navigation }) {
                 onEdit={() => handleEditWorkflow(workflow)}
                 isActive={workflow.active}
                 workflowId={workflow.id}
+                visibility={workflow.visibility}
               />
             );
           })
@@ -329,7 +333,9 @@ export default function MyWorkflowScreen({ navigation }) {
                     {selectedAction && (
                       <View style={styles.logoContainer}>
                         <Image
-                          source={{ uri: URLs.find(u => u.provider === selectedAction.service)?.logo_url }}
+                          source={{
+                            uri: URLs.find(u => u.provider === selectedAction.service)?.logo_url,
+                          }}
                           style={styles.logo}
                         />
                       </View>
@@ -338,12 +344,13 @@ export default function MyWorkflowScreen({ navigation }) {
                       {selectedAction?.event || t("Sélectionner une action")}
                     </Text>
                     {selectedAction && Object.keys(actionParams).length > 0 && (
-                        <TouchableOpacity onPress={() => setIsActionParamsModalVisible(true)}>
-                          <Ionicons name="settings-outline" size={24} color="white" />
-                        </TouchableOpacity>
+                      <TouchableOpacity onPress={() => setIsActionParamsModalVisible(true)}>
+                        <Ionicons name="settings-outline" size={24} color="white" />
+                      </TouchableOpacity>
                     )}
                   </View>
                 </TouchableOpacity>
+
                 <Text style={styles.sectionTitle}>{t("Réaction")}</Text>
                 <TouchableOpacity
                   style={styles.serviceSelector}
@@ -353,7 +360,9 @@ export default function MyWorkflowScreen({ navigation }) {
                     {selectedReaction && (
                       <View style={styles.logoContainer}>
                         <Image
-                          source={{ uri: URLs.find(u => u.provider === selectedReaction.service)?.logo_url }}
+                          source={{
+                            uri: URLs.find(u => u.provider === selectedReaction.service)?.logo_url,
+                          }}
                           style={styles.logo}
                         />
                       </View>
@@ -361,11 +370,11 @@ export default function MyWorkflowScreen({ navigation }) {
                     <Text style={styles.serviceName}>
                       {selectedReaction?.event || t("Sélectionner une réaction")}
                     </Text>
-                  {selectedReaction && Object.keys(reactionParams).length > 0 && (
-                    <TouchableOpacity onPress={() => setIsReactionParamsModalVisible(true)}>
-                      <Ionicons name="settings-outline" size={24} color="white" />
-                    </TouchableOpacity>
-                  )}
+                    {selectedReaction && Object.keys(reactionParams).length > 0 && (
+                      <TouchableOpacity onPress={() => setIsReactionParamsModalVisible(true)}>
+                        <Ionicons name="settings-outline" size={24} color="white" />
+                      </TouchableOpacity>
+                    )}
                   </View>
                 </TouchableOpacity>
               </ScrollView>
@@ -383,6 +392,28 @@ export default function MyWorkflowScreen({ navigation }) {
                   onPress={handleSaveWorkflow}
                 >
                   <Text style={styles.buttonText}>{t("Enregistrer")}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setVisibility(visibility === 'private' ? 'public' : 'private')}
+                  style={{
+                    backgroundColor:
+                      visibility === 'private'
+                        ? 'rgba(239,68,68,0.6)'
+                        : 'rgba(34,197,94,0.6)',
+                    paddingVertical: 10,
+                    paddingHorizontal: 14,
+                    borderRadius: 12,
+                    borderWidth: 1,
+                    borderColor: 'rgba(255,255,255,0.3)',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Ionicons
+                    name={visibility === 'private' ? 'lock-closed' : 'lock-open'}
+                    size={22}
+                    color="#fff"
+                  />
                 </TouchableOpacity>
               </View>
             </View>
