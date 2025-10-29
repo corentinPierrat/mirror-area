@@ -76,10 +76,10 @@ async def trigger_workflows(service: str, event_type: str, data: dict, db: Sessi
         filter_conditions.append(
             func.JSON_EXTRACT(WorkflowStep.params, '$.guild_id') == data["guild_id"]
         )
-    elif service == "twitch" and "broadcaster_user_id" in data:
-        print(f"[DEBUG] Ajout filtre broadcaster_user_id: {data['broadcaster_user_id']}")
+    elif service == "twitch" and "username_streamer" in data:
+        print(f"[DEBUG] Ajout filtre username: {data['username_streamer']}")
         filter_conditions.append(
-            func.JSON_EXTRACT(WorkflowStep.params, '$.broadcaster_user_id') == data["broadcaster_user_id"]
+            func.JSON_EXTRACT(WorkflowStep.params, '$.username_streamer') == data["username_streamer"]
         )
     elif service == "faceit" and "player_id" in data:
         print(f"[DEBUG] Ajout filtre player_id: {data['player_id']}")
