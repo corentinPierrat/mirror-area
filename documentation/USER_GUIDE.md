@@ -37,12 +37,36 @@ Avant de pouvoir créer des workflows, vous devez autoriser AREA à accéder à 
 3.  Cliquez sur **"Connecter"** à côté des services que vous souhaitez utiliser.
 4.  Vous serez redirigé vers la page d'autorisation du service (par exemple, Google) pour approuver la connexion. Une fois connecté, le service apparaîtra comme "Connecté".
 
-### Créer un Workflow
+### Créer un Workflow (L'interface Blueprint)
 1.  Allez sur la page **"Créer un Workflow"** (ou "Créer une AREA").
-2.  Donnez un nom et une description à votre workflow.
-3.  **Choisir l'Action :** Sélectionnez le service (ex: Discord) et l'événement déclencheur (ex: "Un membre rejoint le serveur"). Remplissez les paramètres demandés (ex: l'ID de votre serveur Discord).
-4.  **Choisir la Réaction :** Sélectionnez le service (ex: Twitter) et l'action à effectuer (ex: "Publier un tweet"). Remplissez les paramètres (ex: le texte du tweet).
-5.  Cliquez sur **"Sauvegarder"**.
+2.  Donnez un nom à votre workflow (ex: "Alerte Nouveaux Membres").
+
+Vous accédez à l'interface **Blueprint** : un éditeur visuel où vous glissez et connectez différentes "boîtes" (nœuds) pour construire votre automatisation.
+
+Voici les principaux types de boîtes :
+
+* **Action "Hooker" (Déclencheur) :**
+    * C'est le point de départ qui **lance le workflow** et récupère les premières informations lorsqu'un événement se produit.
+    * *Exemple : "Quand un nouveau membre rejoint le serveur Discord".*
+
+* **Action "Timer" (Déclencheur temporel) :**
+    * Un type d'action spécifique qui permet de lancer le workflow à un **intervalle de temps régulier** que vous choisissez (par exemple, "toutes les 5 minutes", "tous les jours à 8h").
+
+* **Réaction :**
+    * C'est l'action qui sera effectuée en réponse au déclencheur.
+    * *Exemple : "...publier un tweet de bienvenue".*
+
+* **Action "Getter" (Récupération de données) :**
+    * Cette boîte permet de **récupérer des informations supplémentaires en direct** d'un service pour les utiliser dans votre réaction.
+    * *Exemple : "Récupérer les statistiques d'un joueur" pour les inclure dans un message Discord.*
+
+**Comment construire :**
+
+1.  **Choisir le Déclencheur :** Placez votre première boîte (une "Action Hooker" ou une "Action Timer") sur le canevas et configurez-la.
+2.  **Choisir la Réaction :** Placez la boîte de réaction.
+3.  **(Optionnel) Ajouter un "Getter" :** Si besoin, ajoutez un "Getter" pour enrichir vos données.
+4.  **Connecter les boîtes :** Reliez les nœuds pour créer le flux logique.
+5.  Cliquez sur **"Sauvegarder"** (ou "Verify" / "Send").
 
 ### Gérer vos Workflows
 Sur votre tableau de bord (page "Mes Workflows" ou "Dashboard"), vous pouvez voir tous les workflows que vous avez créés. Vous pouvez les activer, les désactiver ou les supprimer à tout moment.
