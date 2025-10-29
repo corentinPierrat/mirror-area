@@ -8,6 +8,7 @@ import TabNavigator from './src/navigation/NavBar';
 import LoginScreen from './src/screens/Login';
 import RegisterScreen from './src/screens/Register';
 import Verifcode from './src/screens/Verifcode';
+import AdminScreen from './src/screens/Admin';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 
@@ -46,6 +47,7 @@ export default function App() {
           <Stack.Screen name="Register" component={RegisterScreen} />
           <Stack.Screen name="Main" component={TabNavigator} />
           <Stack.Screen name="Verifcode" component={Verifcode} />
+          <Stack.Screen name="Admin" component={AdminScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

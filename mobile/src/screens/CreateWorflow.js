@@ -1,16 +1,16 @@
-import React, { act, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Alert, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Modal, TextInput } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import { Modal } from 'react-native';
-import { useEffect } from 'react/cjs/react.development';
+import { useNavigation } from '@react-navigation/native';
 import { API_URL } from "../../config";
 import { useTranslation } from "react-i18next";
 
 export default function CreateWorkflowScreen() {
   const { t } = useTranslation();
+  const navigation = useNavigation();
   const [actions, setActions] = useState([]);
   const [selectedAction, setSelectedAction] = useState(null);
   const [WorkflowName, setWorkflowName] = useState('');
@@ -32,7 +32,7 @@ export default function CreateWorkflowScreen() {
     try {
       const token = await AsyncStorage.getItem('userToken');
       if (!token) {
-        navigate('Login');
+        navigation.navigate('Login');
         return;
       }
       const response = await axios.get(`${API_URL}/catalog/actions`, {
@@ -52,7 +52,7 @@ export default function CreateWorkflowScreen() {
     try {
       const token = await AsyncStorage.getItem('userToken');
       if (!token) {
-        navigate('Login');
+        navigation.navigate('Login');
         return;
       }
 
@@ -109,7 +109,7 @@ export default function CreateWorkflowScreen() {
   try {
     const token = await AsyncStorage.getItem('userToken');
     if (!token) {
-      navigate('Login');
+      navigation.navigate('Login');
       return;
     }
 
@@ -154,7 +154,7 @@ export default function CreateWorkflowScreen() {
   const getURL = async () => {
     const token = await AsyncStorage.getItem('userToken');
     if (!token) {
-      navigate('Login');
+      navigation.navigate('Login');
       return;
     }
     try {
@@ -578,7 +578,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '500',
   },
-    text: {
+  text: {
     fontSize: 26,
     color: '#fff',
     marginBottom: 20,
@@ -589,7 +589,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   modalItemDisabled: {
-  opacity: 0.4,
-  backgroundColor: 'rgba(255,255,255,0.05)',
-},
+    opacity: 0.4,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  },
 });

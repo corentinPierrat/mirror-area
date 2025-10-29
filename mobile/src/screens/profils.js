@@ -16,6 +16,7 @@ const ProfileDashboard = ({ navigation }) => {
   const [message, setMessage] = useState('');
   const [userData, setUserData] = useState(null);
   const [isError, setIsError] = useState(false);
+  const isAdmin = !!(userData?.is_admin || userData?.role === 'admin');
 
   const handleChangePassword = async () => {
     const token = await AsyncStorage.getItem('userToken');
@@ -132,6 +133,9 @@ const ProfileDashboard = ({ navigation }) => {
           <Text style={styles.welcomeText}>{t("Welcome")},</Text>
           <Text style={styles.userName}>{userData?.username}</Text>
           <Text style={styles.subText}>{t("Welcome back!")}</Text>
+        {isAdmin && (
+            <Ionicons onPress={() => navigation.navigate('Admin')} name="settings-outline" size={28} color="#60a5fa" style={styles.logoParameter} />
+        )}
         </View>
 
         <View style={styles.glowContainer}>
@@ -302,6 +306,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  adminButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#1e293b',
+    borderRadius: 12,
+    paddingVertical: 14,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#60a5fa',
+  },
+  adminButtonText: { color: '#60a5fa', fontSize: 16, fontWeight: '700' },
   logoutButton: {
     width: '81%',
     flexDirection: 'row',
@@ -338,6 +355,13 @@ const styles = StyleSheet.create({
   textAlign: 'center',
   fontSize: 14,
 },
+logoParameter: {
+  position: 'absolute',
+  bottom: -80,
+  right: -5,
+  opacity: 0.8,
+},
+
 });
 
 export default ProfileDashboard;
