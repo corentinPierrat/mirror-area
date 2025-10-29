@@ -40,7 +40,9 @@ async def get_twitch_user_id(username_streamer: str) -> str:
     return user["id"]
 
 async def create_twitch_webhook(event_type: str, broadcaster_id: str):
+    print(f"[logs] Creating Twitch webhook: event_type={event_type} broadcaster_id={broadcaster_id}")
     app_token = await get_app_access_token()
+    print(f"[logs] Obtained Twitch app token for webhook creation (length={len(app_token) if app_token else 0})")
 
     headers = {
         "Authorization": f"Bearer {app_token}",
@@ -69,8 +71,10 @@ async def create_twitch_webhook(event_type: str, broadcaster_id: str):
 
     if response.status_code == 202:
         webhook_data = response.json()["data"][0]
+        print(f"[logs] Twitch webhook created successfully: event_type={event_type} webhook_id={webhook_data.get('id')}")
         return webhook_data["id"]
     else:
+        print(f"[logs] Failed to create Twitch webhook: status={response.status_code} body={response.text}")
         raise Exception(f"Failed to create webhook: {response.text}")
 
 async def delete_twitch_webhook(db: Session, user_id: int, webhook_id: str):

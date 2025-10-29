@@ -12,7 +12,9 @@ async def twitter_tweet_reaction(db: Session, user_id: int, params: dict):
     token = await refresh_oauth_token(db, user_id, "twitter")
     if not token:
         return {"error": "Not logged in to Twitter"}
-    text = params.get("message") or params.get("text")
+    text = params.get("message") or params.get("text") or params.get("data")
+    if isinstance(text, (dict, list)):
+        text = str(text)
     if not text or not text.strip():
         return {"error": "Missing text"}
     resp = await oauth.twitter.post("tweets", token=token, json={"text": text})

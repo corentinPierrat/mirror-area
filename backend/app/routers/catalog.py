@@ -232,15 +232,10 @@ ACTIONS_CATALOG = {
         },
         "description": "Returns up to N recent emails received from the specified sender.",
         "output_schema": {
-            "count": {
-                "type": "number",
-                "label": "Email count",
-                "path": "count"
-            },
-            "messages": {
-                "type": "array",
-                "label": "Messages",
-                "path": "messages"
+            "data": {
+                "type": "string",
+                "label": "Summary (one per line)",
+                "path": "data"
             }
         }
     },
@@ -288,22 +283,12 @@ ACTIONS_CATALOG = {
             "game_id": {
                 "type": "string",
                 "label": "Game ID",
-                "default": "csgo"
+                "default": "cs2"
             },
             "limit": {
                 "type": "number",
                 "label": "Limit",
                 "default": 20,
-                "optional": True
-            },
-            "from": {
-                "type": "number",
-                "label": "From (epoch ms)",
-                "optional": True
-            },
-            "to": {
-                "type": "number",
-                "label": "To (epoch ms)",
                 "optional": True
             }
         },
@@ -404,19 +389,7 @@ ACTIONS_CATALOG = {
                 "default": 5
             }
         },
-        "description": "Triggers the workflow periodically after the specified number of minutes.",
-        "output_schema": {
-            "triggered_at": {
-                "type": "string",
-                "label": "Last trigger timestamp",
-                "path": "triggered_at"
-            },
-            "interval_minutes": {
-                "type": "number",
-                "label": "Interval (minutes)",
-                "path": "interval_minutes"
-            }
-        }
+        "description": "Triggers the workflow periodically after the specified number of minutes."
     },
 }
 

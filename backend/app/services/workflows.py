@@ -158,6 +158,7 @@ async def trigger_workflows(service: str, event_type: str, data: dict, db: Sessi
 
 
 async def create_steps_for_workflow(db: Session, workflow_id: int, steps: list, user_id: int):
+    print(f"[logs] create_steps_for_workflow called: workflow_id={workflow_id} user_id={user_id} steps_count={len(steps)}")
     created_steps = []
     id_to_index: Dict[str, int] = {}
 
@@ -165,11 +166,13 @@ async def create_steps_for_workflow(db: Session, workflow_id: int, steps: list, 
         client_id = getattr(step, "client_id", None)
         if client_id:
             id_to_index[client_id] = idx
+            print(f"[logs] Registered client step: client_id={client_id} -> index={idx}")
 
     for idx, step in enumerate(steps):
         try:
             params_payload = deepcopy(step.params) if step.params else {}
             links_payload = getattr(step, "links", None) or {}
+            print(f"[logs] Processing step index={idx} type={step.type} service={step.service} event={step.event}")
 
             for param_name, link_info in links_payload.items():
                 if not isinstance(link_info, dict):
@@ -189,6 +192,10 @@ async def create_steps_for_workflow(db: Session, workflow_id: int, steps: list, 
                 if fallback is None and existing_value not in (None, "", [], {}):
                     fallback = existing_value
 
+                print(
+                    f"[logs] Linking param: step_index={idx} param={param_name} "
+                    f"source_index={source_index} path={path} fallback={fallback}"
+                )
                 link_payload: Dict[str, Any] = {
                     "source_step": source_index,
                     "path": path
@@ -207,6 +214,10 @@ async def create_steps_for_workflow(db: Session, workflow_id: int, steps: list, 
                 params=params_payload
             )
             db.add(db_step)
+            print(
+                f"[logs] Added workflow step to session: workflow_id={workflow_id} "
+                f"index={idx} type={step.type} service={step.service} event={step.event}"
+            )
 
             if step.type == "action" and step.service == "twitch":
                 if not step.params:
@@ -217,10 +228,14 @@ async def create_steps_for_workflow(db: Session, workflow_id: int, steps: list, 
                     raise ValueError("Missing 'username_streamer' in params")
 
                 broadcaster_id = await get_twitch_user_id(username)
+                print(f"[logs] Twitch broadcaster resolved: username={username} broadcaster_id={broadcaster_id}")
                 webhook_id = await create_twitch_webhook(step.event, broadcaster_id)
+                print(f"[logs] Twitch webhook created: step_index={idx} webhook_id={webhook_id}")
                 db_step.params["webhook_id"] = webhook_id
             created_steps.append(db_step)
+            print(f"[logs] Step index={idx} appended to created_steps")
         except Exception as exc:
+            print(f"[logs] Error while creating step index={idx}: {exc}")
             raise HTTPException(
                 status_code=500,
                 detail=f"Failed to create step {idx} ({step.service}.{step.event}): {exc}"

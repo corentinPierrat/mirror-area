@@ -1,3 +1,4 @@
+import html
 from typing import Dict, Any, Callable, Awaitable
 from sqlalchemy.orm import Session
 import httpx
@@ -78,7 +79,8 @@ async def google_recent_emails_action(db: Session, user_id: int, params: dict) -
             continue
         data = message_response.json()
         headers = {h["name"]: h["value"] for h in data.get("payload", {}).get("headers", [])}
-        snippet = data.get("snippet")
+        raw_snippet = data.get("snippet")
+        snippet = html.unescape(raw_snippet) if raw_snippet else ""
         results.append({
             "id": message_id,
             "threadId": data.get("threadId"),
@@ -94,8 +96,12 @@ async def google_recent_emails_action(db: Session, user_id: int, params: dict) -
     for msg in results:
         subject = msg.get("subject") or "(Sans objet)"
         date = msg.get("date") or "Date inconnue"
-        lines.append(f"- {subject} ({date})")
-    return {"text": "\n".join(lines)}
+        snippet = msg.get("snippet") or ""
+        if snippet:
+            lines.append(f"- {subject} ({date}) — {snippet}")
+        else:
+            lines.append(f"- {subject} ({date})")
+    return {"data": "\n".join(lines)}
 
 
 async def faceit_player_stats_action(db: Session, user_id: int, params: dict) -> dict[str, Any]:
