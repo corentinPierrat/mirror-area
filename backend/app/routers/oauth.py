@@ -125,12 +125,13 @@ async def oauth_login(
             return JSONResponse({"error": "Token invalide"}, status_code=401)
     redirect_front = ""
     if context == "link":
-        redirect_front = "http://localhost:8081/Services"
+        redirect_front = "http://localhost:8081/services"
     else:
         redirect_front = "http://localhost:8081/dashboard"
 
     request.session['oauth_context'] = context
     request.session['oauth_redirect_uri'] = redirect_uri_param or redirect_front
+    print(f"TEST: {redirect_uri_param}")
     redirect_uri = f"https://trigger.ink/oauth/{provider}/callback"
     return await oauth.create_client(provider).authorize_redirect(request, redirect_uri, redirect_popup="true")
 
@@ -157,7 +158,7 @@ async def oauth_callback(provider: str, request: Request, db: Session = Depends(
             request.session.pop('oauth_context', None)
             request.session.pop('oauth_user_id', None)
 
-            final_redirect = stored_redirect or "http://localhost:8081/Services"
+            final_redirect = stored_redirect or "http://localhost:8081/services"
             return RedirectResponse(final_redirect)
 
 
