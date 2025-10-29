@@ -282,6 +282,7 @@ export default function MyWorkflowScreen({ navigation }) {
             return (
               <Workflows
                 Name={workflow.name}
+                key={workflow.id}
                 ActionLogo={actionLogo}
                 ReactionLogo={reactionLogo}
                 onDelete={() => handleDeleteWorkflow(workflow.id)}
