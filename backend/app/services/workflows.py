@@ -69,7 +69,7 @@ async def trigger_workflows(service: str, event_type: str, data: dict, db: Sessi
         WorkflowStep.type == "action",
         Workflow.active == True
     ]
-
+    print(f"Triggering workflows for service: {service}, event: {event_type}, data: {data}")
     if service == "discord" and "guild_id" in data:
         filter_conditions.append(
             func.JSON_EXTRACT(WorkflowStep.params, '$.guild_id') == data["guild_id"]

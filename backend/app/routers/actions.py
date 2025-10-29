@@ -32,7 +32,7 @@ async def twitch_webhook(
     twitch_eventsub_message_id: str = Header(None, alias="Twitch-Eventsub-Message-Id"),
     twitch_eventsub_message_timestamp: str = Header(None, alias="Twitch-Eventsub-Message-Timestamp")
 ):
-    print("Received Twitch webhook")
+    print(twitch_eventsub_message_type)
     body = await request.body()
     print(f"Body: {body.decode('utf-8')}")
     if twitch_eventsub_message_signature:
@@ -56,9 +56,10 @@ async def twitch_webhook(
         event_data = data.get("event", {})
 
         payload = parse_twitch_event(event_type, event_data)
-
+        print(f"Parsed payload: {payload}")
         if payload:
             results = await trigger_workflows("twitch", payload["event"], payload, db)
+            print(f"Workflow results: {results}")
             return JSONResponse({"status": "processed", "results": results})
 
     return JSONResponse({"status": "ok"})
