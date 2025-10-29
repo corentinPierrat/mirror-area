@@ -8,7 +8,7 @@ from app.schemas.admin import UserCreate, UserUpdate
 admin_router = APIRouter(prefix="/admin", tags=["admin"])
 
 @admin_router.get("/users")
-async def get_users(db: Session = Depends(get_db), admin_user: User = Depends()):
+async def get_users(db: Session = Depends(get_db), admin_user: User = Depends(get_current_admin_user)):
     return db.query(User).all()
 
 @admin_router.post("/users")
