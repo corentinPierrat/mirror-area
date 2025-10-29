@@ -1,4 +1,4 @@
-import requests
+import httpx
 from sqlalchemy.orm import Session
 from app.config import settings
 from app.services.token_storage import refresh_oauth_token
@@ -39,14 +39,19 @@ async def get_twitch_user_id(username_streamer: str) -> str:
     user = data["data"][0]
     return user["id"]
 
+import httpx
+from fastapi import HTTPException
+
 async def create_twitch_webhook(event_type: str, broadcaster_id: str, db: Session, user_id: int) -> str:
     if event_type == "stream.online":
-        app_token = await get_app_access_token()
+        token = await get_app_access_token()
     else:
-        app_token = await refresh_oauth_token(db, user_id, "twitch")
+        token = await refresh_oauth_token(db, user_id, "twitch")
+        if not token:
+            raise HTTPException(status_code=401, detail="User not connected to Twitch")
 
     headers = {
-        "Authorization": f"Bearer {app_token}",
+        "Authorization": f"Bearer {token}",
         "Client-Id": settings.TWITCH_CLIENT_ID,
         "Content-Type": "application/json"
     }
@@ -67,17 +72,23 @@ async def create_twitch_webhook(event_type: str, broadcaster_id: str, db: Sessio
     if event_type == "channel.follow":
         subscription_data["condition"]["moderator_user_id"] = broadcaster_id
 
-    response = requests.post(
-        "https://api.twitch.tv/helix/eventsub/subscriptions",
-        json=subscription_data,
-        headers=headers
-    )
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            "https://api.twitch.tv/helix/eventsub/subscriptions",
+            headers=headers,
+            json=subscription_data
+        )
 
     if response.status_code == 202:
-        webhook_data = response.json()["data"][0]
-        return webhook_data["id"]
+        data = response.json().get("data", [])
+        if not data:
+            raise HTTPException(status_code=500, detail="Empty response from Twitch.")
+        return data[0]["id"]
     else:
-        raise Exception(f"Failed to create webhook: {response.text}")
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=f"Failed to create webhook: {response.text}"
+        )
 
 async def delete_twitch_webhook(db: Session, user_id: int, webhook_id: str):
     token = await get_app_access_token()
