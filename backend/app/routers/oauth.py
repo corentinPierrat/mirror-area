@@ -127,7 +127,7 @@ async def oauth_login(
     if context == "link":
         redirect_front = "http://localhost:8081/Services"
     else:
-        redirect_front = "http://localhost:8081/oauth/success"
+        redirect_front = "http://localhost:8081/dashboard"
 
     request.session['oauth_context'] = context
     request.session['oauth_redirect_uri'] = redirect_uri_param or redirect_front
@@ -191,7 +191,7 @@ async def oauth_callback(provider: str, request: Request, db: Session = Depends(
 
         request.session.pop('oauth_context', None)
         request.session.pop('oauth_user_id', None)
-        final_redirect = stored_redirect or "http://localhost:8081/oauth/success"
+        final_redirect = stored_redirect or "http://localhost:8081/dashboard"
         print(f"Final redirect: {final_redirect}")
         redirect_url = f"{final_redirect}?token={access_token}"
         return RedirectResponse(redirect_url)
