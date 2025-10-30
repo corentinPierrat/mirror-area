@@ -6,6 +6,7 @@ BACKEND_URL = "http://localhost:8080/actions/discord"
 
 intents = discord.Intents.default()
 intents.members = True
+intents.message_content = True
 
 client = discord.Client(intents=intents)
 
@@ -146,5 +147,31 @@ async def on_member_update(before, after):
             print(f"Sent member update to backend: {response.status_code} {response.text}")
         except Exception as e:
             print(f"Error sending member update to backend: {e}")
+
+@client.event
+async def on_message(message):
+    if message.author.bot:
+        return
+
+    if client.user and client.user in message.mentions:
+        payload = {
+            "event": "bot_mention",
+            "guild_id": str(message.guild.id) if message.guild else None,
+            "channel_id": str(message.channel.id),
+            "message_id": str(message.id),
+            "author": {
+                "id": str(message.author.id),
+                "username": message.author.name,
+                "display_name": message.author.display_name
+            },
+            "content": message.content,
+            "created_at": message.created_at.isoformat()
+        }
+        headers = {"bot-token": settings.BOT_SECRET}
+        try:
+            response = requests.post(BACKEND_URL, json=payload, headers=headers, timeout=5)
+            print(f"Sent bot mention to backend: {response.status_code} {response.text}")
+        except Exception as e:
+            print(f"Error sending bot mention to backend: {e}")
 
 client.run(settings.TOKEN_BOT_DISCORD)

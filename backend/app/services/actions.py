@@ -308,7 +308,7 @@ async def faceit_player_ranking_action(db: Session, user_id: int, params: dict) 
         for candidate in {game_id, game_id.lower(), game_id.upper()}:
             if isinstance(games_info, dict) and candidate in games_info:
                 game_entry = games_info[candidate]
-                game_id = candidate  # normalize to existing key
+                game_id = candidate
                 break
         if not isinstance(game_entry, dict):
             game_entry = {}

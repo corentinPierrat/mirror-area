@@ -71,7 +71,6 @@ ACTIONS_CATALOG = {
     "discord.member_update": {
         "title": "A member updates their nickname",
         "service": "discord",
-
         "event": "member_update",
         "action_kind": "trigger",
         "payload_schema": {
@@ -101,6 +100,41 @@ ACTIONS_CATALOG = {
                 "type": "string",
                 "label": "Old Nickname",
                 "path": "old_nick"
+            }
+        }
+    },
+    "discord.bot_mention": {
+        "title": "Someone mentions the bot",
+        "service": "discord",
+        "event": "bot_mention",
+        "action_kind": "trigger",
+        "payload_schema": {
+            "guild_id": {
+                "type": "string",
+                "label": "Server ID"
+            }
+        },
+        "description": "Triggers when a user mentions the bot in a message.",
+        "output_schema": {
+            "guild_id": {
+                "type": "string",
+                "label": "Server ID",
+                "path": "guild_id"
+            },
+            "channel_id": {
+                "type": "string",
+                "label": "Channel ID",
+                "path": "channel_id"
+            },
+            "author_username": {
+                "type": "string",
+                "label": "Author Username",
+                "path": "author.username"
+            },
+            "message_content": {
+                "type": "string",
+                "label": "Message Content",
+                "path": "content"
             }
         }
     },

@@ -1,89 +1,56 @@
+import time
+from typing import Any, Dict
+
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
-import time
+
+from app.routers.catalog import ACTIONS_CATALOG, REACTIONS_CATALOG
 
 about_router = APIRouter()
+
+
+def ensure_service(services: Dict[str, Dict[str, Any]], service_name: str) -> Dict[str, Any]:
+    if service_name not in services:
+        services[service_name] = {
+            "name": service_name,
+            "actions": [],
+            "reactions": []
+        }
+    return services[service_name]
+
 
 @about_router.get("/about.json")
 async def about(request: Request):
     client_ip = request.client.host
 
-    services = [
-        {
-            "name": "discord",
-            "actions": [
-                {
-                    "name": "member_join",
-                    "description": "Un membre rejoint le serveur Discord"
-                },
-                {
-                    "name": "member_remove",
-                    "description": "Un membre quitte le serveur Discord"
-                },
-                {
-                    "name": "member_update",
-                    "description": "Un membre met à jour son pseudo ou ses rôles sur le serveur Discord"
-                }
-            ]
-        },
-        {
-            "name": "twitter",
-            "actions": [],
-            "reactions": [
-                {
-                    "name": "tweet",
-                    "description": "Publie un tweet avec le texte fourni."
-                }
-            ]
-        },
-        {
-            "name": "google",
-            "actions": [],
-            "reactions": [
-                {
-                    "name": "send_mail",
-                    "description": "Envoie un courriel via l'API Gmail."
-                }
-            ]
-        },
-        {
-            "name": "faceit",
-            "actions": [],
-            "reactions": []
-        },
-        {
-            "name": "twitch",
-            "actions": [
-                {
-                    "name": "stream_online",
-                    "description": "Un streamer passe en direct sur Twitch"
-                },
-                {
-                    "name": "new_follow",
-                    "description": "Un utilisateur suit un streamer sur Twitch"
-                },
-                {
-                    "name": "new_subscribe",
-                    "description": "Un utilisateur s'abonne à un streamer sur Twitch"
-                }
-            ],
-            "reactions": []
-        },
-        {
-            "name": "spotify",
-            "actions": [],
-            "reactions": [
-                {
-                    "name": "play_playlist",
-                    "description": "Joue une playlist spécifique sur Spotify."
-                },
-                {
-                    "name": "play_track",
-                    "description": "Joue une piste spécifique sur Spotify."
-                }
-            ]
-        }
-    ]
+    services_map: Dict[str, Dict[str, Any]] = {}
+
+    for meta in ACTIONS_CATALOG.values():
+        service_entry = ensure_service(services_map, meta["service"])
+        action_name = meta.get("event") or meta.get("name")
+        if not action_name:
+            continue
+        if not any(action["name"] == action_name for action in service_entry["actions"]):
+            service_entry["actions"].append({
+                "name": action_name,
+                "description": meta.get("description", "")
+            })
+
+    for meta in REACTIONS_CATALOG.values():
+        service_entry = ensure_service(services_map, meta["service"])
+        reaction_name = meta.get("event") or meta.get("name")
+        if not reaction_name:
+            continue
+        if not any(reaction["name"] == reaction_name for reaction in service_entry["reactions"]):
+            service_entry["reactions"].append({
+                "name": reaction_name,
+                "description": meta.get("description", "")
+            })
+
+    services = sorted(services_map.values(), key=lambda svc: svc["name"])
+    for service in services:
+        service["actions"] = sorted(service["actions"], key=lambda action: action["name"])
+        service["reactions"] = sorted(service["reactions"], key=lambda reaction: reaction["name"])
 
     return JSONResponse({
         "client": {
