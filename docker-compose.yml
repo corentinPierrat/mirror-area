@@ -33,8 +33,6 @@ services:
     depends_on:
       - server
       - client_mobile
-    environment:
-      - BACKEND_URL=https://api.trigger.ink
     ports:
       - "8081:8081"
     volumes:
