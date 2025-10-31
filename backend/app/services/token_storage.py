@@ -4,6 +4,20 @@ from typing import Dict, Any
 from sqlalchemy.orm import Session
 from app.models.models import UserService
 
+def _deserialize_token_data(raw_value) -> Dict[str, Any] | None:
+    if raw_value is None:
+        return None
+    try:
+        if isinstance(raw_value, (bytes, bytearray)):
+            token_json = raw_value.decode()
+        elif isinstance(raw_value, str):
+            token_json = raw_value
+        else:
+            return None
+        return json.loads(token_json)
+    except Exception:
+        return None
+
 def save_token_to_db(db: Session, user_id: int, provider: str, token: Dict[str, Any]) -> None:
     token_payload = dict(token or {})
     expires_at_dt = None
@@ -19,10 +33,7 @@ def save_token_to_db(db: Session, user_id: int, provider: str, token: Dict[str, 
 
     existing_token: Dict[str, Any] | None = None
     if service and service.token_data:
-        try:
-            existing_token = json.loads(service.token_data.decode())
-        except Exception:
-            existing_token = None
+        existing_token = _deserialize_token_data(service.token_data)
 
     if not token_payload.get("refresh_token") and existing_token:
         refresh_token = existing_token.get("refresh_token")
@@ -37,7 +48,7 @@ def save_token_to_db(db: Session, user_id: int, provider: str, token: Dict[str, 
     token_json = json.dumps(token_payload)
 
     if service:
-        service.token_data = token_json.encode()
+        service.token_data = token_json
         service.token_iv = b''
         service.token_tag = b''
         service.token_expires_at = expires_at_dt
@@ -46,7 +57,7 @@ def save_token_to_db(db: Session, user_id: int, provider: str, token: Dict[str, 
         service = UserService(
             user_id=user_id,
             service_key=provider,
-            token_data=token_json.encode(),
+            token_data=token_json,
             token_iv=b'',
             token_tag=b'',
             token_expires_at=expires_at_dt
@@ -59,10 +70,9 @@ def get_token_from_db(db: Session, user_id: int, provider: str) -> Dict[str, Any
         UserService.user_id == user_id,
         UserService.service_key == provider
     ).first()
-    if not service:
+    if not service or not service.token_data:
         return None
-    token_json = service.token_data.decode()
-    return json.loads(token_json)
+    return _deserialize_token_data(service.token_data)
 
 def get_access_token(token_dict: dict) -> str:
     return token_dict.get("access_token")
@@ -88,9 +98,8 @@ async def refresh_oauth_token(db: Session, user_id: int, provider: str) -> Dict[
     ).first()
     if not service or not service.token_data:
         return None
-    try:
-        token: Dict[str, Any] = json.loads(service.token_data.decode())
-    except Exception:
+    token: Dict[str, Any] | None = _deserialize_token_data(service.token_data)
+    if token is None:
         return None
     if "expires_at" not in token and service.token_expires_at:
         token["expires_at"] = int(service.token_expires_at.timestamp())

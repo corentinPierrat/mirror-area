@@ -2,7 +2,7 @@ import discord
 import requests
 from app.config import settings
 
-BACKEND_URL = "http://localhost:8080/actions/discord"
+BACKEND_URL = "https://trigger.ink/actions/discord"
 
 intents = discord.Intents.default()
 intents.members = True
