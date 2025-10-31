@@ -1,12 +1,16 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
 import random
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from uuid import uuid4
+
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from sqlalchemy.orm import Session
 
 from app.services.auth import get_user_by_email, hash_password, create_jwt_token, verify_password, send_verification_email, get_current_user
 from app.database import get_db
 from app.models.models import User
 from app.schemas.auth import UserCreate, Token, VerificationResponse, UserInfo, UserLogin, ResendVerificationRequest, ChangePasswordRequest
+from app.config import settings
 
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
@@ -100,6 +104,54 @@ def delete_my_account(db: Session = Depends(get_db), current_user = Depends(get_
     db.delete(current_user)
     db.commit()
     return {"detail": "Compte supprimé"}
+
+MAX_PROFILE_IMAGE_SIZE = 5 * 1024 * 1024
+ALLOWED_IMAGE_TYPES = {
+    "image/jpeg": ".jpg",
+    "image/png": ".png",
+    "image/webp": ".webp"
+}
+
+@auth_router.post("/me/profile-image", response_model=UserInfo)
+async def upload_profile_image(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    extension = ALLOWED_IMAGE_TYPES.get(file.content_type or "")
+    if not extension:
+        raise HTTPException(status_code=400, detail="Unsupported image format. Use JPEG, PNG, or WEBP.")
+
+    file_bytes = await file.read()
+    if len(file_bytes) > MAX_PROFILE_IMAGE_SIZE:
+        raise HTTPException(status_code=400, detail="Image too large (max 5 MB).")
+
+    profile_dir = Path(settings.MEDIA_ROOT) / "profile_images"
+    profile_dir.mkdir(parents=True, exist_ok=True)
+
+    filename = f"{uuid4().hex}{extension}"
+    file_path = profile_dir / filename
+    with open(file_path, "wb") as buffer:
+        buffer.write(file_bytes)
+
+    old_url = current_user.profile_image_url
+    if old_url:
+        media_prefix = settings.MEDIA_URL.rstrip("/")
+        if old_url.startswith(media_prefix):
+            relative_old = old_url[len(media_prefix):].lstrip("/")
+            old_path = Path(settings.MEDIA_ROOT) / relative_old
+            if old_path.exists():
+                try:
+                    old_path.unlink()
+                except OSError:
+                    pass
+
+    public_url = f"{settings.MEDIA_URL.rstrip('/')}/profile_images/{filename}"
+    current_user.profile_image_url = public_url
+    db.commit()
+    db.refresh(current_user)
+
+    return current_user
 
 @auth_router.patch("/change-password")
 def change_password(

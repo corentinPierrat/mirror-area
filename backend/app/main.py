@@ -1,6 +1,8 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
+from fastapi.staticfiles import StaticFiles
 from app.database import engine, Base
 from app.routers.auth import auth_router
 from app.routers.oauth import oauth_router
@@ -33,6 +35,10 @@ app.add_middleware(
 )
 
 Base.metadata.create_all(bind=engine)
+
+media_mount_path = settings.MEDIA_URL.rstrip("/") or "/uploads"
+os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
+app.mount(media_mount_path, StaticFiles(directory=settings.MEDIA_ROOT), name="media")
 
 app.include_router(auth_router)
 app.include_router(oauth_router)

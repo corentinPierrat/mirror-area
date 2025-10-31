@@ -1,0 +1,59 @@
+version: "3.9"
+
+services:
+  db:
+    image: mariadb:11.8.3
+    container_name: area_prod_db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: rootpwd
+      MARIADB_DATABASE: area
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./initDatabase:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      start_interval: 10s
+      interval: 1m
+      timeout: 5s
+      retries: 3
+    networks:
+      - area_net
+
+  backend:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    container_name: area_prod_backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: area
+    networks:
+      - area_net
+    volumes:
+      - ./backend:/app
+    restart: unless-stopped
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: area_prod_cloudflared
+    restart: unless-stopped
+    command: tunnel run area-prod-tunnel
+    depends_on:
+      - backend
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    networks:
+      - area_net
+
+volumes:
+  db_data:
+
+networks:
+  area_net:
+    driver: bridge
