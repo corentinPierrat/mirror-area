@@ -39,6 +39,23 @@ services:
       - ./backend:/app
     restart: unless-stopped
 
+  bot:
+    build: ./backend
+    container_name: area_prod_bot
+    command: python bot/bot.py
+    depends_on:
+      backend:
+        condition: service_started
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: area
+    networks:
+      - area_net
+    volumes:
+      - ./backend:/app
+    restart: unless-stopped
+
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: area_prod_cloudflared
