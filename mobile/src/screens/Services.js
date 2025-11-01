@@ -34,7 +34,6 @@ export default function ServiceScreen() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setServices(res.data.services);
-
       const newStatuses = {};
       for (const service of res.data.services) {
         newStatuses[service.provider] = await fetchStatus(service.provider);
@@ -77,6 +76,9 @@ export default function ServiceScreen() {
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
     <LinearGradient colors={['#171542', '#2f339e']} style={styles.container}>
      {services.map((service) => {
+      if (service.provider === 'timer') {
+          return null;
+      }
       const isConnected = statuses[service.provider] || false;
       const route = `${API_URL}/oauth/${service.provider}/${isConnected ? 'disconnect' : 'login'}`;
       return (

@@ -18,7 +18,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/fr.png",
+        "foregroundImage": "./assets/Trigger.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
@@ -30,7 +30,13 @@
     "plugins": [
       "expo-localization",
       "expo-web-browser",
-      "expo-font"
+        "expo-font",
+        [
+          "expo-image-picker",
+          {
+            "photosPermission": "L'application a besoin d'accéder à vos photos pour mettre à jour votre image de profil."
+          }
+        ]
     ],
     "extra": {
       "eas": {

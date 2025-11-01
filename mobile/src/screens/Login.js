@@ -127,16 +127,15 @@ const LoginScreen = ({ navigation }) => {
         secureTextEntry
       />
       {message ? (<Text style={styles.message}>{message}</Text>) : null}
-<View style={styles.buttonRow}>
-  <TouchableOpacity onPress={handleLogin} style={[styles.button, { flex: 1 }]} disabled={loading}>
-    <Text style={styles.buttonText}>{loading ? t("Login") + '...' : t("Login")}</Text>
-  </TouchableOpacity>
+      <View style={styles.buttonRow}>
+        <TouchableOpacity onPress={handleLogin} style={[styles.button, { flex: 1 }]} disabled={loading}>
+          <Text style={styles.buttonText}>{loading ? t("Login") + '...' : t("Login")}</Text>
+        </TouchableOpacity>
 
-  <TouchableOpacity onPress={handleGoogleAuth} style={styles.googleButton} disabled={loading}>
-    <Ionicons name="logo-google" size={20} color="#2f339e" />
-  </TouchableOpacity>
-</View>
-
+        <TouchableOpacity onPress={handleGoogleAuth} style={styles.googleButton} disabled={loading}>
+          <Ionicons name="logo-google" size={20} color="#2f339e" />
+        </TouchableOpacity>
+      </View>
 
       <TouchableOpacity onPress={handleRegister}>
         <Text style={styles.link}>{t("CreateAccount")}</Text>

@@ -26,12 +26,12 @@ export default function TabNavigator() {
             iconName = focused ? 'person' : 'person-outline';
           } else if (route.name === 'CreateWorkflow') {
             iconName = focused ? 'add-circle' : 'add-circle-outline';
+          } else if (route.name === 'Feed') {
+            iconName = focused ? 'newspaper' : 'newspaper-outline';
           } else if (route.name === 'MyWorkflows') {
             iconName = focused ? 'folder' : 'folder-outline';
           } else if (route.name === 'Services') {
             iconName = focused ? 'settings' : 'settings-outline';
-          } else if (route.name === 'Feed') {
-            iconName = focused ? 'newspaper' : 'newspaper-outline';
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
@@ -74,14 +74,14 @@ export default function TabNavigator() {
         options={{ title: t("My Workflows") }}
       />
       <Tab.Screen
-        name="Services"
-        component={ServiceScreen}
-        options={{ title: t("Services") }}
-      />
-      <Tab.Screen
         name="Feed"
         component={FeedScreen}
         options={{ title: t("Feed") }}
+      />
+      <Tab.Screen
+        name="Services"
+        component={ServiceScreen}
+        options={{ title: t("Services") }}
       />
     </Tab.Navigator>
   );
