@@ -248,7 +248,7 @@ SERVICES_INFO = {
     },
     "faceit": {
         "name": "Faceit",
-        "logo_url": "https://cdn.faceit.com/static/layout/images/faceit-logo.svg"
+        "logo_url": "https://seeklogo.com/vector-logo/426276/faceit"
     },
     "google": {
         "name": "Google",
