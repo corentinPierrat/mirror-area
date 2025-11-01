@@ -5,7 +5,7 @@ from sqlalchemy import func
 from app.models.models import Workflow, WorkflowStep
 from app.services.reactions import execute_reaction
 from app.services.actions import execute_action
-from app.services.twitch import get_twitch_user_id, create_twitch_webhook, delete_twitch_webhook
+from app.services.twitch import get_existing_twitch_webhook_id, get_twitch_user_id, create_twitch_webhook, delete_twitch_webhook
 from fastapi import HTTPException
 
 def value_from_path(payload: Any, path: str):
@@ -229,8 +229,12 @@ async def create_steps_for_workflow(db: Session, workflow_id: int, steps: list, 
                     raise ValueError("Missing 'username_streamer' in params")
 
                 broadcaster_id = await get_twitch_user_id(username)
-                webhook_id = await create_twitch_webhook(step.event, broadcaster_id, db, user_id)
-                db_step.params["webhook_id"] = webhook_id
+                existing_id = await get_existing_twitch_webhook_id(step.event, broadcaster_id)
+                if existing_id:
+                    db_step.params["webhook_id"] = existing_id
+                else:
+                    webhook_id = await create_twitch_webhook(step.event, broadcaster_id, db, user_id)
+                    db_step.params["webhook_id"] = webhook_id
             created_steps.append(db_step)
             print(f"[logs] Step index={idx} appended to created_steps")
         except Exception as exc:

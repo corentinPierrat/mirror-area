@@ -45,12 +45,10 @@ async def get_twitch_user_id(username_streamer: str) -> str:
     return user["id"]
 
 async def create_twitch_webhook(event_type: str, broadcaster_id: str, db: Session, user_id: int) -> str:
-    if event_type == "stream.online":
+    if event_type:
         token = await get_app_access_token()
-    else:
-        token = await refresh_oauth_token(db, user_id, "twitch")
-        if not token:
-            raise HTTPException(status_code=401, detail="User not connected to Twitch")
+    if not token:
+        raise HTTPException(status_code=401, detail="User not connected to Twitch")
 
     headers = {
         "Authorization": f"Bearer {token}",
@@ -70,9 +68,6 @@ async def create_twitch_webhook(event_type: str, broadcaster_id: str, db: Sessio
             "secret": settings.TWITCH_WEBHOOK_SECRET
         }
     }
-
-    if event_type == "channel.follow":
-        subscription_data["condition"]["moderator_user_id"] = broadcaster_id
 
     async with httpx.AsyncClient() as client:
         response = await client.post(
@@ -127,17 +122,40 @@ def parse_twitch_event(event_type: str, event_data: dict):
         }
     elif event_type == "channel.follow":
         payload = {
-            "event": "new.follow",
+            "event": "channel.follow",
             "broadcaster_user_id": event_data.get("broadcaster_user_id"),
             "follower_name": event_data.get("user_name"),
             "message": f"{event_data.get('user_name')} just followed {event_data.get('broadcaster_user_name')}!"
         }
     elif event_type == "channel.subscribe":
         payload = {
-            "event": "new.subscriber",
+            "event": "channel.subscriber",
             "broadcaster_user_id": event_data.get("broadcaster_user_id"),
             "subscriber_name": event_data.get("user_name"),
             "tier": event_data.get("tier", "1000"),
             "message": f"{event_data.get('user_name')} just subscribed to {event_data.get('broadcaster_user_name')}!"
         }
     return payload
+
+async def get_existing_twitch_webhook_id(event_type: str, broadcaster_id: str) -> str | None:
+    headers = {
+        "Authorization": f"Bearer {await get_app_access_token()}",
+        "Client-Id": settings.TWITCH_CLIENT_ID
+    }
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(
+            "https://api.twitch.tv/helix/eventsub/subscriptions",
+            headers=headers
+        )
+    if resp.status_code != 200:
+        return None
+    for sub in resp.json().get("data", []):
+        cond = sub.get("condition", {})
+        if (
+            sub.get("type") == event_type
+            and cond.get("broadcaster_user_id") == broadcaster_id
+            and sub.get("transport", {}).get("callback") == "https://trigger.ink/actions/twitch"
+            and sub.get("status") == "enabled"
+        ):
+            return sub["id"]
+    return None
