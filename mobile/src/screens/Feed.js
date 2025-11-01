@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView, Text, StyleSheet, View, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { API_URL } from '../../config';
@@ -20,7 +21,6 @@ export default function FeedScreen({ navigation }) {
       const urls = res.data.services.map(s => ({ provider: s.provider, logo_url: s.logo_url }));
       setServices(urls);
     } catch (e) {
-      // non-blocking for feed
     }
   }, []);
 
@@ -30,6 +30,7 @@ export default function FeedScreen({ navigation }) {
       const token = await AsyncStorage.getItem('userToken');
       const res = await axios.get(`${API_URL}/feed/workflows`, token ? { headers: { Authorization: `Bearer ${token}` } } : {});
       setWorkflows(res.data || []);
+      console.log('Feed data:', res.data);
     } catch (e) {
       console.log('Feed error:', e?.response?.data || e.message);
     } finally {
@@ -44,7 +45,6 @@ export default function FeedScreen({ navigation }) {
         navigation.replace('Login');
         return;
       }
-      // Build a new workflow payload from the feed item
       const payload = {
         name: wf.name || 'Workflow',
         description: wf.description || 'Imported from feed',
@@ -52,16 +52,16 @@ export default function FeedScreen({ navigation }) {
         steps: (wf.steps || []).map(s => ({ type: s.type, service: s.service, event: s.event, params: s.params || {} })),
       };
       await axios.post(`${API_URL}/workflows/`, payload, { headers: { Authorization: `Bearer ${token}` } });
-      Alert.alert(t('Success'), t('Added to your workflows'));
     } catch (e) {
-      Alert.alert(t('Error'), e?.response?.data?.message || 'Failed to add');
     }
   }, [navigation, t]);
 
-  useEffect(() => {
-    fetchServices();
-    fetchFeed();
-  }, [fetchServices, fetchFeed]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchServices();
+      fetchFeed();
+    }, [fetchServices, fetchFeed])
+  );
 
   return (
     <LinearGradient colors={['#171542', '#2f339e']} style={styles.container}>
@@ -73,10 +73,13 @@ export default function FeedScreen({ navigation }) {
             const reactionService = workflow.steps?.find(s => s.type === 'reaction')?.service;
             const actionLogo = services.find(u => u.provider === actionService)?.logo_url;
             const reactionLogo = services.find(u => u.provider === reactionService)?.logo_url;
+            const profilePicture = workflow.profile_picture ? `${API_URL}${workflow.profile_picture}` : null;
             return (
               <WorkflowPublic
                 key={workflow.id || workflow._id || `${workflow.name}-${Math.random()}`}
                 Name={workflow.name}
+                Author={workflow.author}
+                ProfilePicture={profilePicture}
                 ActionLogo={actionLogo}
                 ReactionLogo={reactionLogo}
                 onAdd={() => addToMyWorkflows(workflow)}

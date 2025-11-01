@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import "../components/i18n";
@@ -174,6 +175,12 @@ const handleUploadProfileImage = async (navigation) => {
   useEffect(() => {
     handleUpdateProfile();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      handleUpdateProfile();
+    }, [])
+  );
 
   return (
     <LinearGradient

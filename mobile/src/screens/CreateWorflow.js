@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Modal, TextInput } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
+import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
@@ -178,6 +179,12 @@ export default function CreateWorkflowScreen() {
 useEffect(() => {
   getURL();
 }, []);
+
+useFocusEffect(
+  useCallback(() => {
+    getURL();
+  }, [])
+);
 
   return (
     <LinearGradient colors={['#171542', '#2f339e']} style={styles.container}>
