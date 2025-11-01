@@ -47,10 +47,8 @@ async def get_twitch_user_id(username_streamer: str) -> str:
 async def create_twitch_webhook(event_type: str, broadcaster_id: str, db: Session, user_id: int) -> str:
     if event_type:
         token = await get_app_access_token()
-    else:
-        token = await refresh_oauth_token(db, user_id, "twitch")
-        if not token:
-            raise HTTPException(status_code=401, detail="User not connected to Twitch")
+    if not token:
+        raise HTTPException(status_code=401, detail="User not connected to Twitch")
 
     headers = {
         "Authorization": f"Bearer {token}",
