@@ -71,9 +71,6 @@ async def create_twitch_webhook(event_type: str, broadcaster_id: str, db: Sessio
         }
     }
 
-    if event_type == "channel.follow":
-        subscription_data["condition"]["moderator_user_id"] = broadcaster_id
-
     async with httpx.AsyncClient() as client:
         response = await client.post(
             "https://api.twitch.tv/helix/eventsub/subscriptions",
@@ -127,14 +124,14 @@ def parse_twitch_event(event_type: str, event_data: dict):
         }
     elif event_type == "channel.follow":
         payload = {
-            "event": "new.follow",
+            "event": "channel.follow",
             "broadcaster_user_id": event_data.get("broadcaster_user_id"),
             "follower_name": event_data.get("user_name"),
             "message": f"{event_data.get('user_name')} just followed {event_data.get('broadcaster_user_name')}!"
         }
     elif event_type == "channel.subscribe":
         payload = {
-            "event": "new.subscriber",
+            "event": "channel.subscriber",
             "broadcaster_user_id": event_data.get("broadcaster_user_id"),
             "subscriber_name": event_data.get("user_name"),
             "tier": event_data.get("tier", "1000"),
