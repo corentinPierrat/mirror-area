@@ -1,0 +1,6 @@
+{
+  "services": [
+    { "provider": "discord", "logo_url": "https://example.com/discord.png", "connected": true },
+    { "provider": "spotify", "logo_url": "https://example.com/spotify.png", "connected": true }
+  ]
+}

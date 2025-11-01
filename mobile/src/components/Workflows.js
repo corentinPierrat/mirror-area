@@ -113,11 +113,11 @@ const Workflows = ({ Name, ActionLogo, ReactionLogo, onDelete, onEdit, isActive,
             style={styles.switch}
           />
 
-          <TouchableOpacity onPress={handleEdit} activeOpacity={0.7} style={styles.editButton}>
+          <TouchableOpacity testID='editButton' onPress={handleEdit} activeOpacity={0.7} style={styles.editButton}>
             <Ionicons name="pencil" size={24} color="white" />
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={handleDelete} activeOpacity={0.7} style={styles.deleteButton}>
+          <TouchableOpacity testID='deletebutton' onPress={handleDelete} activeOpacity={0.7} style={styles.deleteButton}>
             <Ionicons name="trash" size={24} color="white" />
           </TouchableOpacity>
         </View>

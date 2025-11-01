@@ -53,5 +53,6 @@
   "VerifCode": "Code de vérification",
   "EnterCode": "Entrez le code envoyé à votre adresse email",
   "BtnResend": "Renvoyer le code",
-  "Verif": "Vérification"
+  "Verif": "Vérification",
+  "Created by": "Créé par"
 }

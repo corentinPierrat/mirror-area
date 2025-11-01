@@ -198,6 +198,7 @@ const handleUploadProfileImage = async (navigation) => {
         >
           {isAdmin && (
             <Pressable
+              testID="adminButton"
               onPress={() => navigation.navigate('Admin')}
               style={styles.adminButtonTop}
             >
@@ -254,7 +255,7 @@ const handleUploadProfileImage = async (navigation) => {
             />
           </View>
 
-          <TouchableOpacity style={styles.changePasswordButton} onPress={handleChangePassword}>
+          <TouchableOpacity testID='changepasswordButton' style={styles.changePasswordButton} onPress={handleChangePassword}>
             <Text style={styles.changePasswordButtonText}>{t("changePassword")}</Text>
           </TouchableOpacity>
         </View>

@@ -29,8 +29,8 @@ export default function WorkflowPublic({ Name, Author, ProfilePicture, ActionLog
               <Text style={styles.authorName}>{Author}</Text>
             </View>
           )}
-          
-          <TouchableOpacity onPress={onAdd} activeOpacity={0.85} style={styles.addButton}>
+
+          <TouchableOpacity testID='addButton' onPress={onAdd} activeOpacity={0.85} style={styles.addButton}>
             <Ionicons name="add-circle-outline" size={24} color="#22c55e" />
           </TouchableOpacity>
         </View>

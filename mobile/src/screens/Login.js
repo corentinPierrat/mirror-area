@@ -128,7 +128,7 @@ const LoginScreen = ({ navigation }) => {
       />
       {message ? (<Text style={styles.message}>{message}</Text>) : null}
       <View style={styles.buttonRow}>
-        <TouchableOpacity onPress={handleLogin} style={[styles.button, { flex: 1 }]} disabled={loading}>
+        <TouchableOpacity testID="loginButton" onPress={handleLogin} style={[styles.button, { flex: 1 }]} disabled={loading}>
           <Text style={styles.buttonText}>{loading ? t("Login") + '...' : t("Login")}</Text>
         </TouchableOpacity>
 

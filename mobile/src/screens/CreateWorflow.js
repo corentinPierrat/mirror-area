@@ -238,6 +238,7 @@ useFocusEffect(
                 <TouchableOpacity
                   onPress={() => setIsActionParamsModalVisible(false)}
                   style={styles.modalButton}
+                  testID='SaveButtonAction'
                 >
                   <BlurView style={styles.modalButtonBlur} intensity={70} tint="systemUltraThinMaterialDark" />
                   <View style={styles.modalButtonOverlay} />
@@ -336,6 +337,7 @@ useFocusEffect(
                   <TouchableOpacity
                     onPress={() => setIsReactionParamsModalVisible(false)}
                     style={styles.modalButton}
+                    testID='SaveButtonReaction'
                   >
                     <BlurView style={styles.modalButtonBlur} intensity={70} tint="systemUltraThinMaterialDark" />
                     <View style={styles.modalButtonOverlay} />
@@ -397,7 +399,7 @@ useFocusEffect(
 
           {message ? (<Text style={[styles.message, { color: isError ? '#ff4d4d' : '#63f614ff' }]}>{message}</Text>) : null}
 
-          <TouchableOpacity style={[styles.addButton, { marginTop: 70, alignSelf: 'center' }]} onPress={createWorkflow}>
+          <TouchableOpacity style={[styles.addButton, { marginTop: 70, alignSelf: 'center' }]} testID='buttonCreateWorkflow' onPress={createWorkflow}>
             <BlurView style={styles.addButtonBlur} intensity={60} tint="systemUltraThinMaterialDark" />
             <View style={styles.addButtonOverlay} />
             <Text style={[styles.addButtonIcon, { fontSize: 18 }]}>{loading ? (t("Create Workflow") + '...') : t("Create Workflow")}</Text>

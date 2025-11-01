@@ -53,5 +53,6 @@
   "VerifCode": "인증 코드",
   "EnterCode": "이메일로 전송된 코드를 입력하세요",
   "BtnResend": "코드 다시 보내기",
-  "Verif": "인증"
+  "Verif": "인증",
+  "Created by": "작성자"
 }

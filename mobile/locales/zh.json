@@ -53,5 +53,6 @@
   "VerifCode": "验证码",
   "EnterCode": "请输入发送到您邮箱的验证码",
   "BtnResend": "重新发送验证码",
-  "Verif": "验证"
+  "Verif": "验证",
+  "Created by": "创建者"
 }

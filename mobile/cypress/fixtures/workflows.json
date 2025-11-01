@@ -1,0 +1,12 @@
+[
+  {
+    "id": 101,
+    "name": "Discord to Spotify",
+    "active": true,
+    "visibility": "private",
+    "steps": [
+      { "type": "action", "service": "discord", "event": "message_received", "params": { "channel": "general" } },
+      { "type": "reaction", "service": "spotify", "event": "add_to_playlist", "params": { "playlist": "Liked" } }
+    ]
+  }
+]

@@ -52,5 +52,6 @@
   "EnterCode": "Enter the code sent to your email address",
   "BtnResend": "Resend code",
   "ParamAction": "Action parameter",
-  "Verif": "Verification"
+  "Verif": "Verification",
+  "Created by": "Created by"
 }
