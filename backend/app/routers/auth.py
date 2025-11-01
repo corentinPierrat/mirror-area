@@ -112,7 +112,7 @@ ALLOWED_IMAGE_TYPES = {
     "image/webp": ".webp"
 }
 
-@auth_router.post("/me/profile-image", response_model=UserInfo)
+@auth_router.post("/me/profile-imagessssssssazdazd", response_model=UserInfo)
 async def upload_profile_image(
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
