@@ -8,7 +8,6 @@ import hmac
 import hashlib
 import json
 from app.services.twitch import parse_twitch_event
-from app.services.faceit import parse_faceit_webhook
 
 actions_router = APIRouter(prefix="/actions", tags=["actions"])
 
@@ -63,25 +62,3 @@ async def twitch_webhook(
             return JSONResponse({"status": "processed", "results": results})
 
     return JSONResponse({"status": "ok"})
-
-@actions_router.post("/faceit")
-async def faceit_webhook(request: Request, db: Session = Depends(get_db)):
-    data = await request.json()
-    player_events = parse_faceit_webhook(data)
-    if not player_events:
-        return JSONResponse({"status": "ignored"})
-
-    aggregated_results = []
-    for event_payload in player_events:
-        event_type = event_payload.get("event")
-        if not event_type:
-            continue
-
-        workflow_results = await trigger_workflows("faceit", event_type, event_payload, db)
-        aggregated_results.append({
-            "player_id": event_payload.get("player_id"),
-            "event": event_type,
-            "results": workflow_results
-        })
-
-    return JSONResponse({"status": "processed", "events": aggregated_results})

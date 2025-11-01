@@ -21,7 +21,6 @@
         "name": "faceit",
         "actions": [
           { "name": "get_player_id", "description": "Retrieves the unique FACEIT player ID associated with the provided nickname." },
-          { "name": "match_finished", "description": "Triggers when the specified FACEIT player finishes a match." },
           { "name": "retrieve_player_ranking", "description": "Récupère la position actuelle d'un joueur FACEIT en se basant sur son pseudo." },
           { "name": "retrieve_player_stats", "description": "Fetches statistics for the player's most recent FACEIT match." }
         ],

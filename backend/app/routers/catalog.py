@@ -467,41 +467,6 @@ ACTIONS_CATALOG = {
             }
         }
     },
-    "faceit.match_finished": {
-        "title": "FACEIT match finished",
-        "service": "faceit",
-        "event": "match_finished",
-        "action_kind": "trigger",
-        "payload_schema": {
-            "player_id": {
-                "type": "string",
-                "label": "Player ID"
-            }
-        },
-        "description": "Triggers when the specified FACEIT player finishes a match.",
-        "output_schema": {
-            "team_score": {
-                "type": "number",
-                "label": "Team score",
-                "path": "team_score"
-            },
-            "opponent_score": {
-                "type": "number",
-                "label": "Opponent score",
-                "path": "opponent_score"
-            },
-            "is_winner": {
-                "type": "boolean",
-                "label": "Win",
-                "path": "is_winner"
-            },
-            "player_stats": {
-                "type": "object",
-                "label": "Player stats",
-                "path": "player_stats"
-            }
-        }
-    },
     "timer.interval": {
         "title": "Timer every N minutes",
         "service": "timer",
