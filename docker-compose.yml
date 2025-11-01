@@ -1,41 +1,21 @@
-services:
-  db:
-    image: mariadb:11.8.3
-    restart: unless-stopped
-    environment:
-      MARIADB_ROOT_PASSWORD: rootpwd
-      MARIADB_DATABASE: area
-    ports:
-      - "3306:3306"
-    volumes:
-      - db_data:/var/lib/mysql
-      - ./initDatabase:/docker-entrypoint-initdb.d
-    healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      start_period: 10s
-      start_interval: 10s
-      interval: 1m
-      timeout: 5s
-      retries: 3
+version: "3.9"
 
-  backend:
-    build: ./backend
+services:
+  server:
+    image: node:20-alpine
+    container_name: area_mock_server
+    working_dir: /app
+    command: >
+      sh -c "npx serve . -l 8080"
     ports:
       - "8080:8080"
-    environment:
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_NAME: area
-    depends_on:
-      db:
-        condition: service_healthy
     volumes:
-      # - shared-bundle:/shared
-      - ./backend:/app
+      - ./about.json:/app/about.json
     restart: unless-stopped
 
-  mobile:
+  client_mobile:
     build: ./mobile
+    container_name: area_mobile
     volumes:
       - shared-bundle:/shared
     ports:
@@ -47,17 +27,23 @@ services:
     tty: true
     restart: unless-stopped
 
-  frontend:
+  client_web:
     build: ./frontend
+    container_name: area_web
+    working_dir: /app
+    depends_on:
+      - server
+      - client_mobile
     ports:
       - "8081:8081"
-    depends_on:
-      - backend
-      - mobile
     volumes:
+      - ./frontend:/app
       - shared-bundle:/shared
+    # command: >
+    #   sh -c "npm install -g serve &&
+    #          echo 'Starting web server...' &&
+    #          npx serve /shared -l 8081"
     restart: unless-stopped
 
 volumes:
-  db_data:
   shared-bundle:
