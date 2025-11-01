@@ -436,7 +436,7 @@ ACTIONS_CATALOG = {
             },
             "summary": {
                 "type": "string",
-                "label": "Sommaire",
+                "label": "Summary",
                 "path": "summary",
                 "optional": True
             }
@@ -458,11 +458,11 @@ ACTIONS_CATALOG = {
                 "default": "cs2"
             }
         },
-        "description": "Récupère la position actuelle d'un joueur FACEIT en se basant sur son pseudo.",
+        "description": "Retrieves the current FACEIT player ranking based on the player's nickname.",
         "output_schema": {
             "summary": {
                 "type": "string",
-                "label": "Résumé",
+                "label": "Summary",
                 "path": "summary"
             }
         }
