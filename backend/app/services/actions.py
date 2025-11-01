@@ -95,14 +95,14 @@ async def google_recent_emails_action(db: Session, user_id: int, params: dict) -
             "snippet": snippet,
         })
     if not results:
-        return {"text": "Aucun email trouvé."}
+        return {"text": "No emails found."}
     lines = []
     for msg in results:
-        subject = msg.get("subject") or "(Sans objet)"
-        date = msg.get("date") or "Date inconnue"
+        subject = msg.get("subject") or "(No subject)"
+        date = msg.get("date") or "Unknown date"
         snippet = msg.get("snippet") or ""
         if snippet:
-            lines.append(f"- {subject} ({date}) — {snippet}")
+            lines.append(f"- {subject} ({date}) - {snippet}")
         else:
             lines.append(f"- {subject} ({date})")
     return {"data": "\n".join(lines)}
@@ -315,7 +315,7 @@ async def faceit_player_ranking_action(db: Session, user_id: int, params: dict) 
 
         region = game_entry.get("region") or player_data.get("region")
         if not region:
-            raise ValueError("Impossible de déterminer la région du joueur pour ce jeu")
+            raise ValueError("Unable to determine the player's region for this game")
         region = str(region).strip()
 
         country_code = _normalize_country(player_data.get("country"))
@@ -365,11 +365,11 @@ async def faceit_player_ranking_action(db: Session, user_id: int, params: dict) 
     if position is None and matching_item:
         position = pick_value(matching_item, "position", "ranking", "rank", "placement")
     if position in (None, "", "None"):
-        raise ValueError("Impossible de déterminer la position du joueur dans le classement")
+        raise ValueError("Unable to determine the player's ranking position")
 
     position_str = str(position).strip()
     if not position_str:
-        raise ValueError("Position du joueur vide dans la réponse FACEIT")
+        raise ValueError("Empty player position in FACEIT response")
     try:
         position_clean = str(int(position_str))
     except (TypeError, ValueError):
@@ -385,7 +385,7 @@ async def faceit_player_ranking_action(db: Session, user_id: int, params: dict) 
         )
 
     suffix = f" ({country_code})" if country_code else ""
-    summary = f"Le joueur {resolved_nickname} est {position_clean} sur {game_id}{suffix}"
+    summary = f"Player {resolved_nickname} is {position_clean} in {game_id}{suffix}"
 
     return {"summary": summary}
 
@@ -395,7 +395,7 @@ async def timer_interval_action(db: Session, user_id: int, params: dict) -> dict
     interval_minutes = parse_interval_minutes(payload)
     if interval_minutes is None:
         raise ValueError(
-            "Paramètre d'intervalle manquant. Fournissez par exemple 'interval_minutes', 'minutes' ou 'every' (en minutes)."
+            "Missing interval parameter. Provide 'interval_minutes', 'minutes', or 'every' (in minutes)."
         )
 
     interval_minutes = max(1, interval_minutes)

@@ -101,9 +101,9 @@ async def test_workflow_step(
             if success_message:
                 return {"success": True, "message": str(success_message)}
 
-        return {"success": True, "message": "Réaction exécutée avec succès."}
+        return {"success": True, "message": "Reaction executed successfully."}
 
-    return {"success": False, "message": f"Type de step non géré pour les tests: {step.type}"}
+    return {"success": False, "message": f"Step type not supported for tests: {step.type}"}
 
 
 @workflows_router.put("/{workflow_id}", response_model=WorkflowOut)
@@ -144,7 +144,7 @@ async def toggle_workflow_status(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Basculer le statut actif/inactif d'un workflow"""
+    """Toggle the active status of a workflow"""
     workflow = db.query(Workflow).filter_by(id=workflow_id, user_id=current_user.id).first()
     if not workflow:
         raise HTTPException(status_code=404, detail="Workflow not found")

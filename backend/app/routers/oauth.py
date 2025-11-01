@@ -106,7 +106,7 @@ async def oauth_login(
     db: Session = Depends(get_db)
 ):
     if provider not in oauth._clients:
-        return JSONResponse({"error": "Provider inconnu"}, status_code=400)
+        return JSONResponse({"error": "Unknown provider"}, status_code=400)
 
     context = "auth"
     user = None
@@ -115,14 +115,14 @@ async def oauth_login(
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
             email: str = payload.get("sub")
             if not email:
-                return JSONResponse({"error": "Token invalide"}, status_code=401)
+                return JSONResponse({"error": "Invalid token"}, status_code=401)
             user = db.query(User).filter(User.email == email).first()
             if not user:
-                return JSONResponse({"error": "Utilisateur introuvable"}, status_code=404)
+                return JSONResponse({"error": "User not found"}, status_code=404)
             request.session['oauth_user_id'] = user.id
             context = "link"
         except JWTError:
-            return JSONResponse({"error": "Token invalide"}, status_code=401)
+            return JSONResponse({"error": "Invalid token"}, status_code=401)
     redirect_front = ""
     if context == "link":
         redirect_front = "http://localhost:8081/services"
@@ -138,7 +138,7 @@ async def oauth_login(
 @oauth_router.get("/{provider}/callback")
 async def oauth_callback(provider: str, request: Request, db: Session = Depends(get_db)):
     if provider not in oauth._clients:
-        return JSONResponse({"error": "Provider inconnu"}, status_code=400)
+        return JSONResponse({"error": "Unknown provider"}, status_code=400)
 
     try:
         client = oauth.create_client(provider)
@@ -151,7 +151,7 @@ async def oauth_callback(provider: str, request: Request, db: Session = Depends(
         if context == "link":
             user_id = request.session.get('oauth_user_id')
             if not user_id:
-                return JSONResponse({"error": "Utilisateur introuvable pour le lien"}, status_code=400)
+                return JSONResponse({"error": "User not found for link"}, status_code=400)
 
             save_token_to_db(db, user_id, provider, token)
 
@@ -167,10 +167,10 @@ async def oauth_callback(provider: str, request: Request, db: Session = Depends(
             user_info = await client.userinfo(token=token)
 
         email = user_info.get('email')
-        name = user_info.get('name') or user_info.get('username') or "Utilisateur"
+        name = user_info.get('name') or user_info.get('username') or "User"
 
         if not email:
-            return JSONResponse({"error": "Impossible de récupérer l'email depuis le provider"}, status_code=400)
+            return JSONResponse({"error": "Unable to retrieve email from provider"}, status_code=400)
 
         user = db.query(User).filter(User.email == email).first()
 
@@ -198,7 +198,7 @@ async def oauth_callback(provider: str, request: Request, db: Session = Depends(
         return RedirectResponse(redirect_url)
 
     except Exception as e:
-        print(f"Erreur OAuth callback: {e}")
+        print(f"OAuth callback error: {e}")
         return JSONResponse({
             "success": False,
             "error": "oauth_failed",
@@ -223,14 +223,14 @@ async def oauth_disconnect(provider: str, db: Session = Depends(get_db), current
     if service:
         db.delete(service)
         db.commit()
-        return {"msg": f"Service {provider} déconnecté avec succès"}
-    return JSONResponse({"error": "Service non trouvé"}, status_code=404)
+        return {"msg": f"Service {provider} disconnected successfully"}
+    return JSONResponse({"error": "Service not found"}, status_code=404)
 
 @oauth_router.get("/{provider}/token")
 async def get_oauth_token(provider: str, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     token = get_token_from_db(db, current_user.id, provider)
     if not token:
-        return JSONResponse({"error": "Token non trouvé"}, status_code=404)
+        return JSONResponse({"error": "Token not found"}, status_code=404)
     return JSONResponse({"token": token})
 
 SERVICES_INFO = {

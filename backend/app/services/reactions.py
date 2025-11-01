@@ -45,7 +45,7 @@ async def google_send_mail_reaction(db: Session, user_id: int, params: dict):
     resp = await client.post("gmail/v1/users/me/messages/send", json=message_body, token=token)
 
     if resp.status_code in (200, 201, 202):
-        return {"status": "Email envoyé avec succès"}
+        return {"status": "Email sent successfully"}
     else:
         try:
             return {"error": resp.json()}
@@ -128,7 +128,7 @@ async def discord_send_message_reaction(db: Session, user_id: int, params: dict)
 
     if response.status_code in (200, 201):
         data = response.json()
-        return {"status": "Message envoyé", "message_id": data.get("id")}
+        return {"status": "Message sent", "message_id": data.get("id")}
     try:
         return {"error": response.json()}
     except Exception:

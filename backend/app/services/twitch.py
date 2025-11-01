@@ -35,11 +35,11 @@ async def get_twitch_user_id(username_streamer: str) -> str:
             headers=headers
         )
     if response.status_code != 200:
-        raise HTTPException(status_code=500, detail=f"Erreur Twitch API: {response.text}")
+        raise HTTPException(status_code=500, detail=f"Twitch API error: {response.text}")
 
     data = response.json()
     if not data.get("data"):
-        raise HTTPException(status_code=404, detail=f"Streamer '{username_streamer}' introuvable")
+        raise HTTPException(status_code=404, detail=f"Streamer '{username_streamer}' not found")
 
     user = data["data"][0]
     return user["id"]

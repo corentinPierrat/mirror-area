@@ -12,7 +12,7 @@ client = discord.Client(intents=intents)
 
 @client.event
 async def on_ready():
-    print(f"✅ Connecté en tant que {client.user}")
+    print(f"✅ Connected as {client.user}")
 
 @client.event
 async def on_member_join(member):
@@ -67,7 +67,7 @@ async def on_member_update(before, after):
             "old_value": old_nick,
             "new_value": new_nick
         })
-        summary_parts.append(f"nickname: {old_nick} → {new_nick}")
+        summary_parts.append(f"nickname: {old_nick} -> {new_nick}")
 
     if before.roles != after.roles:
         added_roles = sorted({role.name for role in set(after.roles) - set(before.roles)})
@@ -93,7 +93,7 @@ async def on_member_update(before, after):
             "old_value": before_activity,
             "new_value": after_activity
         })
-        summary_parts.append(f"activity: {before_activity} → {after_activity}")
+        summary_parts.append(f"activity: {before_activity} -> {after_activity}")
 
     if before.avatar != after.avatar:
         change_records.append({
@@ -108,7 +108,7 @@ async def on_member_update(before, after):
             "old_value": before.name,
             "new_value": after.name
         })
-        summary_parts.append(f"username: {before.name} → {after.name}")
+        summary_parts.append(f"username: {before.name} -> {after.name}")
 
     if before.timed_out_until != after.timed_out_until:
         change_records.append({

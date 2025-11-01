@@ -114,5 +114,5 @@ async def refresh_oauth_token(db: Session, user_id: int, provider: str) -> Dict[
         save_token_to_db(db, user_id, provider, new_token)
         return new_token
     except Exception as e:
-        print(f"Erreur refresh token: {e}")
+        print(f"Token refresh error: {e}")
         return None

@@ -103,7 +103,7 @@ def get_my_info(current_user: User = Depends(get_current_user)):
 def delete_my_account(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     db.delete(current_user)
     db.commit()
-    return {"detail": "Compte supprimé"}
+    return {"detail": "Account deleted"}
 
 MAX_PROFILE_IMAGE_SIZE = 5 * 1024 * 1024
 ALLOWED_IMAGE_TYPES = {
