@@ -29,7 +29,7 @@ async def get_public_workflows(
             "name": w.name,
             "description": w.description,
             "author": w.user.username if w.user else None,
-            "profile_picture": w.user.profile_picture if w.user else None,
+            "profile_picture": w.user.profile_image_url if w.user else None,
             "created_at": w.created_at,
             "steps": [
                 {
