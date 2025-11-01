@@ -236,7 +236,7 @@ async def get_oauth_token(provider: str, db: Session = Depends(get_db), current_
 SERVICES_INFO = {
     "spotify": {
         "name": "Spotify",
-        "logo_url": "https://e7.pngegg.com/pngimages/158/639/png-clipart-spotify-streaming-media-logo-playlist-spotify-app-icon-logo-music-download.png"
+        "logo_url": "https://open.spotifycdn.com/cdn/images/error-page-logo.24aca703.svg"
     },
     "twitter": {
         "name": "Twitter",
