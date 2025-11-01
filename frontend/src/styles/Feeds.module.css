@@ -1,0 +1,179 @@
+.pageContainer {
+    display: grid;
+    grid-template-columns: 250px 1fr; 
+    min-height: 100vh;
+    background: linear-gradient(135deg, #171542 0%, #2f339e 100%);
+  }
+  
+  .sidebar {
+    padding: 20px;
+    color: #fff;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+  }
+
+  .videoBackground {    
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    opacity: 0.4;
+    filter: blur(8px) brightness(0.8) contrast(1.1);
+  }
+
+
+  .mainContent {
+    padding: 30px;
+    overflow-y: auto;
+    margin-top: 8%;
+  }
+  
+  .feedHeader {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  
+  .feedHeader h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #fff;
+  }
+  
+  .feedHeader p {
+    font-size: 1.1rem;
+    color: #adb5bd;
+  }
+  
+  .filterBar {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+  }
+  
+  .filterInput {
+    min-width: 300px;
+    padding: 12px 18px;
+    font-size: 1rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    color: #fff;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+  
+  .filterInput::placeholder {
+    color: #adb5bd;
+  }
+  
+  .filterInput:focus {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: #007bff;
+  }
+  
+  .workflowGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 25px;
+    justify-items: center;
+  }
+  
+  .message {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #adb5bd;
+    padding: 50px 0;
+  }
+  
+  .message.error {
+    color: #ff6b6b;
+    font-weight: 500;
+  }
+  
+  .workflowCard {
+    width: 100%;
+    max-width: 400px;
+    padding: 18px 22px;
+    background: rgba(255, 255, 255, 0.13);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(4.2px);
+    -webkit-backdrop-filter: blur(4.2px);
+    border: 1px solid rgba(255, 255, 255, 0.26);
+    border-radius: 40px;
+    transition: all 0.3s ease;
+  }
+  
+  .workflowCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  }
+  
+  .workflowName {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 20px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .workflowContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .section {
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    line-height: 1.5;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .arrowLogo {
+    display: flex;
+    justify-content: center;
+    color: #fff;
+  }
+  
+  .serviceTag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 102, 255, 0.1);
+    border: 1px solid rgba(0, 140, 255, 0.2);
+    border-radius: 9999px;
+    padding: 6px 14px;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 8px rgba(0, 102, 255, 0.15);
+  }
+  
+  .serviceLogo {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    border-radius: 6px;
+  }
+  
+  .eventName {
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  
+  

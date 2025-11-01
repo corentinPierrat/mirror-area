@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import styles from "../styles/Workflows.module.css";
-import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
+import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -13,13 +15,16 @@ export default function Workflows({
   workflowId,
   onDelete,
   active,
+  visibility = "private", 
 }) {
   const navigate = useNavigate();
   const [isActive, setIsActive] = useState(!!active);
+  const [isPublic, setIsPublic] = useState(visibility === "public");
 
   useEffect(() => {
     setIsActive(!!active);
-  }, [active, workflowId]);
+    setIsPublic(visibility === "public");
+  }, [active, visibility, workflowId]);
 
   const handleDelete = async () => {
     try {
@@ -45,7 +50,59 @@ export default function Workflows({
       );
       setIsActive(response.data.active);
     } catch (err) {
-      console.error("Unable to toggle workflow", err.response?.data || err.message);
+      console.error(
+        "Unable to toggle workflow",
+        err.response?.data || err.message
+      );
+    }
+  };
+
+  const handleToggleVisibility = async () => {
+    const token = localStorage.getItem("userToken");
+    if (!token) return;
+
+    const newVisibility = isPublic ? "private" : "public";
+
+    try {
+      const steps = [];
+      if (Action && Action.service) {
+        steps.push({ ...Action, type: "action" });
+      }
+      if (Reactions && Reactions.length > 0) {
+        Reactions.forEach(r => {
+          if (r && r.service) {
+            steps.push({ ...r, type: "reaction" });
+          }
+        });
+      }
+
+      const updatedWorkflow = {
+        name: Name,
+        active: isActive,
+        visibility: newVisibility,
+        steps: steps,
+      };
+
+      console.log("Workflow reconstruct for PUT :", updatedWorkflow);
+
+      const putResponse = await axios.put(
+        `${API_URL}/workflows/${workflowId}`,
+        updatedWorkflow,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Visibility update :", putResponse.data);
+      setIsPublic(newVisibility === "public");
+    } catch (err) {
+      console.error(
+        "Unable to update visibility",
+        err.response?.data || err.message
+      );
     }
   };
 
@@ -57,11 +114,12 @@ export default function Workflows({
         <div className={styles.centeredTicTac}>
           <div className={styles.tictac}>
             <img
-              src={`../public/${Action.service}.png`}
+              src={`/${Action.service}.png`}
               alt={Action.service}
               className={styles.serviceLogo}
+              onError={(e) => e.target.style.display = 'none'}
             />
-            <span className={styles.eventName}>{Action.event}</span>
+            <span className={styles.eventName}>{Action.event.replace(/_/g, ' ')}</span>
           </div>
         </div>
       );
@@ -78,7 +136,7 @@ export default function Workflows({
 
   const renderReactions = () => {
     if (!Reactions || Reactions.length === 0)
-      return <span>Aucune réaction</span>;
+      return <span className={styles.noReactionText}>No reaction</span>;
 
     return (
       <div className={styles.centeredTicTac}>
@@ -87,11 +145,12 @@ export default function Workflows({
             return (
               <div key={i} className={styles.tictac}>
                 <img
-                  src={`../public/${r.service}.png`}
+                  src={`/${r.service}.png`}
                   alt={r.service}
                   className={styles.serviceLogo}
+                  onError={(e) => e.target.style.display = 'none'}
                 />
-                <span className={styles.eventName}>{r.event}</span>
+                <span className={styles.eventName}>{r.event.replace(/_/g, ' ')}</span>
               </div>
             );
           }
@@ -107,18 +166,32 @@ export default function Workflows({
 
   return (
     <div className={styles.workflowCard}>
-      <h2 className={styles.workflowName}>{Name}</h2>
+      <div className={styles.headerRow}>
+        <button
+          className={styles.visibilityButton}
+          onClick={handleToggleVisibility}
+          title={
+            isPublic
+              ? "Make the workflow private"
+              : "Make the workflow public"
+          }
+        >
+          {isPublic ? (
+            <VisibilityIcon sx={{ color: "#fff", fontSize: 20 }} />
+          ) : (
+            <VisibilityOffIcon sx={{ color: "rgba(255,255,255,0.6)", fontSize: 20 }} />
+          )}
+        </button>
+
+        <h2 className={styles.workflowName}>{Name}</h2>
+      </div>
 
       <div className={styles.workflowContent}>
-        <div className={styles.section}>
-          {renderAction()}
-        </div>
+        <div className={styles.section}>{renderAction()}</div>
         <div className={styles.arrow_logo}>
-        <DoubleArrowIcon sx={{ transform: 'rotate(90deg)' }} />
+          <DoubleArrowIcon sx={{ transform: "rotate(90deg)", color: 'rgba(255, 255, 255, 0.5)' }} />
         </div>
-        <div className={styles.section}>
-          {renderReactions()}
-        </div>
+        <div className={styles.section}>{renderReactions()}</div>
       </div>
 
       <div className={styles.buttonContainer}>
@@ -137,13 +210,14 @@ export default function Workflows({
             })
           }
         >
-          Modifier
+          Modify
         </button>
 
         <button className={styles.deleteButton} onClick={handleDelete}>
-          Supprimer
+          Delete
         </button>
       </div>
     </div>
   );
 }
+

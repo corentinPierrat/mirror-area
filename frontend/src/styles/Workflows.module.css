@@ -20,6 +20,30 @@
   border-color: rgba(255, 255, 255, 0.3);
 }
 
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.visibilityButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.visibilityButton:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
+}
+
+
 .workflowName {
   font-size: 1.25rem;
   font-weight: 600;
