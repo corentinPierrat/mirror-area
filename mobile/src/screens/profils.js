@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -8,6 +8,8 @@ import "../components/i18n";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import { API_URL } from "../../config";
+import { Pressable } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 
 const ProfileDashboard = ({ navigation }) => {
   const { t } = useTranslation();
@@ -16,6 +18,7 @@ const ProfileDashboard = ({ navigation }) => {
   const [message, setMessage] = useState('');
   const [userData, setUserData] = useState(null);
   const [isError, setIsError] = useState(false);
+  const isAdmin = !!(userData?.is_admin || userData?.role === 'admin');
 
   const handleChangePassword = async () => {
     const token = await AsyncStorage.getItem('userToken');
@@ -102,6 +105,7 @@ const ProfileDashboard = ({ navigation }) => {
       });
       if (response.status === 200) {
         setUserData(response.data);
+        console.log('User data loaded:', response.data);
       }
     } catch (error) {
       navigation.replace('Login');
@@ -110,6 +114,63 @@ const ProfileDashboard = ({ navigation }) => {
     }
   };
 
+const handleUploadProfileImage = async (navigation) => {
+  try {
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) {
+      navigation.replace('Login');
+      return;
+    }
+
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert(t('PermissionDenied'), t('GalleryAccessRequired'));
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: 'images',
+      allowsEditing: true,
+      quality: 0.8,
+      aspect: [1, 1],
+    });
+
+    if (result.canceled) return;
+
+    const asset = result.assets[0];
+    const imageUri = asset.uri;
+    const mimeType = asset.mimeType || 'image/jpeg';
+    const fileName = asset.fileName || `profile_${Date.now()}.${mimeType.split('/')[1] || 'jpg'}`;
+
+    setUserData((prev) => ({ ...(prev || {}), profile_image_url: imageUri }));
+
+    const formData = new FormData();
+    formData.append('file', {
+      uri: imageUri,
+      name: fileName,
+      type: mimeType,
+    });
+
+    const response = await axios.post(`${API_URL}/auth/me/profile-image`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    if (response.status >= 200 && response.status < 300 && response.data) {
+      setUserData(response.data);
+    }
+  } catch (error) {
+    console.error('Upload error:', error.response?.data || error.message);
+    await handleUpdateProfile();
+    Alert.alert(
+      t('Error'), 
+      error.response?.data?.detail || error.message || t('UploadError')
+    );
+  }
+};
+
   useEffect(() => {
     handleUpdateProfile();
   }, []);
@@ -117,35 +178,40 @@ const ProfileDashboard = ({ navigation }) => {
   return (
 
     <LinearGradient
-            colors={['#171542', '#2f339e']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.container}
-          >
+      colors={['#171542', '#2f339e']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.container}
+    >
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
     <LanguageSwitcher />
-      <LinearGradient
-        colors={['#1e293b', '#334155']}
-        style={styles.profileCard}
-      >
-        <View style={styles.profileContent}>
-          <Text style={styles.welcomeText}>{t("Welcome")},</Text>
-          <Text style={styles.userName}>{userData?.username}</Text>
+    <LinearGradient
+      colors={['#1e293b', '#334155']}
+      style={styles.profileCard}
+    >
+      <View style={styles.profileHeader}>
+      <TouchableOpacity style={styles.avatarWrapper} onPress={() => handleUploadProfileImage(navigation)}>
+          {userData?.profile_image_url ? (
+            <Image source={{ uri: `${API_URL}` + userData?.profile_image_url }} style={styles.avatar} />
+          ) : (
+            <View style={styles.avatarPlaceholder}>
+              <Ionicons name="camera" size={32} color="white" />
+            </View>
+          )}
+        </TouchableOpacity>
+
+        <View style={styles.profileInfo}>
+          <Text style={styles.userName}>{userData?.username || t("Guest")}</Text>
           <Text style={styles.subText}>{t("Welcome back!")}</Text>
         </View>
 
-        <View style={styles.glowContainer}>
-          <LinearGradient
-            colors={['#60a5fa', '#3b82f6']}
-            style={styles.glowEffect}
-          />
-          <LinearGradient
-            colors={['#67e8f9', '#3b82f6']}
-            style={styles.innerGlow}
-          />
-          <View style={styles.centerOrb} />
-        </View>
-      </LinearGradient>
+        {isAdmin && (
+          <Pressable onPress={() => navigation.navigate('Admin')} style={styles.adminButtonTop}>
+            <Ionicons name="settings-outline" size={24} color="#60a5fa" />
+          </Pressable>
+        )}
+      </View>
+    </LinearGradient>
 
       <View style={styles.passwordSection}>
         <Text style={styles.sectionTitle}>{t("changePassword")}</Text>
@@ -302,6 +368,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  adminButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#1e293b',
+    borderRadius: 12,
+    paddingVertical: 14,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#60a5fa',
+  },
+  adminButtonText: { color: '#60a5fa', fontSize: 16, fontWeight: '700' },
   logoutButton: {
     width: '81%',
     flexDirection: 'row',
@@ -338,6 +417,95 @@ const styles = StyleSheet.create({
   textAlign: 'center',
   fontSize: 14,
 },
+logoParameter: {
+  position: 'absolute',
+  bottom: -80,
+  right: -5,
+  opacity: 0.8,
+},
+  logoParameter: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+  },
+  defaultContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "black",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  profileCard: {
+  borderRadius: 20,
+  padding: 20,
+  marginBottom: 24,
+  backgroundColor: '#1e293b',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+
+profileHeader: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  width: '100%',
+},
+
+avatarWrapper: {
+  width: 90,
+  height: 90,
+  borderRadius: 45,
+  overflow: 'hidden',
+  backgroundColor: '#000',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+
+avatar: {
+  width: '100%',
+  height: '100%',
+  borderRadius: 45,
+},
+
+avatarPlaceholder: {
+  width: '100%',
+  height: '100%',
+  borderRadius: 45,
+  backgroundColor: '#0f172a',
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderWidth: 1,
+  borderColor: '#334155',
+},
+
+profileInfo: {
+  flex: 1,
+  marginLeft: 16,
+},
+
+userName: {
+  color: '#ffffff',
+  fontSize: 22,
+  fontWeight: '700',
+  marginBottom: 4,
+},
+
+subText: {
+  color: '#94a3b8',
+  fontSize: 14,
+},
+
+adminButtonTop: {
+  padding: 10,
+  borderRadius: 12,
+  backgroundColor: '#0f172a',
+  borderWidth: 1,
+  borderColor: '#60a5fa',
+},
+
+
 });
 
 export default ProfileDashboard;

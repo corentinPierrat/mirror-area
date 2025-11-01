@@ -7,6 +7,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import "../components/i18n";
 import { useTranslation } from "react-i18next";
 import { API_URL } from "../../config";
+import * as WebBrowser from 'expo-web-browser';
+import * as Linking from 'expo-linking';
 
 const LoginScreen = ({ navigation }) => {
   const { t } = useTranslation();
@@ -14,6 +16,43 @@ const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+
+  const extractTokenFromUrl = (url) => {
+    try {
+      const parsed = Linking.parse(url);
+      const qp = parsed?.queryParams || {};
+      return qp.token || qp.access_token || qp.jwt || null;
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const handleGoogleAuth = async () => {
+    try {
+      setLoading(true);
+      setMessage('');
+
+      const redirectUri = Linking.createURL('');
+      const authUrl = `${API_URL}/oauth/google/login?redirect_uri=${encodeURIComponent(redirectUri)}`;
+
+      const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUri);
+
+      if (result.type === 'success' && result.url) {
+        const token = extractTokenFromUrl(result.url);
+        if (token) {
+          await AsyncStorage.setItem('userToken', token);
+          navigation.replace('Main');
+          return;
+        }
+      }
+      setMessage(t('NetworkError'));
+    } catch (error) {
+      console.log('Erreur OAuth Google:', error);
+      setMessage(t('NetworkError'));
+    } finally {
+      setLoading(false);
+    }
+  };
 
    const handleLogin = async () => {
     if (!email || !password) {
@@ -88,9 +127,15 @@ const LoginScreen = ({ navigation }) => {
         secureTextEntry
       />
       {message ? (<Text style={styles.message}>{message}</Text>) : null}
-      <TouchableOpacity onPress={handleLogin} style={styles.button} disabled={loading}>
-        <Text style={styles.buttonText}>{loading ? t("Login") + '...' : t("Login")}</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonRow}>
+        <TouchableOpacity onPress={handleLogin} style={[styles.button, { flex: 1 }]} disabled={loading}>
+          <Text style={styles.buttonText}>{loading ? t("Login") + '...' : t("Login")}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={handleGoogleAuth} style={styles.googleButton} disabled={loading}>
+          <Ionicons name="logo-google" size={20} color="#2f339e" />
+        </TouchableOpacity>
+      </View>
 
       <TouchableOpacity onPress={handleRegister}>
         <Text style={styles.link}>{t("CreateAccount")}</Text>
@@ -138,11 +183,40 @@ const styles = StyleSheet.create({
     color: '#2f339e',
     fontWeight: 'bold',
   },
+  oauthButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 10,
+  },
+  oauthButtonText: {
+    color: '#2f339e',
+    fontWeight: 'bold',
+  },
   link: {
     color: '#fff',
     marginBottom: 30,
     textDecorationLine: 'underline',
   },
+buttonRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  width: '100%',
+},
+googleButton: {
+  marginLeft: 10,
+  backgroundColor: '#fff',
+  borderRadius: 10,
+  padding: 15,
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: 50,
+  marginBottom: 15,
+},
+
 });
 
 export default LoginScreen;

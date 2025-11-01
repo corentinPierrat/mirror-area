@@ -5,6 +5,10 @@ import axios from 'axios';
 import Verifcode from './../screens/Verifcode';
 import { t } from 'i18next';
 import { API_URL } from "../../config";
+import * as WebBrowser from 'expo-web-browser';
+import * as Linking from 'expo-linking';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
 
 const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -13,6 +17,42 @@ const RegisterScreen = ({ navigation }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const extractTokenFromUrl = (url) => {
+    try {
+      const parsed = Linking.parse(url);
+      const qp = parsed?.queryParams || {};
+      return qp.token || qp.access_token || qp.jwt || null;
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const handleGoogleAuth = async () => {
+    try {
+      setLoading(true);
+      setMessage('');
+
+      const redirectUri = Linking.createURL('');
+      const authUrl = `${API_URL}/oauth/google/login?redirect_uri=${encodeURIComponent(redirectUri)}`;
+
+      const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUri);
+
+      if (result.type === 'success' && result.url) {
+        const token = extractTokenFromUrl(result.url);
+        if (token) {
+          await AsyncStorage.setItem('userToken', token);
+          return;
+        }
+      }
+      setMessage(t('NetworkError'));
+    } catch (error) {
+      console.log('Erreur OAuth Google:', error);
+      setMessage(t('NetworkError'));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleRegister = async () => {
     if (!email || !password || !confirmPassword) {
@@ -96,9 +136,15 @@ const RegisterScreen = ({ navigation }) => {
 
       {message ? <Text style={styles.message}>{message}</Text> : null}
 
-      <TouchableOpacity onPress={handleRegister} style={styles.button} disabled={loading}>
+    <View style={styles.buttonRow}>
+      <TouchableOpacity onPress={handleRegister} style={[styles.button, { flex: 1 }]} disabled={loading}>
         <Text style={styles.buttonText}>{loading ? t("Register") + '...' : t("Register")}</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity onPress={handleGoogleAuth} style={styles.googleButton} disabled={loading}>
+        <Ionicons name="logo-google" size={20} color="#2f339e" />
+      </TouchableOpacity>
+    </View>
 
       <TouchableOpacity onPress={() => navigation.goBack()}>
         <Text style={styles.link}>{t("Back to Login")}</Text>
@@ -140,6 +186,20 @@ const styles = StyleSheet.create({
     color: '#2f339e',
     fontWeight: 'bold'
   },
+  oauthButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 15,
+  },
+  oauthButtonText: {
+    color: '#2f339e',
+    fontWeight: 'bold',
+  },
   link: {
     color: '#fff',
     marginTop: 10,
@@ -151,6 +211,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#ff4d4d'
   },
+  buttonRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  width: '100%',
+},
+googleButton: {
+  marginLeft: 10,
+  backgroundColor: '#fff',
+  borderRadius: 10,
+  padding: 15,
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: 50,
+  marginBottom: 15,
+},
+
 });
 
 export default RegisterScreen;
