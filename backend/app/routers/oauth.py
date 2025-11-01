@@ -239,8 +239,8 @@ SERVICES_INFO = {
         "logo_url": "https://storage.googleapis.com/pr-newsroom-wp/1/2018/11/Spotify_Logo_RGB_Green.png"
     },
     "twitter": {
-        "name": "Twitter",
-        "logo_url": "https://abs.twimg.com/icons/apple-touch-icon-192x192.png"
+        "name": "X",
+        "logo_url": "https://penji.co/wp-content/uploads/2023/07/X-logo-twitter-1-e1690571698797.jpg"
     },
     "discord": {
         "name": "Discord",
@@ -280,3 +280,4 @@ async def get_services(db: Session = Depends(get_db), current_user = Depends(get
             "connected": connected
         })
     return JSONResponse({"services": services})
+
