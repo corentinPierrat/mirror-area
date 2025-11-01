@@ -165,7 +165,7 @@ const handleUploadProfileImage = async (navigation) => {
     console.error('Upload error:', error.response?.data || error.message);
     await handleUpdateProfile();
     Alert.alert(
-      t('Error'), 
+      t('Error'),
       error.response?.data?.detail || error.message || t('UploadError')
     );
   }
@@ -176,86 +176,98 @@ const handleUploadProfileImage = async (navigation) => {
   }, []);
 
   return (
-
     <LinearGradient
       colors={['#171542', '#2f339e']}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.container}
     >
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-    <LanguageSwitcher />
-    <LinearGradient
-      colors={['#1e293b', '#334155']}
-      style={styles.profileCard}
-    >
-      <View style={styles.profileHeader}>
-      <TouchableOpacity style={styles.avatarWrapper} onPress={() => handleUploadProfileImage(navigation)}>
-          {userData?.profile_image_url ? (
-            <Image source={{ uri: `${API_URL}` + userData?.profile_image_url }} style={styles.avatar} />
-          ) : (
-            <View style={styles.avatarPlaceholder}>
-              <Ionicons name="camera" size={32} color="white" />
-            </View>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <LanguageSwitcher />
+
+        <LinearGradient
+          colors={['#1e293b', '#334155']}
+          style={styles.profileCard}
+        >
+          {isAdmin && (
+            <Pressable
+              onPress={() => navigation.navigate('Admin')}
+              style={styles.adminButtonTop}
+            >
+              <Ionicons name="settings-outline" size={24} color="#60a5fa" />
+            </Pressable>
           )}
-        </TouchableOpacity>
 
-        <View style={styles.profileInfo}>
-          <Text style={styles.userName}>{userData?.username || t("Guest")}</Text>
-          <Text style={styles.subText}>{t("Welcome back!")}</Text>
+          <TouchableOpacity
+            style={styles.avatarWrapper}
+            onPress={() => handleUploadProfileImage(navigation)}
+          >
+            {userData?.profile_image_url ? (
+              <Image
+                source={{ uri: `${API_URL}${userData?.profile_image_url}` }}
+                style={styles.avatar}
+              />
+            ) : (
+              <View style={styles.avatarPlaceholder}>
+                <Ionicons name="person-outline" size={40} color="#94a3b8" />
+              </View>
+            )}
+          </TouchableOpacity>
+
+          <View style={styles.profileInfo}>
+            <Text style={styles.userName}>{userData?.username || t("Guest")}</Text>
+            <Text style={styles.subText}>{t("Welcome back!")}</Text>
+          </View>
+        </LinearGradient>
+
+        <View style={styles.passwordSection}>
+          <Text style={styles.sectionTitle}>{t("changePassword")}</Text>
+
+          <View style={styles.inputContainer}>
+            <Ionicons name="lock-closed-outline" size={20} color="#94a3b8" style={styles.inputIcon} />
+            <TextInput
+              style={styles.textInput}
+              placeholder={t("Current Password")}
+              placeholderTextColor="#64748b"
+              secureTextEntry
+              value={currentPassword}
+              onChangeText={setCurrentPassword}
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Ionicons name="key-outline" size={20} color="#94a3b8" style={styles.inputIcon} />
+            <TextInput
+              style={styles.textInput}
+              placeholder={t("New Password")}
+              placeholderTextColor="#64748b"
+              secureTextEntry
+              value={newPassword}
+              onChangeText={setNewPassword}
+            />
+          </View>
+
+          <TouchableOpacity style={styles.changePasswordButton} onPress={handleChangePassword}>
+            <Text style={styles.changePasswordButtonText}>{t("changePassword")}</Text>
+          </TouchableOpacity>
         </View>
+        {message ? (
+          <Text style={[styles.message, { color: isError ? '#ff4d4d' : '#63f614ff' }]}>
+            {message}
+          </Text>
+        ) : null}
 
-        {isAdmin && (
-          <Pressable onPress={() => navigation.navigate('Admin')} style={styles.adminButtonTop}>
-            <Ionicons name="settings-outline" size={24} color="#60a5fa" />
-          </Pressable>
-        )}
-      </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 40 }}>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Ionicons name="log-out-outline" size={20} color="#ef4444" />
+            <Text style={styles.logoutButtonText}>{t("logout")}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.deleteAccountButton} onPress={handleDeleteAccount}>
+            <Ionicons name="trash" size={20} color="#ef4444" />
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </LinearGradient>
-
-      <View style={styles.passwordSection}>
-        <Text style={styles.sectionTitle}>{t("changePassword")}</Text>
-
-        <View style={styles.inputContainer}>
-          <Ionicons name="lock-closed-outline" size={20} color="#94a3b8" style={styles.inputIcon} />
-          <TextInput
-            style={styles.textInput}
-            placeholder={t("Current Password")}
-            placeholderTextColor="#64748b"
-            secureTextEntry
-            value={currentPassword}
-            onChangeText={setCurrentPassword}
-          />
-        </View>
-
-        <View style={styles.inputContainer}>
-          <Ionicons name="key-outline" size={20} color="#94a3b8" style={styles.inputIcon} />
-          <TextInput
-            style={styles.textInput}
-            placeholder={t("New Password")}
-            placeholderTextColor="#64748b"
-            secureTextEntry
-            value={newPassword}
-            onChangeText={setNewPassword}
-          />
-        </View>
-
-        <TouchableOpacity style={styles.changePasswordButton} onPress={handleChangePassword}>
-          <Text style={styles.changePasswordButtonText}>{t("changePassword")}</Text>
-        </TouchableOpacity>
-      </View>
-     {message ? (<Text style={[styles.message, { color: isError ? '#ff4d4d' : '#63f614ff' }]}>{message}</Text>) : null}
-     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 40 }}>
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Ionicons name="log-out-outline" size={20} color="#ef4444" />
-        <Text style={styles.logoutButtonText}>{t("logout")}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.deleteAccountButton} onPress={handleDeleteAccount}>
-        <Ionicons name="trash" size={20} color="#ef4444" />
-      </TouchableOpacity>
-      </View>
-    </ScrollView>
-      </LinearGradient>
   );
 };
 
@@ -266,64 +278,76 @@ const styles = StyleSheet.create({
     paddingTop: 38,
   },
   profileCard: {
-    borderRadius: 16,
-    padding: 20,
-    position: 'relative',
-    overflow: 'hidden',
+    borderRadius: 20,
+    padding: 24,
     marginBottom: 24,
-    height: 200,
+    backgroundColor: '#1e293b',
+    alignItems: 'center',
+    position: 'relative',
   },
-  profileContent: {
-    zIndex: 2,
+  avatarWrapper: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    overflow: 'hidden',
+    backgroundColor: '#0f172a',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+    borderWidth: 1,
+    borderColor: '#3b82f6',
+    marginBottom: 16,
   },
-  welcomeText: {
-    color: '#94a3b8',
-    fontSize: 14,
-    marginBottom: 4,
+  avatar: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 50,
+  },
+  avatarPlaceholder: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 50,
+    backgroundColor: '#0f172a',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cameraBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: '#3b82f6',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: '#1e293b',
+  },
+  profileInfo: {
+    alignItems: 'center',
   },
   userName: {
     color: '#ffffff',
     fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 8,
+    fontWeight: '700',
+    marginBottom: 4,
+    textAlign: 'center',
   },
   subText: {
     color: '#94a3b8',
     fontSize: 14,
-    lineHeight: 18,
+    textAlign: 'center',
   },
-  glowContainer: {
+  adminButtonTop: {
     position: 'absolute',
-    right: -20,
-    top: -10,
-    width: 120,
-    height: 120,
-  },
-  glowEffect: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    opacity: 0.3,
-    position: 'absolute',
-  },
-  innerGlow: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    opacity: 0.5,
-    position: 'absolute',
-    top: 10,
-    left: 10,
-  },
-  centerOrb: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#60a5fa',
-    opacity: 0.8,
-    position: 'absolute',
-    top: 20,
-    left: 20,
+    top: 16,
+    right: 16,
+    padding: 10,
+    borderRadius: 12,
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(96, 165, 250, 0.3)',
   },
   passwordSection: {
     backgroundColor: '#1e293b',
@@ -368,19 +392,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  adminButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: '#1e293b',
-    borderRadius: 12,
-    paddingVertical: 14,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#60a5fa',
-  },
-  adminButtonText: { color: '#60a5fa', fontSize: 16, fontWeight: '700' },
   logoutButton: {
     width: '81%',
     flexDirection: 'row',
@@ -412,100 +423,11 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   message: {
-  marginTop: -10,
-  marginBottom: 10,
-  textAlign: 'center',
-  fontSize: 14,
-},
-logoParameter: {
-  position: 'absolute',
-  bottom: -80,
-  right: -5,
-  opacity: 0.8,
-},
-  logoParameter: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    marginTop: -10,
+    marginBottom: 10,
+    textAlign: 'center',
+    fontSize: 14,
   },
-  defaultContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: "black",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  profileCard: {
-  borderRadius: 20,
-  padding: 20,
-  marginBottom: 24,
-  backgroundColor: '#1e293b',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-},
-
-profileHeader: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  width: '100%',
-},
-
-avatarWrapper: {
-  width: 90,
-  height: 90,
-  borderRadius: 45,
-  overflow: 'hidden',
-  backgroundColor: '#000',
-  justifyContent: 'center',
-  alignItems: 'center',
-},
-
-avatar: {
-  width: '100%',
-  height: '100%',
-  borderRadius: 45,
-},
-
-avatarPlaceholder: {
-  width: '100%',
-  height: '100%',
-  borderRadius: 45,
-  backgroundColor: '#0f172a',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderWidth: 1,
-  borderColor: '#334155',
-},
-
-profileInfo: {
-  flex: 1,
-  marginLeft: 16,
-},
-
-userName: {
-  color: '#ffffff',
-  fontSize: 22,
-  fontWeight: '700',
-  marginBottom: 4,
-},
-
-subText: {
-  color: '#94a3b8',
-  fontSize: 14,
-},
-
-adminButtonTop: {
-  padding: 10,
-  borderRadius: 12,
-  backgroundColor: '#0f172a',
-  borderWidth: 1,
-  borderColor: '#60a5fa',
-},
-
-
 });
 
 export default ProfileDashboard;

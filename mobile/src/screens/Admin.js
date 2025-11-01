@@ -111,14 +111,14 @@ export default function AdminScreen({ navigation }) {
 
   return (
     <LinearGradient colors={['#171542', '#2f339e']} style={styles.container}>
-        <TouchableOpacity
+      <TouchableOpacity
         style={{ position: 'absolute', top: 40, left: 16, zIndex: 10, flexDirection: 'row', alignItems: 'center' }}
         onPress={() => navigation.replace('Main')}
-        >
+      >
         <Ionicons name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
-      <ScrollView contentContainerStyle={[styles.scroll, { flexGrow: 1 }]} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>{t('Admin')}</Text>
+      </TouchableOpacity>
+
+      <View style={styles.contentWrapper}>
 
         <View style={styles.statsRow}>
           <StatCard icon="people-outline" label={t('Total Users')} value={stats?.total_users ?? users.length} />
@@ -137,7 +137,7 @@ export default function AdminScreen({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.listContainer}>
+        <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
           {users.map((u) => (
             <View key={u.id} style={styles.userRow}>
               <View style={{ flex: 1 }}>
@@ -158,8 +158,8 @@ export default function AdminScreen({ navigation }) {
           {!users?.length && (
             <Text style={styles.emptyText}>{t('No users found')}</Text>
           )}
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
 
       <Modal visible={modalVisible} transparent animationType="fade" onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalOverlay}>
@@ -202,9 +202,14 @@ export default function AdminScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scroll: { paddingTop: 65, paddingBottom: 120, paddingHorizontal: 16 },
+  contentWrapper: { 
+    flex: 1, 
+    paddingTop: 65, 
+    paddingBottom: 20, 
+    paddingHorizontal: 16 
+  },
   title: { color: '#fff', fontSize: 26, fontWeight: '700', marginBottom: 18, textAlign: 'center' },
-  statsRow: { flexDirection: 'row', gap: 12, marginBottom: 12 },
+  statsRow: { flexDirection: 'row', gap: 12, marginBottom: 12, marginTop: 12 },
   statCard: { flex: 1, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
   statLabel: { color: 'rgba(255,255,255,0.8)', fontSize: 12, marginTop: 6 },
   statValue: { color: '#fff', fontSize: 22, fontWeight: '800', marginTop: 8 },
@@ -212,7 +217,14 @@ const styles = StyleSheet.create({
   sectionTitle: { color: '#fff', fontSize: 18, fontWeight: '700' },
   addButton: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(99,102,241,0.4)', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, borderWidth: 1, borderColor: 'rgba(99,102,241,0.6)' },
   addButtonText: { color: '#fff', fontWeight: '700' },
-  listContainer: { backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)', padding: 6 },
+  listContainer: { 
+    flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.08)', 
+    borderRadius: 16, 
+    borderWidth: 1, 
+    borderColor: 'rgba(255,255,255,0.15)', 
+    padding: 6,
+  },
   userRow: { flexDirection: 'row', alignItems: 'center', padding: 12, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(255,255,255,0.06)', marginBottom: 8 },
   userName: { color: '#fff', fontWeight: '700', marginBottom: 2 },
   userSub: { color: 'rgba(255,255,255,0.7)', fontSize: 12 },
