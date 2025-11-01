@@ -31,10 +31,10 @@ oauth.register(
     name="twitter",
     client_id=settings.TWITTER_CLIENT_ID,
     client_secret=settings.TWITTER_CLIENT_SECRET,
-    access_token_url="https://api.x.com/2/oauth2/token",
+    access_token_url="https://api.twitter.com/2/oauth2/token",
     access_token_params=None,
-    authorize_url="https://x.com/i/oauth2/authorize",
-    api_base_url="https://api.x.com/2/",
+    authorize_url="https://twitter.com/i/oauth2/authorize",
+    api_base_url="https://api.twitter.com/2/",
     client_kwargs={
         "scope": "tweet.read users.read offline.access tweet.write",
         "code_challenge_method": "S256",
