@@ -1,0 +1,11 @@
+{
+  "spotify": [
+    {
+      "service": "spotify",
+      "event": "add_to_playlist",
+      "title": "Add to playlist",
+      "description": "Adds a track to a playlist",
+      "payload_schema": { "playlist": { "label": "Playlist" } }
+    }
+  ]
+}

@@ -4,11 +4,41 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #171542 0%, #2f339e 100%);
   color: #fff;
   font-family: "Inter", sans-serif;
   padding: 40px 20px;
+
+  background: rgba(255, 255, 255, 0.13);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(2.2px);
+  -webkit-backdrop-filter: blur(4.2px);
+  border: 1px solid rgba(255, 255, 255, 0.26);
+
 }
+
+.googleButton {
+  position: relative;
+  z-index: 2;
+  background-color: #fff;
+  color: #000;
+}
+
+.googleIcon {
+  height: 20px;
+  margin-right: 10px;
+}
+
+.videoBackground {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  opacity: 0.4;
+}
+
 
 .title {
   font-size: 2.3rem;
@@ -94,6 +124,8 @@ p {
   cursor: pointer;
   font-weight: 600;
   transition: color 0.3s ease;
+  position: relative;
+  z-index: 2;
 }
 
 .link:hover {

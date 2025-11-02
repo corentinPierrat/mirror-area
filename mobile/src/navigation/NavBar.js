@@ -7,6 +7,7 @@ import Profils from '../screens/profils';
 import CreateWorkflowScreen from '../screens/CreateWorflow';
 import MyWorkflowScreen from '../screens/MyWorflows';
 import ServiceScreen from '../screens/Services';
+import FeedScreen from '../screens/Feed';
 import "../components/i18n";
 import { useTranslation } from "react-i18next";
 
@@ -14,17 +15,20 @@ const Tab = createBottomTabNavigator();
 
 export default function TabNavigator() {
   const { t } = useTranslation();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-          headerShown: false,
+        headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
           if (route.name === 'Profil') {
             iconName = focused ? 'person' : 'person-outline';
-          } else if (route.name === 'Créer Workflow') {
+          } else if (route.name === 'CreateWorkflow') {
             iconName = focused ? 'add-circle' : 'add-circle-outline';
-          } else if (route.name === 'Mes Workflows') {
+          } else if (route.name === 'Feed') {
+            iconName = focused ? 'newspaper' : 'newspaper-outline';
+          } else if (route.name === 'MyWorkflows') {
             iconName = focused ? 'folder' : 'folder-outline';
           } else if (route.name === 'Services') {
             iconName = focused ? 'settings' : 'settings-outline';
@@ -54,10 +58,31 @@ export default function TabNavigator() {
         tabBarIconStyle: styles.tabBarIcon,
       })}
     >
-      <Tab.Screen name={t("Profile")} component={Profils} />
-      <Tab.Screen name={t("Create Workflow")} component={CreateWorkflowScreen} />
-      <Tab.Screen name={t("My Workflows")} component={MyWorkflowScreen} />
-      <Tab.Screen name={t("Services")} component={ServiceScreen} />
+      <Tab.Screen
+        name="Profil"
+        component={Profils}
+        options={{ title: t("Profile") }}
+      />
+      <Tab.Screen
+        name="CreateWorkflow"
+        component={CreateWorkflowScreen}
+        options={{ title: t("Create Workflow") }}
+      />
+      <Tab.Screen
+        name="MyWorkflows"
+        component={MyWorkflowScreen}
+        options={{ title: t("My Workflows") }}
+      />
+      <Tab.Screen
+        name="Feed"
+        component={FeedScreen}
+        options={{ title: t("Feed") }}
+      />
+      <Tab.Screen
+        name="Services"
+        component={ServiceScreen}
+        options={{ title: t("Services") }}
+      />
     </Tab.Navigator>
   );
 }
@@ -92,6 +117,8 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 1,
     marginTop: 8,
+    flexShrink: 1,
+    textAlign: 'center',
   },
   tabBarIcon: {
     marginBottom: -4,

@@ -7,7 +7,7 @@ from app.config import settings
 from app.database import get_db
 from app.models.models import UserService
 from app.services.token_storage import save_token_to_db, get_token_from_db
-from app.services.auth import get_current_user
+from app.services.auth import get_current_user, hash_password, create_jwt_token, random_password
 from jose import JWTError, jwt
 from app.models.models import User
 
@@ -31,10 +31,10 @@ oauth.register(
     name="twitter",
     client_id=settings.TWITTER_CLIENT_ID,
     client_secret=settings.TWITTER_CLIENT_SECRET,
-    access_token_url="https://api.twitter.com/2/oauth2/token",
+    access_token_url="https://api.x.com/2/oauth2/token",
     access_token_params=None,
-    authorize_url="https://twitter.com/i/oauth2/authorize",
-    api_base_url="https://api.twitter.com/2/",
+    authorize_url="https://x.com/i/oauth2/authorize",
+    api_base_url="https://api.x.com/2/",
     client_kwargs={
         "scope": "tweet.read users.read offline.access tweet.write",
         "code_challenge_method": "S256",
@@ -54,19 +54,6 @@ oauth.register(
 )
 
 oauth.register(
-    name="microsoft",
-    client_id=settings.MS_CLIENT_ID,
-    client_secret=settings.MS_CLIENT_SECRET,
-    authorize_url="https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
-    access_token_url="https://login.microsoftonline.com/common/oauth2/v2.0/token",
-    api_base_url="https://graph.microsoft.com/v1.0/",
-    client_kwargs={
-        "scope": "openid profile email offline_access User.Read Mail.Read Mail.Send",
-        "code_challenge_method": "S256",
-    },
-)
-
-oauth.register(
     name="faceit",
     client_id=settings.FACEIT_CLIENT_ID,
     client_secret=settings.FACEIT_CLIENT_SECRET,
@@ -74,7 +61,7 @@ oauth.register(
     access_token_url="https://api.faceit.com/auth/v1/oauth/token",
     api_base_url="https://open.faceit.com/data/v4/",
     client_kwargs={
-        "scope": "openid email profile membership",
+        "scope": "email profile membership",
         "code_challenge_method": "S256",
     },
 )
@@ -89,55 +76,129 @@ oauth.register(
         "scope": (
             "openid email profile "
             "https://www.googleapis.com/auth/gmail.readonly "
-            "https://www.googleapis.com/auth/gmail.send"
+            "https://www.googleapis.com/auth/gmail.send "
+            "https://www.googleapis.com/auth/calendar.events"
         ),
         "access_type": "offline",
-        "prompt": "consent",
+        # "prompt": "consent",
     },
 )
 
+oauth.register(
+    name="twitch",
+    client_id=settings.TWITCH_CLIENT_ID,
+    client_secret=settings.TWITCH_CLIENT_SECRET,
+    access_token_url="https://id.twitch.tv/oauth2/token",
+    authorize_url="https://id.twitch.tv/oauth2/authorize",
+    api_base_url="https://api.twitch.tv/helix/",
+    client_kwargs={
+        "scope": "user:read:email channel:read:subscriptions moderator:read:followers user:read:follows",
+        "token_endpoint_auth_method": "client_secret_post"
+    }
+)
+
 @oauth_router.get("/{provider}/login")
-async def oauth_login(provider: str, request: Request, token: str = Query(None), db: Session = Depends(get_db)):
+async def oauth_login(
+    provider: str,
+    request: Request,
+    token: str = Query(None),
+    redirect_uri_param: str | None = Query(None, alias="redirect_uri"),
+    db: Session = Depends(get_db)
+):
     if provider not in oauth._clients:
-        return JSONResponse({"error": "Provider inconnu"}, status_code=400)
+        return JSONResponse({"error": "Unknown provider"}, status_code=400)
 
-    if not token:
-        return JSONResponse({"error": "Token manquant"}, status_code=401)
-
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
-        email: str = payload.get("sub")
-        if not email:
-            return JSONResponse({"error": "Token invalide"}, status_code=401)
-        user = db.query(User).filter(User.email == email).first()
-        if not user:
-            return JSONResponse({"error": "Utilisateur introuvable"}, status_code=404)
-    except JWTError:
-        return JSONResponse({"error": "Token invalide"}, status_code=401)
-
-    request.session['oauth_user_id'] = user.id
-
-    if provider == "microsoft":
-        redirect_uri = f"http://localhost:8080/oauth/{provider}/callback"
-    elif provider == "faceit":
-        redirect_uri = f"https://b107b2467506.ngrok-free.app/oauth/{provider}/callback"
+    context = "auth"
+    user = None
+    if token:
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+            email: str = payload.get("sub")
+            if not email:
+                return JSONResponse({"error": "Invalid token"}, status_code=401)
+            user = db.query(User).filter(User.email == email).first()
+            if not user:
+                return JSONResponse({"error": "User not found"}, status_code=404)
+            request.session['oauth_user_id'] = user.id
+            context = "link"
+        except JWTError:
+            return JSONResponse({"error": "Invalid token"}, status_code=401)
+    redirect_front = ""
+    if context == "link":
+        redirect_front = "http://localhost:8081/services"
     else:
-        redirect_uri = f"http://127.0.0.1:8080/oauth/{provider}/callback"
-    return await oauth.create_client(provider).authorize_redirect(request, redirect_uri)
+        redirect_front = "http://localhost:8081/dashboard"
+
+    request.session['oauth_context'] = context
+    request.session['oauth_redirect_uri'] = redirect_uri_param or redirect_front
+    print(f"TEST: {redirect_uri_param}")
+    redirect_uri = f"https://trigger.ink/oauth/{provider}/callback"
+    return await oauth.create_client(provider).authorize_redirect(request, redirect_uri, redirect_popup="true")
 
 @oauth_router.get("/{provider}/callback")
 async def oauth_callback(provider: str, request: Request, db: Session = Depends(get_db)):
     if provider not in oauth._clients:
-        return JSONResponse({"error": "Provider inconnu"}, status_code=400)
+        return JSONResponse({"error": "Unknown provider"}, status_code=400)
+
     try:
         client = oauth.create_client(provider)
-        token = await client.authorize_access_token(request, grant_type="authorization_code")
-        user_id = request.session.get('oauth_user_id')
-        if user_id:
+        token = await client.authorize_access_token(request)
+
+        context = request.session.get('oauth_context', 'auth')
+        stored_redirect = request.session.pop('oauth_redirect_uri', None)
+        print(f"OAuth context: {context}, stored redirect: {stored_redirect}")
+
+        if context == "link":
+            user_id = request.session.get('oauth_user_id')
+            if not user_id:
+                return JSONResponse({"error": "User not found for link"}, status_code=400)
+
             save_token_to_db(db, user_id, provider, token)
-        return RedirectResponse("http://127.0.0.1:5173")
+
+            request.session.pop('oauth_context', None)
+            request.session.pop('oauth_user_id', None)
+
+            final_redirect = stored_redirect or "http://localhost:8081/services"
+            return RedirectResponse(final_redirect)
+
+
+        user_info = token.get('userinfo')
+        if not user_info:
+            user_info = await client.userinfo(token=token)
+
+        email = user_info.get('email')
+        name = user_info.get('name') or user_info.get('username') or "User"
+
+        if not email:
+            return JSONResponse({"error": "Unable to retrieve email from provider"}, status_code=400)
+
+        user = db.query(User).filter(User.email == email).first()
+
+        if not user:
+            user = User(
+                username=name,
+                email=email,
+                password_hash=hash_password(random_password()),
+                role="user",
+                is_verified=True
+            )
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+
+        save_token_to_db(db, user.id, provider, token)
+
+        access_token = create_jwt_token({"sub": user.email})
+
+        request.session.pop('oauth_context', None)
+        request.session.pop('oauth_user_id', None)
+        final_redirect = stored_redirect or "http://localhost:8081/dashboard"
+        print(f"Final redirect: {final_redirect}")
+        redirect_url = f"{final_redirect}?token={access_token}"
+        return RedirectResponse(redirect_url)
+
     except Exception as e:
-        print(f"Erreur OAuth callback: {e}")
+        print(f"OAuth callback error: {e}")
         return JSONResponse({
             "success": False,
             "error": "oauth_failed",
@@ -146,6 +207,8 @@ async def oauth_callback(provider: str, request: Request, db: Session = Depends(
 
 @oauth_router.get("/{provider}/status")
 async def oauth_status(provider: str, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    if provider == "timer":
+        return JSONResponse({"logged_in": True})
     token = get_token_from_db(db, current_user.id, provider)
     if not token:
         return JSONResponse({"logged_in": False})
@@ -160,20 +223,20 @@ async def oauth_disconnect(provider: str, db: Session = Depends(get_db), current
     if service:
         db.delete(service)
         db.commit()
-        return {"msg": f"Service {provider} déconnecté avec succès"}
-    return JSONResponse({"error": "Service non trouvé"}, status_code=404)
+        return {"msg": f"Service {provider} disconnected successfully"}
+    return JSONResponse({"error": "Service not found"}, status_code=404)
 
 @oauth_router.get("/{provider}/token")
 async def get_oauth_token(provider: str, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     token = get_token_from_db(db, current_user.id, provider)
     if not token:
-        return JSONResponse({"error": "Token non trouvé"}, status_code=404)
+        return JSONResponse({"error": "Token not found"}, status_code=404)
     return JSONResponse({"token": token})
 
 SERVICES_INFO = {
     "spotify": {
         "name": "Spotify",
-        "logo_url": "https://storage.googleapis.com/pr-newsroom-wp/1/2018/11/Spotify_Logo_RGB_Green.png"
+        "logo_url": "https://storage.googleapis.com/pr-newsroom-wp/1/2023/05/Spotify_Primary_Logo_RGB_Green.png"
     },
     "twitter": {
         "name": "Twitter",
@@ -183,13 +246,21 @@ SERVICES_INFO = {
         "name": "Discord",
         "logo_url": "https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png"
     },
-    "microsoft": {
-        "name": "Microsoft 365",
-        "logo_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/512px-Microsoft_logo.svg.png"
-    },
     "faceit": {
         "name": "Faceit",
-        "logo_url": "https://cdn.faceit.com/static/layout/images/faceit-logo.svg"
+        "logo_url": "https://assets.faceit-cdn.net/organizer_avatar/faceit_1551450699251.jpg"
+    },
+    "google": {
+        "name": "Google",
+        "logo_url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png"
+    },
+    "twitch": {
+        "name": "Twitch",
+        "logo_url": "https://static.twitchcdn.net/assets/favicon-32-e29e246c157142c94346.png"
+    },
+    "timer": {
+        "name": "Timer",
+        "logo_url": "https://cdn-icons-png.flaticon.com/512/2088/2088617.png"
     }
 }
 
@@ -197,11 +268,15 @@ SERVICES_INFO = {
 async def get_services(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     services = []
     for provider, info in SERVICES_INFO.items():
-        token = get_token_from_db(db, current_user.id, provider)
+        if provider == "timer":
+            connected = True
+        else:
+            token = get_token_from_db(db, current_user.id, provider)
+            connected = bool(token)
         services.append({
             "provider": provider,
             "name": info["name"],
             "logo_url": info["logo_url"],
-            "connected": bool(token)
+            "connected": connected
         })
     return JSONResponse({"services": services})

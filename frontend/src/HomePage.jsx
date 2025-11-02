@@ -1,20 +1,30 @@
 import React from "react";
-import Header from './components/Header';
-import Hero from './components/Hero';
-import Footer from './components/Footer';
-import HowItWorks from './components/HowItWorks';
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 import styles from "./styles/HomePage.module.css";
+import LiquidText from "./components/LiquidText";
 
 function HomePage() {
   return (
     <>
-      <main>
+      <video
+        className={styles.videoBackground}
+        src="/bg-video.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+      />
+
+      <main className={styles.mainContent}>
         <div className={styles.container}>
-          <Hero />
-          <HowItWorks />
-          <HowItWorks />
-          <HowItWorks />
-          <Footer />
+          <Header />
+          <div className={styles.containerText}>
+            <LiquidText />
+          </div>
+            <div className={styles.footercontainer}>
+            <Footer />
+            </div>
         </div>
       </main>
     </>
@@ -22,4 +32,3 @@ function HomePage() {
 }
 
 export default HomePage;
-

@@ -3,11 +3,10 @@ import styles from "../styles/Login.module.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = "http://10.18.207.151:8080";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Login() {
   const navigate = useNavigate();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,7 +16,7 @@ export default function Login() {
     e.preventDefault();
 
     if (!email || !password) {
-      setMessage("Veuillez remplir tous les champs.");
+      setMessage("Please fill in all fields.");
       return;
     }
 
@@ -35,18 +34,18 @@ export default function Login() {
       console.error(error.response?.data || error.message);
 
       if (error.response?.status === 401) {
-        setMessage("Email ou mot de passe invalide.");
+        setMessage("Invalid email or password.");
       } else if (error.response?.status === 422) {
-        setMessage("Le mot de passe est trop court.");
+        setMessage("The password is too short.");
       } else if (error.response?.status === 403) {
         try {
           await axios.post(`${API_URL}/auth/resend-verification`, { email });
           navigate("/verify-code", { state: { email } });
         } catch {
-          setMessage("Erreur lors de l'envoi du code de vérification.");
+          setMessage("Error sending verification code.");
         }
       } else {
-        setMessage("Erreur réseau, veuillez réessayer.");
+        setMessage("Network error, please try again.");
       }
     } finally {
       setLoading(false);
@@ -57,11 +56,21 @@ export default function Login() {
     navigate("/register");
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = `${API_URL}/oauth/google/login`;
+  };
+
   return (
     <div className={styles.container}>
+      <video
+        className={styles.videoBackground}
+        src="/bg-video.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+      />
       <div className={styles.card}>
-        <h1 className={styles.title}>Connexion</h1>
-
         <form onSubmit={handleLogin}>
           <input
             type="email"
@@ -72,21 +81,31 @@ export default function Login() {
           />
           <input
             type="password"
-            placeholder="Mot de passe"
+            placeholder="Passeword"
             className={styles.input}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
           {message && <p className={styles.message}>{message}</p>}
-          <button type="submit" className={styles.button} disabled={loading}>
+          <button type="submit" className={styles.buttons} disabled={loading}>
             {loading ? "Connexion..." : "Connexion"}
           </button>
         </form>
 
-        <p className={styles.linkText}>
-          Pas de compte ? <span onClick={goToRegister} className={styles.link}>Inscrivez-vous</span>
-        </p>
+        <div className={styles.divider}>OR</div>
+
+        <button onClick={handleGoogleLogin} className={styles.googleButton}>
+          <img src="/google.png" alt="Google" className={styles.googleIcon} />
+          Continue with Google
+        </button>
       </div>
+
+      <p className={styles.linkText}>
+        No account?{" "}
+        <span onClick={goToRegister} className={styles.link}>
+          Register
+        </span>
+      </p>
     </div>
   );
 }

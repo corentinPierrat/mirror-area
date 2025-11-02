@@ -1,0 +1,71 @@
+{
+    "client": {
+      "host": "172.18.0.4",
+      "current_time": 1761921798
+    },
+    "services": [
+      {
+        "name": "discord",
+        "actions": [
+          { "name": "bot_mention", "description": "Triggers when a user mentions the bot in a message." },
+          { "name": "list_guilds", "description": "Retrieves the list of Discord servers linked to your account." },
+          { "name": "member_join", "description": "Triggers when a member joins the specified Discord server." },
+          { "name": "member_remove", "description": "Triggers when a member leaves the specified Discord server." },
+          { "name": "member_update", "description": "Triggers when a member changes their nickname in the specified Discord server." }
+        ],
+        "reactions": [
+          { "name": "send_channel_message", "description": "Sends a message to the specified Discord channel using the connected bot." }
+        ]
+      },
+      {
+        "name": "faceit",
+        "actions": [
+          { "name": "get_player_id", "description": "Retrieves the unique FACEIT player ID associated with the provided nickname." },
+          { "name": "retrieve_player_ranking", "description": "Retrieves the current FACEIT player ranking based on the player's nickname." },
+          { "name": "retrieve_player_stats", "description": "Fetches statistics for the player's most recent FACEIT match." }
+        ],
+        "reactions": []
+      },
+      {
+        "name": "google",
+        "actions": [
+          { "name": "recent_emails_from_sender", "description": "Returns up to N recent emails received from the specified sender." }
+        ],
+        "reactions": [
+          { "name": "create_calendar_event", "description": "Creates a Google Calendar event starting immediately and lasting one hour." },
+          { "name": "send_mail", "description": "Sends an email using the Gmail API." }
+        ]
+      },
+      {
+        "name": "spotify",
+        "actions": [],
+        "reactions": [
+          { "name": "play_playlist", "description": "Plays the specified playlist on the user's active Spotify device." },
+          { "name": "play_track", "description": "Plays the specified track on the user's active Spotify device." }
+        ]
+      },
+      {
+        "name": "timer",
+        "actions": [
+          { "name": "interval", "description": "Triggers the workflow periodically after the specified number of minutes." }
+        ],
+        "reactions": []
+      },
+      {
+        "name": "twitch",
+        "actions": [
+          { "name": "channel.follow", "description": "Triggers when someone follows the channel." },
+          { "name": "channel.subscribe", "description": "Triggers when someone subscribes to the channel." },
+          { "name": "stream.online", "description": "Triggers when a Twitch stream goes live." }
+        ],
+        "reactions": []
+      },
+      {
+        "name": "twitter",
+        "actions": [],
+        "reactions": [
+          { "name": "tweet", "description": "Posts a tweet with the given text." }
+        ]
+      }
+    ]
+  }

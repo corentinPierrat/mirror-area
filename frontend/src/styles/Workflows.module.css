@@ -1,13 +1,257 @@
 .workflowCard {
-    padding: 16px;
-    background-color: rgba(255,255,255,0.05);
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.2);
-  }
+  width: 400px;
+  padding: 20px 25px;
   
-  .workflowName {
-    font-size: 18px;
-    margin-bottom: 8px;
-    color: #fff;
-  }
+  background: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 40px;
   
+  display: flex;
+  flex-direction: column;
+  transition: 0.3s ease;
+}
+
+.workflowCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.visibilityButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.visibilityButton:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
+}
+
+
+.workflowName {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+
+.centeredTicTac {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.tictac {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 102, 255, 0.1);
+  border: 1px solid rgba(0, 140, 255, 0.2);
+  border-radius: 9999px;
+  padding: 6px 14px;
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+  box-shadow: 0 0 8px rgba(0, 102, 255, 0.15);
+}
+
+.tictac:hover {
+  background: rgba(0, 102, 255, 0.2);
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(0, 140, 255, 0.25);
+}
+
+.serviceLogo {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  border-radius: 6px;
+  filter: drop-shadow(0 0 2px rgba(0, 140, 255, 0.3));
+  transform: "rotate(360deg)";
+}
+
+.arrow_logo{
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.workflowContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.section {
+  width: 100%;
+}
+
+.arrowLogo{
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.noReactionText {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+  text-align: center;
+  display: block;
+}
+
+.tagWrapper {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.serviceTag {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+  
+  border-radius: 9999px;
+  padding: 6px 14px 6px 8px;
+  transition: all 0.2s ease;
+}
+
+.serviceTag:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.03);
+}
+
+.serviceLogo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.eventName {
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.buttonContainer {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.editButton,
+.deleteButton {
+  padding: 8px 16px;
+  background-color: transparent;
+  color: #ff5252;
+  border: 1px solid #ff5252;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.editButton {
+  border: 1px solid #5eff00;
+  
+  color: #5eff00;
+}
+
+.editButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.4);
+}
+
+.deleteButton {
+  border: 1px solid #ff5252;
+  
+    color: #ff5252;
+}
+
+.deleteButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 12px rgba(185, 28, 28, 0.4);
+}
+
+.toggleSwitch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+  margin-right: auto;
+}
+
+.toggleSwitch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #55555515;
+  transition: 0.4s;
+  border-radius: 28px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+.toggleSwitch input:checked + .slider {
+  background-color: #256aeb4d;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.toggleSwitch input:checked + .slider:before {
+  transform: translateX(22px);
+}
+

@@ -1,0 +1,152 @@
+.settingsPageContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem;
+  z-index: 2;
+  position: relative;
+}
+
+.profileCard {
+  padding: 2rem;
+  border-radius: 1.5rem;
+  text-align: center;
+  color: #fff;
+  width: 350px;
+  flex-shrink: 0;
+
+  position: relative;
+  z-index: 2;
+
+  background-color: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.formBubble {
+  width: 400px;
+}
+
+.title {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.infoGroup {
+  text-align: left;
+  margin-bottom: 2rem;
+}
+
+.infoGroup p {
+  margin-bottom: 0.5rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.editBtn,
+.deleteBtn,
+.saveBtn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 30px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background-color: #ffffff00;
+}
+
+.editBtn {
+  color: white;
+  border: 1px solid rgb(5, 89, 247);
+}
+
+.editBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.4);
+}
+
+.deleteBtn {
+  background-color: #ffffff00;
+  color: #fff;
+  border: 1px solid rgba(247, 9, 9, 0.973);
+}
+
+.deleteBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 12px rgba(185, 28, 28, 0.4);
+}
+
+.formGroup {
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(0, 0, 0, 0.2);
+  color: #fff;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.dropzone {
+  border: 2px dashed rgba(255, 255, 255, 0.4);
+  border-radius: 1rem;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dropzone p {
+  margin: 0;
+  font-weight: 500;
+  color: #ccc;
+}
+
+.dropzone:hover,
+.dropzoneActive {
+  background-color: rgba(0, 123, 255, 0.1);
+  border-color: #007bff;
+}
+
+.messageError {
+  color: #ff5252;
+  font-weight: 500;
+  margin-top: 1rem;
+}
+
+.messageSuccess {
+  color: #00ff88;
+  font-weight: 500;
+  margin-top: 1rem;
+}
+
+.loading {
+  font-size: 1.2rem;
+  color: #fff;
+  text-align: center;
+  padding: 2rem;
+}

@@ -3,12 +3,19 @@ import Header from './components/Header';
 import HeaderDashboard from './components/HeaderDashboard';
 import Footer from './components/Footer';
 import Crarea from './components/Cr-area';
-import styles from "./styles/Dashboard.module.css";
+import styles from "./styles/CreationPage.module.css";
 
 export default function CreationPage() {
   return (
     <div className={styles.dashboardContainer}>
-
+      <video
+        className={styles.videoBackground}
+        src="/bg-video.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+      />
       <div className={styles.dashboardBody}>
         <aside className={styles.sidebar}>
           <HeaderDashboard />
@@ -16,12 +23,15 @@ export default function CreationPage() {
 
         <main className={styles.mainContent}>
           <Header />
-          {/* <h1 className={styles.title}>Créer un Workflow</h1> */}
-          <Crarea />
+          <div className={styles.CrareaContainer}>
+            <Crarea />
+          </div>
         </main>
       </div>
+      <div className={styles.footer}>
+        <Footer />
+      </div>
 
-      <Footer />
     </div>
   );
 }

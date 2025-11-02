@@ -5,29 +5,40 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import * as Linking from 'expo-linking';
 import { useNavigation } from '@react-navigation/native';
- import * as WebBrowser from 'expo-web-browser';
+import { useTranslation } from "react-i18next";
 
-const OAuthButton = ({ logo, text, apiRoute, onSuccess, connected }) => {
+const OAuthButton = ({ logo, apiRoute, onSuccess, connected, provider }) => {
   const navigation = useNavigation();
+  const { t } = useTranslation();
 
-const handlePress = async () => {
-  try {
-    const token = await AsyncStorage.getItem('userToken');
-    if (!token) {
-      navigation.replace('Login');
-      return;
+  const handlePress = async () => {
+    try {
+      const token = await AsyncStorage.getItem('userToken');
+      if (!token) {
+        navigation.replace('Login');
+        return;
+      }
+
+      if (connected) {
+        await axios.delete(apiRoute, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (onSuccess) onSuccess();
+      } else {
+        if (!provider) {
+          console.warn('Provider manquant pour le bouton OAuth');
+          return;
+        }
+        const redirectUri = Linking.createURL('oauth/callback', {
+          queryParams: { provider },
+        });
+        const authUrl = `${apiRoute}?token=${encodeURIComponent(token)}&redirect_uri=${encodeURIComponent(redirectUri)}`;
+        await Linking.openURL(authUrl);
+      }
+    } catch (error) {
+      console.error('Erreur OAuth:', error);
     }
-    const authUrl = `${apiRoute}?token=${encodeURIComponent(token)}`;
-
-    await Linking.openURL(authUrl);
-
-    if (onSuccess) {
-      onSuccess();
-    }
-  } catch (error) {
-    console.error('Erreur lors de l\'ouverture OAuth:', error);
-  }
-};
+  };
 
   return (
     <TouchableOpacity
@@ -51,7 +62,7 @@ const handlePress = async () => {
 
         <View style={styles.textContainer}>
           <Text style={[styles.status, connected ? styles.statusConnected : styles.statusDisconnected]}>
-            {connected ? 'Connecté' : 'Déconnecté'}
+            {connected ? t("Connected") : t("Disconnected")}
           </Text>
         </View>
 

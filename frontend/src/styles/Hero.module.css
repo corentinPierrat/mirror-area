@@ -1,12 +1,9 @@
-/* Hero.css */
-
 .hero-section {
   position: sticky;
-  top: 20px;
+  top: 200px;
   width: 100%;
   margin: auto;
   max-width: 98%;
-  background-color: #070b27;
   overflow: visible;
   z-index: 1000;
   transition: height 0.3s ease, border-radius 0.3s ease, padding 0.3s ease;
@@ -55,6 +52,7 @@
     font-size: 3rem;
     font-weight: 700;
     line-height: 1.1;
+    color: #FFF;
   }
   
   .hero-subtitle {
@@ -65,6 +63,7 @@
   
   .hero-button {
     margin-top: 2rem;
+    margin-left: 220px; 
     background-color: #2563EB;
     color: white;
     font-weight: 600;
@@ -75,6 +74,7 @@
     cursor: pointer;
     transition: background-color 0.2s ease-in-out;
   }
+
   
   .hero-button:hover {
     background-color: #1D4ED8;

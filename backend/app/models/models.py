@@ -32,6 +32,7 @@ class Workflow(Base):
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
     visibility = Column(Enum("public", "private", "friend_only", name="workflow_visibility"), default="private")
+    active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
@@ -84,7 +85,7 @@ class UserService(Base):
     id = Column(BigInteger, primary_key=True, autoincrement=True)
     user_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     service_key = Column(String(64), nullable=False)
-    token_data = Column(VARBINARY(2048), nullable=False)
+    token_data = Column(Text, nullable=False)
     token_iv = Column(VARBINARY(16), nullable=False)
     token_tag = Column(VARBINARY(16), nullable=False)
     token_expires_at = Column(DateTime(timezone=True), nullable=True)

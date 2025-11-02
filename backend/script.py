@@ -3,25 +3,25 @@ from app.models.models import Workflow, WorkflowStep
 
 db = SessionLocal()
 
-# Remplace par l'ID de l'utilisateur concerné
+# Replace with the target user ID
 user_id = 6
 
-# Paramètres pour l'action Discord (guild_id à adapter)
+# Parameters for the Discord action (update guild_id as needed)
 discord_action_params = {
     "guild_id": "851867116343918603"
 }
 
 
-# Création du workflow
+# Create the workflow
 workflow = Workflow(
     user_id=user_id,
-    name="Discord join → Tweet",
+    name="Discord join -> Tweet",
 )
 db.add(workflow)
 db.commit()
 db.refresh(workflow)
 
-# Step 1 : Action Discord
+# Step 1: Discord action
 action_step = WorkflowStep(
     workflow_id=workflow.id,
     type="action",
@@ -32,7 +32,7 @@ action_step = WorkflowStep(
 )
 db.add(action_step)
 
-# Step 2 : Réaction Twitter
+# Step 2: Twitter reaction
 reaction_step = WorkflowStep(
     workflow_id=workflow.id,
     type="reaction",
@@ -44,6 +44,6 @@ reaction_step = WorkflowStep(
 db.add(reaction_step)
 
 db.commit()
-print(f"Workflow créé avec id={workflow.id}")
+print(f"Workflow created with id={workflow.id}")
 
 db.close()

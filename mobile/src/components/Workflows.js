@@ -1,36 +1,44 @@
 import React, { useState } from 'react';
 import { TouchableOpacity, Text, Image, StyleSheet, View, Switch } from 'react-native';
 import { BlurView } from 'expo-blur';
+import { useTranslation } from "react-i18next";
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { API_URL } from "../../config";
 
-const Workflows = ({ Name, Action, Reaction, onDelete }) => {
-  const [isEnabled, setIsEnabled] = useState(false);
-  const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+const Workflows = ({ Name, ActionLogo, ReactionLogo, onDelete, onEdit, isActive, workflowId, visibility }) => {
+  const navigation = useNavigation();
+  const { t } = useTranslation();
+  const [isEnabled, setIsEnabled] = useState(isActive);
 
   const handleDelete = () => {
     if (onDelete) onDelete();
   };
 
-  const getServiceImage = (service) => {
-    switch (service) {
-      case "Spotify":
-        return require('../../assets/Spotify.png');
-      case "Outlook":
-        return require('../../assets/outlook.png');
-      case "Steam":
-        return require('../../assets/steam.jpeg');
-      case "Faceit":
-        return require('../../assets/faceit.png');
-      case "X":
-        return require('../../assets/X.png');
-      case "Discord":
-        return require('../../assets/discord.png');
-      default:
-        return null;
-    }
+  const handleEdit = () => {
+    if (onEdit) onEdit();
   };
 
-  const imageAction = getServiceImage(Action);
-  const imageReaction = getServiceImage(Reaction);
+  const handleToggle = async () => {
+    setIsEnabled(prev => !prev);
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) {
+      navigation.replace('Login');
+      return;
+    }
+    try {
+      const response = await axios.patch(`${API_URL}/workflows/${workflowId}/toggle`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.status === 200) {
+        setIsEnabled(response.data.active);
+      }
+    } catch (error) {
+      console.log('Erreur lors du changement de statut du workflow:', error.response?.data || error.message);
+    }
+  };
 
   return (
     <View style={styles.workflowWrapper}>
@@ -43,11 +51,19 @@ const Workflows = ({ Name, Action, Reaction, onDelete }) => {
       <View style={styles.overlayContainer} />
 
       <View style={styles.content}>
+      <Ionicons
+        name={visibility === 'private' ? 'lock-closed' : 'lock-open'}
+        size={22}
+        color="#fff"
+      />
         <View style={styles.servicesRow}>
-          {imageAction && (
+          {ActionLogo && (
             <View style={styles.serviceContainer}>
               <View style={styles.logoContainer}>
-                <Image source={imageAction} style={styles.logo} />
+                <Image
+                  source={{ uri: ActionLogo || 'https://via.placeholder.com/40' }}
+                  style={styles.logo}
+                />
               </View>
             </View>
           )}
@@ -56,10 +72,13 @@ const Workflows = ({ Name, Action, Reaction, onDelete }) => {
             <Text style={styles.arrowText}>→</Text>
           </View>
 
-          {imageReaction && (
+          {ReactionLogo && (
             <View style={styles.serviceContainer}>
               <View style={styles.logoContainer}>
-                <Image source={imageReaction} style={styles.logo} />
+                <Image
+                  source={{ uri: ReactionLogo || 'https://via.placeholder.com/40' }}
+                  style={styles.logo}
+                />
               </View>
             </View>
           )}
@@ -69,9 +88,19 @@ const Workflows = ({ Name, Action, Reaction, onDelete }) => {
 
         <View style={styles.controlsRow}>
           <View style={styles.statusContainer}>
-            <View style={[styles.indicator, isEnabled ? styles.indicatorActive : styles.indicatorInactive]} />
-            <Text style={[styles.statusText, isEnabled ? styles.statusActive : styles.statusInactive]}>
-              {isEnabled ? 'Actif' : 'Inactif'}
+            <View
+              style={[
+                styles.indicator,
+                isEnabled ? styles.indicatorActive : styles.indicatorInactive,
+              ]}
+            />
+            <Text
+              style={[
+                styles.statusText,
+                isEnabled ? styles.statusActive : styles.statusInactive,
+              ]}
+            >
+              {isEnabled ? t("Actif") : t("Inactif")}
             </Text>
           </View>
 
@@ -79,17 +108,17 @@ const Workflows = ({ Name, Action, Reaction, onDelete }) => {
             trackColor={{ false: 'rgba(148,163,184,0.3)', true: 'rgba(16,185,129,0.4)' }}
             thumbColor={isEnabled ? '#34d399' : '#94a3b8'}
             ios_backgroundColor="rgba(148,163,184,0.2)"
-            onValueChange={toggleSwitch}
+            onValueChange={handleToggle}
             value={isEnabled}
             style={styles.switch}
           />
 
-          <TouchableOpacity
-            onPress={handleDelete}
-            activeOpacity={0.7}
-            style={styles.deleteButton}
-          >
-            <Text style={styles.deleteIcon}>🗑️</Text>
+          <TouchableOpacity testID='editButton' onPress={handleEdit} activeOpacity={0.7} style={styles.editButton}>
+            <Ionicons name="pencil" size={24} color="white" />
+          </TouchableOpacity>
+
+          <TouchableOpacity testID='deletebutton' onPress={handleDelete} activeOpacity={0.7} style={styles.deleteButton}>
+            <Ionicons name="trash" size={24} color="white" />
           </TouchableOpacity>
         </View>
       </View>
@@ -229,6 +258,20 @@ const styles = StyleSheet.create({
   },
   switch: {
     marginHorizontal: 12,
+  },
+  editButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: 'rgba(59,130,246,0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(59,130,246,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  editIcon: {
+    fontSize: 18,
   },
   deleteButton: {
     width: 40,

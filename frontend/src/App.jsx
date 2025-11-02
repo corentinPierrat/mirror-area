@@ -9,6 +9,13 @@ import Dashboard from "./Dashboard";
 import TestCatalog from "./components/TestCatalog"
 import Services from "./Services"
 import CreationPage from "./CreationPage"
+import Account from "./Account"
+import EditWorkflow from "./components/EditWorkflow"
+import OAuthSuccess from "./components/OAuthSuccess"
+import ThreeBackground from "./components/ThreeBackground"
+import EditPage from "./components/EditPage";
+import AdminDashboard from "./AdminPage"
+import Feeds from "./FeedPage"
 
 
 function App() {
@@ -26,8 +33,14 @@ function App() {
         <Route path="/services" element={<Services />} />
         <Route path="/TestCatalog" element={<TestCatalog />} />
         <Route path="/CreationPage" element={<CreationPage />} />
+        <Route path="/Account" element={<Account />} />
+        <Route path="/ThreeBackground" element={<ThreeBackground />} />
+        <Route path="/edit/:id" element={<EditPage />} />
+        <Route path="/admindashboard" element={<AdminDashboard />} />
+        <Route path="/Feeds" element={<Feeds />} />
       </Routes>
     </Router>
+    
   );
 }
 

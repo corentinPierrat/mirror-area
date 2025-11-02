@@ -3,8 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "../styles/VerifyCode.module.css";
 
-const API_URL = "http://10.18.207.151:8080";
-
+const API_URL = import.meta.env.VITE_API_URL;
 export default function VerifyCode() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -17,7 +16,7 @@ export default function VerifyCode() {
   const handleVerify = async (e) => {
     e.preventDefault();
     if (!code || code.length !== 6) {
-      setMessage("Code invalide");
+      setMessage("Invalid code");
       return;
     }
 
@@ -28,7 +27,7 @@ export default function VerifyCode() {
       const res = await axios.post(`${API_URL}/auth/verify`, { email, code });
       if (res.status === 200) navigate("/login");
     } catch (error) {
-      setMessage("Code invalide ou erreur serveur");
+      setMessage("Invalid code or server error");
     } finally {
       setLoading(false);
     }
@@ -38,15 +37,23 @@ export default function VerifyCode() {
     setMessage("");
     try {
       await axios.post(`${API_URL}/auth/resend-verification`, { email });
-      setMessage("Code renvoyé !");
+      setMessage("Code returned");
     } catch {
-      setMessage("Erreur lors de l'envoi du code");
+      setMessage("Error sending code");
     }
   };
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Code de vérification</h1>
+      <video
+        className={styles.videoBackground}
+        src="/bg-video.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+      />
+      <h1 className={styles.title}>Verification code</h1>
       <form onSubmit={handleVerify} className={styles.form}>
         <input
           type="text"
@@ -58,11 +65,11 @@ export default function VerifyCode() {
         />
         {message && <p className={styles.message}>{message}</p>}
         <button type="submit" disabled={loading} className={styles.button}>
-          {loading ? "Vérification..." : "Vérifier"}
+          {loading ? "Verification..." : "Verify"}
         </button>
       </form>
       <button onClick={handleResend} className={styles.link}>
-        Renvoyer le code
+      Resend code
       </button>
     </div>
   );

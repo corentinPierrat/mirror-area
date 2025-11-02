@@ -1,9 +1,5 @@
-/* HowItWorks.css */
-
 .how-it-works-section {
-    /* padding-top: 6rem; */
     padding-bottom: 6rem;
-    /* text-align: center; */
     margin-left: 180px;
   }
   
@@ -16,18 +12,13 @@
   .how-it-works-subtitle {
     color: #9CA3AF;
     max-width: 42rem;
-    /* margin-left: auto;
-    margin-right: auto; */
     margin-bottom: 3rem;
-    /* margin-left: 200px; */
   }
   
   .steps-container {
     display: flex;
     flex-direction: column;
-    /* justify-content: center; */
     gap: 2rem;
-    /* align-items: center; */
   }
   
   .step-card {

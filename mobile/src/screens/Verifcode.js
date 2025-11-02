@@ -3,12 +3,13 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-nativ
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import axios from 'axios';
-
-const API_URL = 'http://10.18.207.151:8080';
+import { API_URL } from "../../config";
+import { useTranslation } from "react-i18next";
 
 import { useNavigation } from '@react-navigation/native';
 
 export default function Verifcode({ route }) {
+  const { t } = useTranslation();
   const { email } = route.params;
   const navigation = useNavigation();
 
@@ -18,7 +19,7 @@ export default function Verifcode({ route }) {
 
   const handleVerify = async () => {
     if (code.length !== 6) {
-      setMessage('Le code de vérification est trop court');
+      setMessage(t("CodeTooShort"));
       return;
     }
     setLoading(true);
@@ -30,9 +31,9 @@ export default function Verifcode({ route }) {
       }
     } catch (error) {
       if (error?.response?.status === 422 || error?.response?.status === 400) {
-        setMessage('Code invalide');
+        setMessage(t("InvalidCode"));
       } else {
-        setMessage('Erreur serveur');
+        setMessage(t("NetWorkError"));
       }
     } finally {
       setLoading(false);
@@ -44,10 +45,10 @@ const handleresendCode = async () => {
     try {
         const response = await axios.post(`${API_URL}/auth/resend-verification`, { email });
         if (response.status === 200)
-            setMessage('Code renvoyé !');
+            setMessage(t("CodeResent"));
     } catch (error) {
         if (error?.response?.status === 422)
-            setMessage('Erreur lors de l\'envoi du code');
+            setMessage(t("ErrorResendCode"));
     }
 }
 
@@ -59,9 +60,9 @@ const handleresendCode = async () => {
       style={styles.container}
     >
       <View style={styles.content}>
-        <Text style={styles.title}>Code de vérification</Text>
+        <Text style={styles.title}>{t("VerifCode")}</Text>
         <Text style={styles.subtitle}>
-          Entrez le code envoyé à votre adresse email
+          {t("EnterCode")}
         </Text>
 
         <View style={styles.inputWrapper}>
@@ -103,7 +104,7 @@ const handleresendCode = async () => {
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.resendButton} onPress={handleresendCode}>
-          <Text style={styles.resendText}>Renvoyer le code</Text>
+          <Text style={styles.resendText}>{t("BtnResend")}</Text>
         </TouchableOpacity>
       </View>
     </LinearGradient>

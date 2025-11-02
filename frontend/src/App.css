@@ -1,5 +1,3 @@
-/* App.css ou index.css */
-
 body {
   margin: 0;  
   background-color: #02061a;
@@ -8,6 +6,4 @@ body {
 }
 
 #root {
-  /* On laisse #root vide pour qu'il ne contraigne rien */
-  /* width: 100%; */
 }

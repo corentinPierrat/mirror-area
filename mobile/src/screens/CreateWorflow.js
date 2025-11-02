@@ -1,68 +1,118 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Alert, TextInput } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Modal, TextInput } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
+import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { useNavigation } from '@react-navigation/native';
+import { API_URL } from "../../config";
+import { useTranslation } from "react-i18next";
 
 export default function CreateWorkflowScreen() {
-  const API_URL = 'http://10.18.207.151:8080';
+  const { t } = useTranslation();
+  const navigation = useNavigation();
   const [actions, setActions] = useState([]);
   const [selectedAction, setSelectedAction] = useState(null);
   const [WorkflowName, setWorkflowName] = useState('');
   const [reactions, setReactions] = useState([]);
   const [selectedReaction, setSelectedReaction] = useState(null);
-  const [serverId, setServerId] = useState('');
+  const [isActionModalVisible, setIsActionModalVisible] = useState(false);
+  const [isReactionModalVisible, setIsReactionModalVisible] = useState(false);
+  const [actionParams, setActionParams] = useState({});
+  const [reactionParams, setReactionParams] = useState({});
+  const [isActionParamsModalVisible, setIsActionParamsModalVisible] = useState(false);
+  const [isReactionParamsModalVisible, setIsReactionParamsModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [isError, setIsError] = useState(true);
+  const [URLs, setURLs] = useState([]);
 
   const fetchActions = async () => {
+    setMessage('');
     try {
       const token = await AsyncStorage.getItem('userToken');
-      if (!token) return console.log('No token found');
+      if (!token) {
+        navigation.navigate('Login');
+        return;
+      }
       const response = await axios.get(`${API_URL}/catalog/actions`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const keys = Object.keys(response.data || {});
-      const data = keys.length > 0 ? response.data[keys[0]] : [];
-      setActions(Array.isArray(data) ? data : [data]);
+    const data = Object.values(response.data || {}).flat();
+    setActions(data);
+    setIsActionModalVisible(true);
     } catch (error) {
-      console.error(error);
+      setIsError(true);
+      setMessage('Erreur lors de la récupération des actions.');
     }
   };
 
   const fetchReactions = async () => {
+    setMessage('');
     try {
       const token = await AsyncStorage.getItem('userToken');
-      if (!token) return console.log('No token found');
+      if (!token) {
+        navigation.navigate('Login');
+        return;
+      }
+
       const response = await axios.get(`${API_URL}/catalog/reactions`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const keys = Object.keys(response.data || {});
-      const data = keys.length > 0 ? response.data[keys[0]] : [];
-      setReactions(Array.isArray(data) ? data : [data]);
+    const data = Object.values(response.data || {}).flat();
+    setReactions(data);
+    setIsReactionModalVisible(true);
     } catch (error) {
-      console.error(error);
+      setIsError(true);
+      setMessage(t("GetReaction"));
     }
   };
 
   const handleSelectAction = (action) => {
     setSelectedAction(action);
-    setActions([]);
+
+    const params = action.payload_schema
+      ? Object.keys(action.payload_schema).reduce((acc, key) => {
+          acc[key] = '';
+          return acc;
+        }, {})
+      : {};
+
+    setActionParams(params);
+    setIsActionModalVisible(false);
+    setIsActionParamsModalVisible(true);
   };
+
 
   const handleSelectReaction = (reaction) => {
     setSelectedReaction(reaction);
-    setReactions([]);
+
+    const params = reaction.payload_schema
+      ? Object.keys(reaction.payload_schema).reduce((acc, key) => {
+          acc[key] = '';
+          return acc;
+        }, {})
+      : {};
+
+    setReactionParams(params);
+    setIsReactionModalVisible(false);
+    setIsReactionParamsModalVisible(true);
   };
 
   const createWorkflow = async () => {
   if (!selectedAction || !selectedReaction) {
-    return Alert.alert('Erreur', 'Veuillez sélectionner une action et une réaction.');
+    setIsError(true);
+    setMessage(t("SelectActionOrReaction"));
+    return;
   }
-
+    setLoading(true);
   try {
     const token = await AsyncStorage.getItem('userToken');
-    if (!token)
-      return console.log('No token found');
+    if (!token) {
+      navigation.navigate('Login');
+      return;
+    }
 
     const payload = {
       name: WorkflowName || "Mon Workflow",
@@ -71,119 +121,288 @@ export default function CreateWorkflowScreen() {
       steps: [
         {
           type: "action",
-          service: selectedAction?.service || "unknown",
-          event: selectedAction?.event || "unknown",
-          params: { "guild_id": serverId } || {}
+          service: selectedAction?.service,
+          event: selectedAction?.event,
+          params: actionParams
         },
         {
           type: "reaction",
-          service: selectedReaction?.service || "unknown",
-          event: selectedReaction?.event || "unknown",
-          params: selectedReaction?.params || {}
+          service: selectedReaction?.service,
+          event: selectedReaction?.event,
+          params: reactionParams
         }
       ]
     };
-
     const response = await axios.post(`${API_URL}/workflows/`, payload, {
       headers: { Authorization: `Bearer ${token}` },
     });
-
-    Alert.alert('Succès', 'Workflow créé avec succès !');
-    console.log(response.data);
-
+    setIsError(false);
+    setLoading(false);
+    setActions([]);
+    setSelectedAction(null);
+    setWorkflowName('');
+    setReactions([]);
+    setSelectedReaction(null);
+    setActionParams({});
+    setMessage("Workflow créé avec succès !");
   } catch (error) {
-    console.error(error);
-    Alert.alert('Erreur', 'Impossible de créer le workflow.');
+    setLoading(false);
+    setIsError(true);
+    setMessage("Impossible de créer le workflow.");
   }
 };
 
+  const getURL = async () => {
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) {
+      navigation.navigate('Login');
+      return;
+    }
+    try {
+      const res = await axios.get(`${API_URL}/oauth/services`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      console.log(res.data)
+      const urls = res.data.services.map(s => ({
+        provider: s.provider,
+        logo_url: s.logo_url,
+        connected: s.connected,
+      }));
+      console.log('Liste des URLs :', urls);
+      setURLs(urls);
+      } catch (error) {
+        setIsError(true);
+        setMessage(t("ErreurGetServices"));
+      }
+  };
+
+useEffect(() => {
+  getURL();
+}, []);
+
+useFocusEffect(
+  useCallback(() => {
+    getURL();
+  }, [])
+);
+
   return (
-    <LinearGradient
-      colors={['#171542', '#2f339e']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.container}
-    >
+    <LinearGradient colors={['#171542', '#2f339e']} style={styles.container}>
+      <Text style={styles.text}>{t("Create Workflow")}</Text>
       <View style={styles.workflowContainer}>
         <BlurView style={styles.blurContainer} intensity={80} tint="systemUltraThinMaterialDark" />
         <View style={styles.overlayContainer} />
-       <View style={styles.inputContainer}>
+        <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder={"Workflow Name"}
+            placeholder="Workflow Name"
             placeholderTextColor="#64748b"
             value={WorkflowName}
             onChangeText={setWorkflowName}
           />
         </View>
+
         <View style={styles.content}>
-          <TouchableOpacity style={styles.serviceWrapper} activeOpacity={0.7} onPress={fetchActions}>
+          <TouchableOpacity style={styles.serviceWrapper} onPress={fetchActions}>
             <View style={styles.logoContainer}>
-              <Image source={selectedAction ? require("../../assets/discord.png") : require("../../assets/None.png")} style={styles.logo} />
+              <Image source={selectedAction ? { uri: URLs.find(u => u.provider === selectedAction?.service)?.logo_url} : require("../../assets/None.png")} style={styles.logo}/>
             </View>
             <View style={[styles.badge, styles.badgeAction]}>
               <Text style={styles.badgeText}>{selectedAction?.title || 'Action'}</Text>
             </View>
           </TouchableOpacity>
 
-          {actions?.length > 0 && (
-            <ScrollView style={{ marginTop: 10, maxHeight: 150 }}>
-              {actions.map((action, index) => (
+        <Modal visible={isActionParamsModalVisible} transparent animationType="fade">
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContentWrapper}>
+              <BlurView style={styles.modalBlur} intensity={90} tint="systemUltraThinMaterialDark" />
+              <View style={styles.modalOverlay} />
+              <View style={styles.modalInnerContent}>
+                <Text style={styles.modalHeaderText}>{t("ParamAction")}</Text>
+                <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
+                  {selectedAction && Object.keys(actionParams).map((key) => (
+                    <View key={key} style={styles.paramInputWrapper}>
+                      <BlurView style={styles.paramInputBlur} intensity={60} tint="systemUltraThinMaterialDark" />
+                      <View style={styles.paramInputOverlay} />
+                      <TextInput
+                        style={styles.paramInput}
+                        placeholder={selectedAction.payload_schema[key].label || key}
+                        placeholderTextColor="#94a3b8"
+                        value={actionParams[key]}
+                        onChangeText={(text) => setActionParams({ ...actionParams, [key]: text })}
+                      />
+                    </View>
+                  ))}
+                </ScrollView>
+
                 <TouchableOpacity
-                  key={index}
-                  style={{ padding: 10, backgroundColor: 'rgba(255,255,255,0.1)', marginVertical: 4, borderRadius: 8 }}
-                  onPress={() => handleSelectAction(action)}
+                  onPress={() => setIsActionParamsModalVisible(false)}
+                  style={styles.modalButton}
+                  testID='SaveButtonAction'
                 >
-                  <Text style={{ color: '#fff', fontWeight: '600' }}>{action?.title || 'Titre inconnu'}</Text>
-                  <Text style={{ color: '#fff' }}>{action?.description || 'Description indisponible'}</Text>
+                  <BlurView style={styles.modalButtonBlur} intensity={70} tint="systemUltraThinMaterialDark" />
+                  <View style={styles.modalButtonOverlay} />
+                  <Text style={styles.modalButtonText}>{t("Enregistrer")}</Text>
                 </TouchableOpacity>
-              ))}
-               <TextInput
-                    style={styles.input}
-                    placeholder={"Server ID"}
-                    placeholderTextColor="#64748b"
-                    value={serverId}
-                    onChangeText={setServerId}
-                  />
-            </ScrollView>
-          )}
+              </View>
+            </View>
+          </View>
+        </Modal>
+
+          <Modal visible={isActionModalVisible} transparent animationType="fade">
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContentWrapper}>
+                <BlurView style={styles.modalBlur} intensity={90} tint="systemUltraThinMaterialDark" />
+                <View style={styles.modalOverlay} />
+                <View style={styles.modalInnerContent}>
+                  <Text style={styles.modalHeaderText}>{t("SelectAction")}</Text>
+                  <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
+                    {Object.entries(
+                      actions.reduce((acc, action) => {
+                        if (!acc[action.service]) acc[action.service] = [];
+                        acc[action.service].push(action);
+                        return acc;
+                      }, {})
+                    ).map(([service, serviceActions]) => (
+                      <View key={service}>
+                        <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700', marginVertical: 10 }}>{service.charAt(0).toUpperCase() + service.slice(1)}</Text>
+                        {serviceActions.map((action, index) => (
+                          <TouchableOpacity
+                              key={index}
+                              style={[
+                                styles.modalItemWrapper,
+                                !URLs.find(u => u.provider === action?.service)?.connected && styles.modalItemDisabled
+                              ]}
+                              onPress={() => handleSelectAction(action)}
+                              disabled={!URLs.find(u => u.provider === action?.service)?.connected}
+                            >
+                            <BlurView style={styles.modalItemBlur} intensity={50} tint="systemUltraThinMaterialDark" />
+                            <View style={styles.modalItemOverlay} />
+                            <View style={styles.modalItemContent}>
+                              <Text style={styles.modalTitle}>{action?.title || 'Titre inconnu'}</Text>
+                              <Text style={styles.modalDesc}>{action?.description || 'Description indisponible'}</Text>
+                            </View>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    ))}
+                  </ScrollView>
+
+                  <TouchableOpacity onPress={() => setIsActionModalVisible(false)} style={styles.modalButton}>
+                    <BlurView style={styles.modalButtonBlur} intensity={70} tint="systemUltraThinMaterialDark" />
+                    <View style={styles.modalButtonOverlay} />
+                    <Text style={styles.modalButtonText}>{t("Close")}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
 
           <View style={styles.connectorWrapper}>
             <View style={styles.connectorLine} />
           </View>
 
-          <TouchableOpacity style={styles.serviceWrapper} activeOpacity={0.7} onPress={fetchReactions}>
+          <TouchableOpacity style={styles.serviceWrapper} onPress={fetchReactions}>
             <View style={styles.logoContainer}>
-              <Image source={selectedReaction ? require("../../assets/X.png") : require("../../assets/None.png")} style={styles.logo} />
+              <Image source={selectedReaction ? { uri: URLs.find(u => u.provider === selectedReaction?.service)?.logo_url} : require("../../assets/None.png")} style={styles.logo}/>
             </View>
             <View style={[styles.badge, styles.badgeReaction]}>
               <Text style={styles.badgeText}>{selectedReaction?.title || 'Reaction'}</Text>
             </View>
           </TouchableOpacity>
 
-          {reactions?.length > 0 && (
-            <ScrollView style={{ marginTop: 10, maxHeight: 150 }}>
-              {reactions.map((reaction, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={{ padding: 10, backgroundColor: 'rgba(255,255,255,0.1)', marginVertical: 4, borderRadius: 8 }}
-                  onPress={() => handleSelectReaction(reaction)}
-                >
-                  <Text style={{ color: '#fff', fontWeight: '600' }}>{reaction?.title || 'Titre inconnu'}</Text>
-                  <Text style={{ color: '#fff' }}>{reaction?.description || 'Description indisponible'}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          )}
+          <Modal visible={isReactionParamsModalVisible} transparent animationType="fade">
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContentWrapper}>
+                <BlurView style={styles.modalBlur} intensity={90} tint="systemUltraThinMaterialDark" />
+                <View style={styles.modalOverlay} />
+                <View style={styles.modalInnerContent}>
+                  <Text style={styles.modalHeaderText}>{t("ParamReaction")}</Text>
+                  <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
+                    {selectedReaction && Object.keys(reactionParams).map((key) => (
+                      <View key={key} style={styles.paramInputWrapper}>
+                        <BlurView style={styles.paramInputBlur} intensity={60} tint="systemUltraThinMaterialDark" />
+                        <View style={styles.paramInputOverlay} />
+                        <TextInput
+                          style={styles.paramInput}
+                          placeholder={selectedReaction.payload_schema[key].label || key}
+                          placeholderTextColor="#94a3b8"
+                          value={reactionParams[key]}
+                          onChangeText={(text) => setReactionParams({ ...reactionParams, [key]: text })}
+                        />
+                      </View>
+                    ))}
+                  </ScrollView>
 
-          <TouchableOpacity
-            style={[styles.addButton, { marginTop: 20, alignSelf: 'center' }]}
-            activeOpacity={0.8}
-            onPress={createWorkflow}
-          >
+                  <TouchableOpacity
+                    onPress={() => setIsReactionParamsModalVisible(false)}
+                    style={styles.modalButton}
+                    testID='SaveButtonReaction'
+                  >
+                    <BlurView style={styles.modalButtonBlur} intensity={70} tint="systemUltraThinMaterialDark" />
+                    <View style={styles.modalButtonOverlay} />
+                    <Text style={styles.modalButtonText}>{t("Enregistrer")}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+
+          <Modal visible={isReactionModalVisible} transparent animationType="fade">
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContentWrapper}>
+                <BlurView style={styles.modalBlur} intensity={90} tint="systemUltraThinMaterialDark" />
+                <View style={styles.modalOverlay} />
+                <View style={styles.modalInnerContent}>
+                  <Text style={styles.modalHeaderText}>{t("SelectReaction")}</Text>
+                  <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
+                    {Object.entries(
+                      reactions.reduce((acc, reaction) => {
+                        if (!acc[reaction.service]) acc[reaction.service] = [];
+                        acc[reaction.service].push(reaction);
+                        return acc;
+                      }, {})
+                    ).map(([service, serviceReactions]) => (
+                      <View key={service}>
+                        <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700', marginVertical: 10 }}>
+                          {service.charAt(0).toUpperCase() + service.slice(1)}
+                        </Text>
+                        {serviceReactions.map((reaction, index) => (
+                          <TouchableOpacity
+                            key={index}
+                            style={[styles.modalItemWrapper, !URLs.find(u => u.provider === reaction?.service)?.connected && styles.modalItemDisabled
+                            ]}
+                            onPress={() => handleSelectReaction(reaction)}
+                            disabled={!URLs.find(u => u.provider === reaction?.service)?.connected}
+                          >
+
+                            <BlurView style={styles.modalItemBlur} intensity={50} tint="systemUltraThinMaterialDark" />
+                            <View style={styles.modalItemOverlay} />
+                            <View style={styles.modalItemContent}>
+                              <Text style={styles.modalTitle}>{reaction?.title || 'Titre inconnu'}</Text>
+                              <Text style={styles.modalDesc}>{reaction?.description || 'Description indisponible'}</Text>
+                            </View>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    ))}
+                  </ScrollView>
+                  <TouchableOpacity onPress={() => setIsReactionModalVisible(false)} style={styles.modalButton}>
+                    <BlurView style={styles.modalButtonBlur} intensity={70} tint="systemUltraThinMaterialDark" />
+                    <View style={styles.modalButtonOverlay} />
+                    <Text style={styles.modalButtonText}>{t("Close")}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+
+          {message ? (<Text style={[styles.message, { color: isError ? '#ff4d4d' : '#63f614ff' }]}>{message}</Text>) : null}
+
+          <TouchableOpacity style={[styles.addButton, { marginTop: 70, alignSelf: 'center' }]} testID='buttonCreateWorkflow' onPress={createWorkflow}>
             <BlurView style={styles.addButtonBlur} intensity={60} tint="systemUltraThinMaterialDark" />
             <View style={styles.addButtonOverlay} />
-            <Text style={[styles.addButtonIcon, { fontSize: 18 }]}>Créer Workflow</Text>
+            <Text style={[styles.addButtonIcon, { fontSize: 18 }]}>{loading ? (t("Create Workflow") + '...') : t("Create Workflow")}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -197,7 +416,7 @@ const styles = StyleSheet.create({
   blurContainer: { ...StyleSheet.absoluteFillObject, borderRadius: 24 },
   overlayContainer: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
   content: { paddingVertical: 32, paddingHorizontal: 24 },
-  serviceWrapper: { alignItems: 'center', marginVertical: 8 },
+  serviceWrapper: { alignItems: 'center', marginVertical: 8, },
   logoContainer: { width: 64, height: 64, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.15)', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', shadowColor: 'rgba(0,0,0,0.2)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 6, marginBottom: 12 },
   logo: { width: 40, height: 40, resizeMode: 'contain', borderRadius: 6 },
   badge: { paddingHorizontal: 12, paddingVertical: 4, borderRadius: 8, borderWidth: 1 },
@@ -232,5 +451,154 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 6,
   },
-
+  modalContainer: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    backgroundColor: 'rgba(0,0,0,0.85)',
+    paddingHorizontal: 20,
+  },
+  modalContentWrapper: { 
+    width: '100%', 
+    maxWidth: 400,
+    maxHeight: '80%', 
+    borderRadius: 24, 
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    elevation: 16,
+  },
+  modalBlur: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 24,
+  },
+  modalOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(30,30,60,0.85)',
+    borderRadius: 24,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.25)',
+  },
+  modalInnerContent: {
+    padding: 24,
+    height: '100%',
+  },
+  modalHeaderText: {
+    color: '#fff',
+    fontSize: 22,
+    fontWeight: '700',
+    marginBottom: 20,
+    textAlign: 'center',
+    letterSpacing: 0.5,
+  },
+  modalScrollView: {
+    flex: 1,
+    marginBottom: 16,
+  },
+  modalItemWrapper: {
+    marginVertical: 6,
+    borderRadius: 14,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  modalItemBlur: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  modalItemOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 14,
+  },
+  modalItemContent: {
+    padding: 14,
+  },
+  modalTitle: { 
+    color: '#fff', 
+    fontWeight: '700', 
+    fontSize: 16,
+    marginBottom: 4,
+    letterSpacing: 0.3,
+  },
+  modalDesc: { 
+    color: 'rgba(255,255,255,0.75)', 
+    fontSize: 13, 
+    lineHeight: 18,
+  },
+  modalButton: {
+    height: 50,
+    borderRadius: 16,
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  modalButtonBlur: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  modalButtonOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(99,102,241,0.3)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(99,102,241,0.5)',
+    borderRadius: 16,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 16,
+    letterSpacing: 0.5,
+  },
+  paramInputWrapper: {
+    marginBottom: 16,
+    borderRadius: 12,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  paramInputBlur: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  paramInputOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 12,
+  },
+  paramInput: {
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '500',
+  },
+  text: {
+    fontSize: 26,
+    color: '#fff',
+    marginBottom: 20,
+  },
+  message: {
+    marginBottom: 15,
+    textAlign: 'center',
+    fontSize: 15,
+  },
+  modalItemDisabled: {
+    opacity: 0.4,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  },
 });

@@ -1,8 +1,8 @@
 .container {
-  padding: 40px 20px;
-  /* min-height: 80vh; */
-  /* background: linear-gradient(135deg, #171542 0%, #2f339e 100%); */
+  padding: 0px 20px;
   color: #fff;
+  position: relative;
+  z-index: 2;   
 }
 
 .title {
@@ -12,9 +12,10 @@
 }
 
 .workflowList {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(calc(100% / 3 - 20px), 1fr));
+  gap: 20px;
+  width: 100%;
 }
 
 .noWorkflows {

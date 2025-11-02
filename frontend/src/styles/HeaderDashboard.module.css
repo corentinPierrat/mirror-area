@@ -1,109 +1,117 @@
-/* Header.css */
-
 .header {
-    padding: 1rem 2rem;
-    flex-direction: column;
-    width: 100%;  
-  }
-  
-  .navbar {
+  padding: 1rem 2rem 1em 0em;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 70px;
+  position: relative;
+  z-index: 2;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.navLeft {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.ulElem {
+  margin-top: 40px;
+}
+
+.sectionTitle {
+  margin-top: 30px;
+  font-size: 1rem;
+  color: #c0c0c0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.navLinks {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  padding: 0;
+  margin: 15px 0;
+  gap: 1rem;
+}
+
+.navLinks li {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.navLinks li:hover {
+  transform: translateX(3px);
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0c214d;
+  border-radius: 12px;
+  padding: 8px;
+  color: white;
+}
+
+.navLinks a {
+  color: #d1d5db;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.2s ease-in-out;
+}
+
+.navLinks a:hover {
+  color: white;
+}
+
+.docSection {
+  border-radius: 20px;
+  padding: 25px;
+  margin-top: 40px;
+  background: none;
+}
+
+.docSection h2 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+}
+
+.helpIcon {
+  color: #0c214d;
+}
+
+.docSection p {
+  margin: 5px 0 10px 0;
+  color: #bdbdbd;
+}
+
+.docSection a {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background-color: #0000006e;
+  color: white;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.docSection a:hover {
+  background-color: #00000090;
+}
+
+@media (min-width: 768px) {
+  .navLinks {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
   }
-
-  .navicons {
-    width: 30px;
-    height: 30px;
-    border-radius: 15px 15px;
-    padding: 10px;
-    background-color:#0c214d; 
-  }
-  
-  .nav-left {
-    align-items: center;
-    gap: 2.5rem;
-  }
-  
-  .logo {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-top: -20px;
-    color: white;
-    text-decoration: none;
-  }
-
-  .ul_elem{
-    margin-top: 60px;
-  }
-  
-  .nav-links {
-    display: none;
-    flex-direction: column;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    align-items: left;
-    gap: 2rem;
-  }
-  
-  .nav-links li {
-    justify-content: center;
-    align-items: center;
-  }
-
-  .nav-links a {
-    margin-left: 30px;
-    color: #D1D5DB;
-    text-decoration: none;
-    transition: color 0.2s ease-in-out;
-  }
-  
-  .nav-links a:hover {
-    color: white;
-  }
-  
-  .nav-right {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-  
-  .nav-right a {
-     text-decoration: none;
-  }
-  
-  .signin-btn {
-    color: #D1D5DB;
-    transition: color 0.2s ease-in-out;
-  }
-  
-  .signin-btn:hover {
-    color: white;
-  }
-  
-  .signup-btn {
-    background-color: #2563EB;
-    color: white;
-    font-weight: 500;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    transition: background-color 0.2s ease-in-out;
-  }
-  
-  .signup-btn:hover {
-    background-color: #1D4ED8;
-  }
-
-  .doc-section {
-    background-color: #1D4ED8;
-    border-radius: 20px 20px;
-    padding: 20px;
-    margin-top: 50px;
-  }
-  
-  @media (min-width: 768px) {
-    .nav-links {
-      display: flex;
-    }
-  }
+}
