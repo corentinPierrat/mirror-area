@@ -27,7 +27,7 @@ export default function Dashboard() {
     const tokenFromStorage = localStorage.getItem('userToken');
     
     if (!tokenFromStorage && !tokenFromUrl) {
-      console.log("Aucun token trouvé, redirection vers login.");
+      console.log("No token found, redirecting to login.");
       navigate('/login', { replace: true });
     }
     
@@ -41,7 +41,7 @@ export default function Dashboard() {
         height: "100vh", display: "flex", justifyContent: "center",
         alignItems: "center", background: "#0d0d0d", color: "white"
       }}>
-        Vérification de l'authentification...
+        Checking authentication...
       </div>
     );
   }

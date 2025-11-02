@@ -18,7 +18,7 @@ export default function EditWorkflowModal({ workflowId, onClose, onSave }) {
         });
         setWorkflowData(res.data);
       } catch (error) {
-        console.error("Impossible de charger les détails du workflow", error);
+        console.error("Unable to load workflow details", error);
         onClose();
       }
       setLoading(false);
@@ -44,18 +44,18 @@ export default function EditWorkflowModal({ workflowId, onClose, onSave }) {
       }, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      alert('Workflow mis à jour !');
+      alert("Workflow updated!");
       onSave();
     } catch (error) {
-      console.error("Erreur lors de la mise à jour", error);
-      alert("La mise à jour a échoué.");
+      console.error("Error during update", error);
+      alert("The update failed.");
     }
   };
 
   if (loading || !workflowData) {
     return (
       <div className={styles.modalOverlay}>
-        <div className={styles.modalContent}><p>Chargement...</p></div>
+        <div className={styles.modalContent}><p>Loading...</p></div>
       </div>
     );
   }
@@ -63,14 +63,14 @@ export default function EditWorkflowModal({ workflowId, onClose, onSave }) {
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
-        <h2>Modifier le Workflow</h2>
+        <h2>Edit Workflow</h2>
         <div className={styles.formGroup}>
-          <label>Nom du Workflow</label>
+          <label>Workflow Name</label>
           <input type="text" value={workflowData.name} onChange={handleNameChange} className={styles.input} />
         </div>
         {workflowData.steps.map((step, index) => (
           <div key={index} className={styles.stepContainer}>
-            <h3>{step.type === 'action' ? 'Action' : 'Réaction'}: {step.event}</h3>
+            <h3>{step.type === 'action' ? 'Action' : 'Reaction'}: {step.event}</h3>
             {Object.keys(step.params || {}).length > 0 ? (
               Object.keys(step.params).map((paramKey) => (
                 <div key={paramKey} className={styles.formGroup}>
@@ -78,12 +78,12 @@ export default function EditWorkflowModal({ workflowId, onClose, onSave }) {
                   <input type="text" value={step.params[paramKey]} onChange={(e) => handleParamChange(index, paramKey, e.target.value)} className={styles.input} />
                 </div>
               ))
-            ) : <p className={styles.noParams}>Ce module n'a pas de paramètres à configurer.</p>}
+            ) : <p className={styles.noParams}>This module has no configurable parameters.</p>}
           </div>
         ))}
         <div className={styles.modalActions}>
-          <button onClick={onClose} className={styles.cancelButton}>Annuler</button>
-          <button onClick={handleSaveChanges} className={styles.saveButton}>Enregistrer</button>
+          <button onClick={onClose} className={styles.cancelButton}>Cancel</button>
+          <button onClick={handleSaveChanges} className={styles.saveButton}>Save</button>
         </div>
       </div>
     </div>

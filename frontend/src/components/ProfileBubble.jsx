@@ -28,7 +28,7 @@ export default function ProfileBubble() {
   }
 
   if (!user) {
-    return <div className={styles.loading}>Chargement...</div>;
+    return <div className={styles.loading}>Loading...</div>;
   }
 
   const avatarUrl = user.profile_image_url

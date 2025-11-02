@@ -20,7 +20,7 @@ export default function Header() {
           });
           setUser(res.data);
         } catch (err) {
-          console.error("Token invalide ou expiré, déconnexion...", err);
+          console.error("Invalid or expired token, logging out...", err);
           localStorage.removeItem("userToken");
         }
       };

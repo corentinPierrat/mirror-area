@@ -37,7 +37,7 @@ function Weather() {
         time: null,
         is_day: 1,
         loading: false,
-        error: "Impossible de récupérer la météo. Vérifiez le serveur ou CORS.",
+        error: "Unable to retrieve the weather. Check the server or CORS.",
       });
     }
   };
@@ -48,9 +48,9 @@ function Weather() {
 
   const renderReaction = () => {
     const { temperature } = weather;
-    if (temperature < 10) return "❄️ Il fait froid, mets une veste !";
-    if (temperature > 25) return "🔥 Il fait chaud, pense à boire de l'eau !";
-    return "🙂 La météo est agréable.";
+    if (temperature < 10) return "❄️ It's cold, grab a jacket!";
+    if (temperature > 25) return "🔥 It's hot, remember to drink water!";
+    return "🙂 The weather is pleasant.";
   };
 
   const getBackground = () => {
@@ -75,23 +75,23 @@ return (
       style={{ top: "50%", animationDuration: "80s", left: "-200px" }}
     ></div>
     <div className="weather-card">
-      <h1>Météo actuelle</h1>
+      <h1>Current Weather</h1>
       {weather.loading ? (
-        <p>Chargement...</p>
+        <p>Loading...</p>
       ) : weather.error ? (
         <p className="error">{weather.error}</p>
       ) : (
         <>
-          <p className="temperature">🌡️ Température: {weather.temperature}°C</p>
-          <p className="windspeed">💨 Vitesse du vent: {weather.windspeed} km/h</p>
-          <p className="winddirection">🧭 Direction du vent: {windCompass(weather.winddirection)}</p>
+          <p className="temperature">🌡️ Temperature: {weather.temperature}°C</p>
+          <p className="windspeed">💨 Wind speed: {weather.windspeed} km/h</p>
+          <p className="winddirection">🧭 Wind direction: {windCompass(weather.winddirection)}</p>
           <p className="time">
-            ⏱️ Heure:{" "}
+            ⏱️ Time:{" "}
             {new Date(weather.time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
           </p>
-          <p className="weathercode">🌤️ Code météo: {weather.weathercode}</p>
+          <p className="weathercode">🌤️ Weather code: {weather.weathercode}</p>
           <p className="reaction">{renderReaction()}</p>
-          <button onClick={fetchWeather}>🔄 Rafraîchir</button>
+          <button onClick={fetchWeather}>🔄 Refresh</button>
         </>
       )}
     </div>

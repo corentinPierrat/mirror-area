@@ -131,7 +131,7 @@ export default function AdminDashboard() {
     setLoading(true);
     try {
       const res = await axios.get(`${API_URL}/admin/stats`, getAuthHeaders());
-      console.log("DEBUG: Données brutes de /admin/stats:", res.data);
+      console.log("DEBUG: Raw data from /admin/stats:", res.data);
       setStats(res.data);
     } catch (err) {
       handleApiError(err, "stats");
@@ -208,7 +208,7 @@ export default function AdminDashboard() {
   };
 
   const handleDeleteWorkflow = async (workflowId) => {
-    console.warn(`workflow deletion reques ${workflowId}`);
+    console.warn(`workflow deletion request ${workflowId}`);
     try {
       await axios.delete(
         `${API_URL}/admin/workflows/${workflowId}`,
@@ -259,7 +259,7 @@ export default function AdminDashboard() {
               <button
                 className={styles.editBtn}
                 onClick={() => {
-                  console.log("DEBUG: Bouton 'Edit' cliqué. Utilisateur:", user);
+                  console.log("DEBUG: Edit button clicked. User:", user);
                   setEditingUser(user);
                 }}
               >
@@ -376,4 +376,3 @@ export default function AdminDashboard() {
     </Fragment>
   );
 }
-
