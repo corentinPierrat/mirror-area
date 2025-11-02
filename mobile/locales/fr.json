@@ -53,5 +53,13 @@
   "VerifCode": "Code de vérification",
   "EnterCode": "Entrez le code envoyé à votre adresse email",
   "BtnResend": "Renvoyer le code",
-  "Verif": "Vérification"
+  "Verif": "Vérification",
+  "Created by": "Créé par",
+  "CreateAccount": "Créer un compte",
+  "Feed": "Fil d'actualité",
+  "Loading...": "Chargement...",
+  "No workflows in feed": "Aucun workflow dans le fil",
+  "Search workflows...": "Rechercher des workflows...",
+  "All": "Tous",
+  "No workflows match your filters": "Aucun workflow ne correspond à vos filtres"
 }

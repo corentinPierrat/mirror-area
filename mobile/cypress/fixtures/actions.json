@@ -1,0 +1,11 @@
+{
+  "discord": [
+    {
+      "service": "discord",
+      "event": "message_received",
+      "title": "On Message",
+      "description": "Triggers when a message is received",
+      "payload_schema": { "channel": { "label": "Channel" } }
+    }
+  ]
+}

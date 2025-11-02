@@ -53,5 +53,12 @@
   "VerifCode": "验证码",
   "EnterCode": "请输入发送到您邮箱的验证码",
   "BtnResend": "重新发送验证码",
-  "Verif": "验证"
+  "Verif": "验证",
+  "Created by": "创建者",
+  "Feed": "动态",
+  "Loading...": "加载中...",
+  "No workflows in feed": "动态中没有工作流",
+  "Search workflows...": "搜索工作流...",
+  "All": "全部",
+  "No workflows match your filters": "没有工作流符合您的筛选条件"
 }

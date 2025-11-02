@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Modal, TextInput } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
+import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
@@ -179,6 +180,12 @@ useEffect(() => {
   getURL();
 }, []);
 
+useFocusEffect(
+  useCallback(() => {
+    getURL();
+  }, [])
+);
+
   return (
     <LinearGradient colors={['#171542', '#2f339e']} style={styles.container}>
       <Text style={styles.text}>{t("Create Workflow")}</Text>
@@ -231,6 +238,7 @@ useEffect(() => {
                 <TouchableOpacity
                   onPress={() => setIsActionParamsModalVisible(false)}
                   style={styles.modalButton}
+                  testID='SaveButtonAction'
                 >
                   <BlurView style={styles.modalButtonBlur} intensity={70} tint="systemUltraThinMaterialDark" />
                   <View style={styles.modalButtonOverlay} />
@@ -329,6 +337,7 @@ useEffect(() => {
                   <TouchableOpacity
                     onPress={() => setIsReactionParamsModalVisible(false)}
                     style={styles.modalButton}
+                    testID='SaveButtonReaction'
                   >
                     <BlurView style={styles.modalButtonBlur} intensity={70} tint="systemUltraThinMaterialDark" />
                     <View style={styles.modalButtonOverlay} />
@@ -390,7 +399,7 @@ useEffect(() => {
 
           {message ? (<Text style={[styles.message, { color: isError ? '#ff4d4d' : '#63f614ff' }]}>{message}</Text>) : null}
 
-          <TouchableOpacity style={[styles.addButton, { marginTop: 70, alignSelf: 'center' }]} onPress={createWorkflow}>
+          <TouchableOpacity style={[styles.addButton, { marginTop: 70, alignSelf: 'center' }]} testID='buttonCreateWorkflow' onPress={createWorkflow}>
             <BlurView style={styles.addButtonBlur} intensity={60} tint="systemUltraThinMaterialDark" />
             <View style={styles.addButtonOverlay} />
             <Text style={[styles.addButtonIcon, { fontSize: 18 }]}>{loading ? (t("Create Workflow") + '...') : t("Create Workflow")}</Text>

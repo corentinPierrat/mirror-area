@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import "../components/i18n";
@@ -175,6 +176,12 @@ const handleUploadProfileImage = async (navigation) => {
     handleUpdateProfile();
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+      handleUpdateProfile();
+    }, [])
+  );
+
   return (
     <LinearGradient
       colors={['#171542', '#2f339e']}
@@ -191,6 +198,7 @@ const handleUploadProfileImage = async (navigation) => {
         >
           {isAdmin && (
             <Pressable
+              testID="adminButton"
               onPress={() => navigation.navigate('Admin')}
               style={styles.adminButtonTop}
             >
@@ -247,7 +255,7 @@ const handleUploadProfileImage = async (navigation) => {
             />
           </View>
 
-          <TouchableOpacity style={styles.changePasswordButton} onPress={handleChangePassword}>
+          <TouchableOpacity testID='changepasswordButton' style={styles.changePasswordButton} onPress={handleChangePassword}>
             <Text style={styles.changePasswordButtonText}>{t("changePassword")}</Text>
           </TouchableOpacity>
         </View>

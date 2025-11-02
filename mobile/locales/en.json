@@ -52,5 +52,13 @@
   "EnterCode": "Enter the code sent to your email address",
   "BtnResend": "Resend code",
   "ParamAction": "Action parameter",
-  "Verif": "Verification"
+  "Verif": "Verification",
+  "Created by": "Created by",
+  "CreateAccount": "Create Account",
+  "Feed": "Feed",
+  "Loading...": "Loading...",
+  "No workflows in feed": "No workflows in feed",
+  "Search workflows...": "Search workflows...",
+  "All": "All",
+  "No workflows match your filters": "No workflows match your filters"
 }

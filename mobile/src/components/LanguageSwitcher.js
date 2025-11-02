@@ -25,7 +25,7 @@ export default function LanguageSwitcher() {
   };
 
   return (
-    <TouchableOpacity onPress={switchLanguage}>
+    <TouchableOpacity testID='languageSwitcher' onPress={switchLanguage}>
       <Image
         source={flags[lang]}
         style={{

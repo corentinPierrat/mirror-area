@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   server:
     image: node:20-alpine
@@ -14,8 +12,21 @@ services:
     restart: unless-stopped
 
   client_mobile:
-    build: ./mobile
+    build:
+      context: ./mobile
+      dockerfile: Dockerfile.build
     container_name: area_mobile
+    volumes:
+      - shared-bundle:/shared
+    environment:
+      - EXPO_TOKEN=32byPGz6WVXbT2bDtjXlFx1oNWIfIaJIGNb1ItwY
+      - EAS_NO_VCS=1
+      - EAS_LOCAL_BUILD_SKIP_CLEANUP=1
+    restart: "no"
+
+  mobile_dev:
+    build: ./mobile
+    container_name: area_mobile_dev
     volumes:
       - shared-bundle:/shared
     ports:

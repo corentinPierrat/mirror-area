@@ -23,7 +23,7 @@
   "Connexion": "Verbindung",
   "Email": "E-Mail",
   "Password": "Passwort",
-  "Login": "Anmelden",
+  "Logine": "Anmelden",
   "PasswordDoesNotMatch": "Die Passwörter stimmen nicht überein",
   "ErrorDeleteAccount": "Fehler beim Löschen des Kontos",
   "Connected": "Verbunden",
@@ -53,5 +53,12 @@
   "VerifCode": "Bestätigungscode",
   "EnterCode": "Geben Sie den an Ihre E-Mail gesendeten Code ein",
   "BtnResend": "Code erneut senden",
-  "Verif": "Überprüfung"
+  "Verif": "Überprüfung",
+  "Created by": "Erstellt von",
+  "Feed": "Feed",
+  "Loading...": "Laden...",
+  "No workflows in feed": "Keine Workflows im Feed",
+  "Search workflows...": "Workflows suchen...",
+  "All": "Alle",
+  "No workflows match your filters": "Keine Workflows entsprechen Ihren Filtern"
 }

@@ -1,0 +1,13 @@
+[
+  {
+    "id": 201,
+    "name": "Public Discord to Spotify",
+    "description": "A handy automation",
+    "author": "Moddy Defender",
+    "profile_picture": "/uploads/profile_images/test.jpg",
+    "steps": [
+      { "type": "action", "service": "discord", "event": "message_received", "params": { "channel": "music" } },
+      { "type": "reaction", "service": "spotify", "event": "add_to_playlist", "params": { "playlist": "Party" } }
+    ]
+  }
+]

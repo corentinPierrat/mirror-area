@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import OAuthButton from '../components/OauthButton';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -44,9 +45,11 @@ export default function ServiceScreen() {
     }
   }, [fetchStatus]);
 
-  useEffect(() => {
-    loadServices();
-  }, [loadServices]);
+  useFocusEffect(
+    useCallback(() => {
+      loadServices();
+    }, [loadServices])
+  );
 
   useEffect(() => {
     const handleDeepLink = async ({ url }) => {

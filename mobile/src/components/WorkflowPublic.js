@@ -4,8 +4,7 @@ import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
-// Simplified workflow card for the public feed: no toggle/edit/delete/visibility
-export default function WorkflowPublic({ Name, ActionLogo, ReactionLogo, onAdd }) {
+export default function WorkflowPublic({ Name, Author, ProfilePicture, ActionLogo, ReactionLogo, onAdd }) {
   const { t } = useTranslation();
 
   return (
@@ -19,6 +18,23 @@ export default function WorkflowPublic({ Name, ActionLogo, ReactionLogo, onAdd }
       <View style={styles.overlayContainer} />
 
       <View style={styles.content}>
+        <View style={styles.topHeader}>
+          {Author && (
+            <View style={styles.authorHeader}>
+              <Image 
+                source={{ uri: ProfilePicture }} 
+                style={styles.profilePicture}
+                defaultSource={require('../../assets/icon.png')}
+              />
+              <Text style={styles.authorName}>{Author}</Text>
+            </View>
+          )}
+
+          <TouchableOpacity testID='addButton' onPress={onAdd} activeOpacity={0.85} style={styles.addButton}>
+            <Ionicons name="add-circle-outline" size={24} color="#22c55e" />
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.servicesRow}>
           {ActionLogo && (
             <View style={styles.serviceContainer}>
@@ -42,13 +58,6 @@ export default function WorkflowPublic({ Name, ActionLogo, ReactionLogo, onAdd }
         </View>
 
         <Text style={styles.workflowName}>{Name}</Text>
-
-        <View style={styles.controlsRow}>
-          <TouchableOpacity onPress={onAdd} activeOpacity={0.85} style={styles.addButton}>
-            <Ionicons name="add-circle-outline" size={22} color="#22c55e" />
-            <Text style={styles.addButtonText}>{t('Add')}</Text>
-          </TouchableOpacity>
-        </View>
       </View>
     </View>
   );
@@ -80,6 +89,31 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.15)',
+  },
+  topHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  authorHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  profilePicture: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    marginRight: 10,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.3)',
+  },
+  authorName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#ffffff',
+    opacity: 0.9,
   },
   servicesRow: {
     flexDirection: 'row',
@@ -118,30 +152,18 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#ffffff',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 0,
     opacity: 0.9,
     textShadowColor: 'rgba(0,0,0,0.2)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
-  controlsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.1)',
-  },
   addButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
     backgroundColor: 'rgba(34,197,94,0.15)',
     borderWidth: 1,
     borderColor: 'rgba(34,197,94,0.35)',
     borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    padding: 8,
   },
   addButtonText: { color: '#22c55e', fontWeight: '700' },
 });
