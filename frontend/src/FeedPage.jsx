@@ -108,16 +108,11 @@ export default function Feed() {
   const fetchWorkflows = useCallback(async () => {
     setLoading(true);
     try {
-      const params = {
-        limit: 100,
-      };
-      if (serviceFilter) {
-        params.service = serviceFilter;
-      }
-
       const res = await axios.get(`${API_URL}/feed/workflows`, {
         ...getAuthHeaders(),
-        params,
+        params: {
+          limit: 100,
+        },
       });
 
       if (Array.isArray(res.data)) {
@@ -134,7 +129,7 @@ export default function Feed() {
     } finally {
       setLoading(false);
     }
-  }, [token, serviceFilter]);
+  }, [token]);
 
   const handleCloneWorkflow = async (workflowToClone) => {
     if (!token) return alert("You must be logged in to copy a workflow.");
@@ -181,11 +176,21 @@ export default function Feed() {
   }, [serviceInput]);
 
   useEffect(() => {
-    const results = workflows.filter((wf) =>
-      wf.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+    const normalizedService = serviceFilter.trim().toLowerCase();
+
+    const results = workflows.filter((wf) => {
+      const matchesName = wf.name.toLowerCase().includes(normalizedSearch);
+      const matchesService =
+        !normalizedService ||
+        wf.steps?.some((step) =>
+          step?.service?.toLowerCase().includes(normalizedService)
+        );
+      return matchesName && matchesService;
+    });
+
     setFilteredWorkflows(results);
-  }, [searchTerm, workflows]);
+  }, [searchTerm, serviceFilter, workflows]);
 
   const renderContent = () => {
     if (loading) {
