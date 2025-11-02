@@ -2,7 +2,6 @@ import React from "react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import styles from "./styles/HomePage.module.css";
-import videoBg from "../public/bg-video.mp4";
 import LiquidText from "./components/LiquidText";
 
 function HomePage() {
@@ -10,7 +9,7 @@ function HomePage() {
     <>
       <video
         className={styles.videoBackground}
-        src={videoBg}
+        src="/bg-video.mp4"
         autoPlay
         loop
         muted

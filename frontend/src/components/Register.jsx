@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import videoBg from "../../public/bg-video.mp4";
 import axios from "axios";
 import styles from "../styles/Register.module.css";
 
@@ -51,7 +50,7 @@ export default function Register() {
     <div className={styles.container}>
       <video
         className={styles.videoBackground}
-        src={videoBg}
+        src="/bg-video.mp4"
         autoPlay
         loop
         muted
@@ -96,7 +95,7 @@ export default function Register() {
       <div className={styles.divider}>OR</div>
 
       <button onClick={handleGoogleRegister} className={styles.googleButton}>
-        <img src="../public/google.png" alt="Google" className={styles.googleIcon} />
+        <img src="/google.png" alt="Google" className={styles.googleIcon} />
         Sign up with Google
       </button>
       </form>

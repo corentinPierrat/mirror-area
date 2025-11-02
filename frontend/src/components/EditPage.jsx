@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import Header from './Header';
 import HeaderDashboard from './HeaderDashboard';
 import Footer from './Footer';
-import videoBg from "../../public/bg-video.mp4";
 import Crarea from './Cr-area';
 import styles from "../styles/CreationPage.module.css";
 
@@ -14,7 +13,7 @@ export default function EditPage() {
     <div className={styles.dashboardContainer}>
       <video
         className={styles.videoBackground}
-        src={videoBg}
+        src="/bg-video.mp4"
         autoPlay
         loop
         muted

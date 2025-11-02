@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import styles from "./styles/Feeds.module.css";
-import Footer from "./components/Footer";
-import videoBg from "../public/bg-video.mp4";
 import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
 import HeaderDashboard from "./components/HeaderDashboard";
 
@@ -216,7 +214,7 @@ export default function Feed() {
     <div className={styles.pageContainer}>
       <video
               className={styles.videoBackground}
-              src={videoBg}
+              src="/bg-video.mp4"
               autoPlay
               loop
               muted
@@ -254,4 +252,3 @@ export default function Feed() {
     </div>
   );
 }
-

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import videoBg from "../../public/bg-video.mp4";
 import styles from "../styles/VerifyCode.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -47,13 +46,13 @@ export default function VerifyCode() {
   return (
     <div className={styles.container}>
       <video
-              className={styles.videoBackground}
-              src={videoBg}
-              autoPlay
-              loop
-              muted
-              playsInline
-            />
+        className={styles.videoBackground}
+        src="/bg-video.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+      />
       <h1 className={styles.title}>Verification code</h1>
       <form onSubmit={handleVerify} className={styles.form}>
         <input

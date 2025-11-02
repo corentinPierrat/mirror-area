@@ -2,7 +2,6 @@ import React from "react";
 import Header from './components/Header';
 import HeaderDashboard from './components/HeaderDashboard';
 import Footer from './components/Footer';
-import videoBg from "../public/bg-video.mp4";
 import Crarea from './components/Cr-area';
 import styles from "./styles/CreationPage.module.css";
 
@@ -11,7 +10,7 @@ export default function CreationPage() {
     <div className={styles.dashboardContainer}>
       <video
         className={styles.videoBackground}
-        src={videoBg}
+        src="/bg-video.mp4"
         autoPlay
         loop
         muted

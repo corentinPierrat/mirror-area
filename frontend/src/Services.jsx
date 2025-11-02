@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import Header from "./components/Header";
 import HeaderDashboard from "./components/HeaderDashboard";
 import Footer from "./components/Footer";
-import videoBg from "../public/bg-video.mp4";
 import styles from "./styles/Services.module.css";
 import axios from "axios";
 
@@ -100,7 +99,7 @@ export default function Services() {
     <div className={styles.dashboardContainer}>
       <video
         className={styles.videoBackground}
-        src={videoBg}
+        src="/bg-video.mp4"
         autoPlay
         loop
         muted

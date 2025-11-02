@@ -47,7 +47,7 @@ export default function Header() {
         <div className={styles['nav-left']}>
           <Link to="/" className={styles.logo}>Triggers.</Link>
           <ul className={styles['nav-links']}>
-            <li><a href="#">About</a></li>
+            <li><a href="https://trigger.ink/about.json#">About</a></li>
             <li><a href="https://trigger.ink/docs#/">Docs</a></li>
           </ul>
         </div>

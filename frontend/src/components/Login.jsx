@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import styles from "../styles/Login.module.css";
-import videoBg from "../../public/bg-video.mp4";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -65,7 +64,7 @@ export default function Login() {
     <div className={styles.container}>
       <video
         className={styles.videoBackground}
-        src={videoBg}
+        src="/bg-video.mp4"
         autoPlay
         loop
         muted
@@ -96,7 +95,7 @@ export default function Login() {
         <div className={styles.divider}>OR</div>
 
         <button onClick={handleGoogleLogin} className={styles.googleButton}>
-          <img src="../public/google.png" alt="Google" className={styles.googleIcon} />
+          <img src="/google.png" alt="Google" className={styles.googleIcon} />
           Continue with Google
         </button>
       </div>

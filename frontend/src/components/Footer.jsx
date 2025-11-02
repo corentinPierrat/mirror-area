@@ -139,7 +139,7 @@ function Footer() {
               <strong className={styles.linkTitle}> About </strong>
               <ul className={styles.linkList}>
                 <li>
-                  <a className={styles.linkItem} href="#"> About </a>
+                  <a className={styles.linkItem} href="https://trigger.ink/about.json#/"> About </a>
                 </li>
                 <li>
                   <a className={styles.linkItem} href="https://trigger.ink/docs#/"> Docs </a>
