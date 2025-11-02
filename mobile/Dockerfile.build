@@ -27,7 +27,7 @@ CMD ["sh", "-c", "\
     exit 1; \
   fi && \
   eas build --platform android --profile preview --non-interactive --wait && \
-  eas build:download --platform android --output /app/build-output.apk && \
+  eas build:download --platform android && \
   mkdir -p /shared && \
-  cp /app/build-output.apk /shared/client.apk \
+  cp *.apk /shared/client.apk \
 "]
