@@ -12,13 +12,12 @@ export default function HeaderDashboard() {
   const menuMain = [
     { name: "Dashboard", icon: <DashboardIcon />, href: "/dashboard" },
     { name: "Connections", icon: <LoginIcon />, href: "/Services" },
-    { name: "Create", icon: <BuildIcon />, href: "/CreationPage" },
+    { name: "Create area", icon: <BuildIcon />, href: "/CreationPage" },
   ];
 
   const menuAccount = [
     { name: "Profile", icon: <PersonIcon />, href: "/Account" },
     { name: "Feeds", icon: <RssFeedIcon />, href: "/Feeds" },
-    { name: "Subscriptions", icon: <GroupIcon />, href: "#" },
   ];
 
   return (
