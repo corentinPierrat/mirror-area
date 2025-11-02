@@ -5,27 +5,6 @@ function Footer() {
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
-        <div className={styles.newsletterSection}>
-          <strong className={styles.newsletterTitle}>
-            Want to join newletter ?
-          </strong>
-
-          <form className={styles.newsletterForm}>
-            <div className={styles.formInputWrapper}>
-              <label className={styles.srOnly} htmlFor="email"> Email </label>
-
-              <input
-                className={styles.newsletterInput}
-                id="email"
-                type="email"
-                placeholder="john@doe.com"
-              />
-
-              <button className={styles.newsletterButton}>Subscribe</button>
-            </div>
-          </form>
-        </div>
-
         <div className={styles.mainGrid}>
           <div className={styles.aboutSection}>
             <p className={styles.aboutText}>
