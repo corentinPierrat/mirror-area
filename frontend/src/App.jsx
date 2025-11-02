@@ -1,4 +1,3 @@
-import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Login from "./components/Login";
 import Register from "./components/Register";
@@ -10,8 +9,6 @@ import TestCatalog from "./components/TestCatalog"
 import Services from "./Services"
 import CreationPage from "./CreationPage"
 import Account from "./Account"
-import EditWorkflow from "./components/EditWorkflow"
-import OAuthSuccess from "./components/OAuthSuccess"
 import ThreeBackground from "./components/ThreeBackground"
 import EditPage from "./components/EditPage";
 import AdminDashboard from "./AdminPage"
