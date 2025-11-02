@@ -50,9 +50,6 @@ services:
     volumes:
       - ./frontend:/app
       - shared-bundle:/shared
-    command: >
-      sh -c "npm install -g serve &&
-           serve /shared -l 8081"
     restart: unless-stopped
 
 volumes:
