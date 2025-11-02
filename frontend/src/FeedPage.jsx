@@ -1,23 +1,29 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import videoBg from "../public/bg-video.mp4";
 import styles from "./styles/Feeds.module.css";
-import Header from "./components/Header";
-import HeaderDashboard from "./components/HeaderDashboard";
+import videoBg from "../public/bg-video.mp4";
 import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
+import HeaderDashboard from "./components/HeaderDashboard";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-function PublicWorkflowCard({ workflow }) {
+function PublicWorkflowCard({ workflow, onClone }) {
   const [action, setAction] = useState(null);
   const [reactions, setReactions] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { name, steps, author, profile_picture, description } = workflow;
 
   useEffect(() => {
-    const actionStep = workflow.steps?.find((s) => s.type === "action");
-    const reactionSteps = workflow.steps?.filter((s) => s.type === "reaction");
+    const actionStep = steps?.find((s) => s.type === "action");
+    const reactionSteps = steps?.filter((s) => s.type === "reaction");
     setAction(actionStep);
     setReactions(reactionSteps || []);
-  }, [workflow]);
+  }, [steps]);
+
+  const avatarUrl = profile_picture
+    ? `${API_URL}${profile_picture}`
+    : `https://api.dicebear.com/7.x/identicon/svg?seed=${author || 'default'}`;
 
   const renderServiceTag = (service, event, key) => (
     <div className={styles.serviceTag} key={key}>
@@ -31,9 +37,25 @@ function PublicWorkflowCard({ workflow }) {
     </div>
   );
 
+  const handleCloneClick = async () => {
+    setIsLoading(true);
+    await onClone(workflow);
+    setIsLoading(false);
+  };
+
   return (
     <div className={styles.workflowCard}>
-      <h3 className={styles.workflowName}>{workflow.name}</h3>
+      <div className={styles.workflowOwner}>
+        <img src={avatarUrl} alt={author} className={styles.ownerAvatar} />
+        <span className={styles.ownerName}>{author || 'Unknown Creator'}</span>
+      </div>
+
+      <h3 className={styles.workflowName}>{name}</h3>
+
+      {description && (
+        <p className={styles.workflowDescription}>{description}</p>
+      )}
+
       <div className={styles.workflowContent}>
         <div className={styles.section}>
           {action ? (
@@ -54,6 +76,16 @@ function PublicWorkflowCard({ workflow }) {
             <span>No Reactions</span>
           )}
         </div>
+      </div>
+
+      <div className={styles.cardFooter}>
+        <button
+          onClick={handleCloneClick}
+          className={styles.cloneButton}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Copying...' : 'Add to My Account'}
+        </button>
       </div>
     </div>
   );
@@ -105,6 +137,34 @@ export default function Feed() {
     }
   }, [token, serviceFilter]);
 
+  const handleCloneWorkflow = async (workflowToClone) => {
+    if (!token) return alert("You must be logged in to copy a workflow.");
+    if (!workflowToClone || !workflowToClone.steps) {
+      console.error("Workflow data is incomplete:", workflowToClone);
+      alert("Error: Cannot copy incomplete workflow.");
+      return;
+    }
+
+    const payload = {
+      name: `Copy of ${workflowToClone.name}`,
+      description: workflowToClone.description || "Copied from public feed",
+      visibility: "private",
+      steps: workflowToClone.steps,
+    };
+
+    console.log("Attempting to clone workflow with payload:", payload);
+
+    try {
+      await axios.post(`${API_URL}/workflows/`, payload, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert("Workflow copied to your account!");
+    } catch (err) {
+      console.error("Error cloning workflow:", err.response?.data || err);
+      alert(`Error: ${err.response?.data?.detail || 'Could not copy workflow.'}`);
+    }
+  };
+
   useEffect(() => {
     if (!token) {
       setError("Not authenticated.");
@@ -141,7 +201,11 @@ export default function Feed() {
     return (
       <div className={styles.workflowGrid}>
         {filteredWorkflows.map((wf) => (
-          <PublicWorkflowCard key={wf.id} workflow={wf} />
+          <PublicWorkflowCard
+            key={wf.id}
+            workflow={wf}
+            onClone={handleCloneWorkflow}
+          />
         ))}
       </div>
     );
@@ -162,9 +226,6 @@ export default function Feed() {
       </aside>
 
       <main className={styles.mainContent}>
-        <div style={{ width: '0%' }}>
-          <Header />
-        </div>
         <header className={styles.feedHeader}>
           <h1>Public Feed</h1>
           <p>Discover workflows created by the community.</p>

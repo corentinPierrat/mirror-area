@@ -15,7 +15,8 @@ export default function Workflows({
   workflowId,
   onDelete,
   active,
-  visibility = "private", 
+  visibility = "private",
+  description = "",
 }) {
   const navigate = useNavigate();
   const [isActive, setIsActive] = useState(!!active);
@@ -78,6 +79,7 @@ export default function Workflows({
 
       const updatedWorkflow = {
         name: Name,
+        description: description,
         active: isActive,
         visibility: newVisibility,
         steps: steps,
@@ -186,6 +188,10 @@ export default function Workflows({
         <h2 className={styles.workflowName}>{Name}</h2>
       </div>
 
+      {description && (
+        <p className={styles.workflowDescription}>{description}</p>
+      )}
+
       <div className={styles.workflowContent}>
         <div className={styles.section}>{renderAction()}</div>
         <div className={styles.arrow_logo}>
@@ -205,7 +211,7 @@ export default function Workflows({
           onClick={() =>
             navigate(`/edit/${workflowId}`, {
               state: {
-                workflow: { Name, Action, Reactions, workflowId, active: isActive },
+                workflow: { Name, Action, Reactions, workflowId, active: isActive, description },
               },
             })
           }

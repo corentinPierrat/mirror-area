@@ -77,15 +77,11 @@ return (
             key={workflow.id}
             workflowId={workflow.id}
             Name={workflow.name}
-            Action={
-              workflow.action
-                ? `${workflow.action.service} - ${workflow.action.event}`
-                : "Action unknow"
-            }
+            Action={workflow.action || {}}
             Reactions={workflow.reactions || []} 
-            
             active={workflow.active} 
-            
+            description={workflow.description}
+            visibility={workflow.visibility}
             onDelete={(id) =>
               setWorkflows((prev) => prev.filter((w) => w.id !== id))
             }
@@ -108,3 +104,4 @@ return (
   </div>
 );
 }
+

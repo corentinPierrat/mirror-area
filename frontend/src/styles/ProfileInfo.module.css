@@ -1,61 +1,159 @@
-.profileCard {
-    padding: 2rem;
-    border-radius: 1.5rem;
-    text-align: center;
-    color: #fff;
-    width: 350px;
-    margin: 0 auto;
+.settingsPageContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem;
+  z-index: 2;
+  position: relative;
+}
 
-    position: relative;
-    z-index: 2;
+.profileCard {
+  padding: 2rem;
+  border-radius: 1.5rem;
+  text-align: center;
+  color: #fff;
+  width: 350px;
+  flex-shrink: 0;
+
+  position: relative;
+  z-index: 2;
 
   background-color: rgba(255, 255, 255, 0.01);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  }
-  
-  .title {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .infoGroup {
-    text-align: left;
-    margin-bottom: 2rem;
-  }
-  
-  .actions {
-    display: flex;
-    justify-content: space-around;
-    gap: 1rem;
-  }
-  
-  .editBtn,
-  .deleteBtn {
-    padding: 0.6rem 1.2rem;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    transition: 0.2s;
-  }
-  
-  .editBtn {
-    background-color: #00ff88;
-    color: #000;
-  }
-  
-  .editBtn:hover {
-    background-color: #00cc6a;
-  }
-  
-  .deleteBtn {
-    background-color: #ff5252;
-    color: #fff;
-  }
-  
-  .deleteBtn:hover {
-    background-color: #e64545;
-  }
-  
+}
+
+.formBubble {
+  width: 400px;
+}
+
+.title {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.infoGroup {
+  text-align: left;
+  margin-bottom: 2rem;
+}
+
+.infoGroup p {
+  margin-bottom: 0.5rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.editBtn,
+.deleteBtn,
+.saveBtn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.editBtn {
+  background-color: #00ff88;
+  color: #000;
+}
+
+.editBtn:hover {
+  background-color: #00cc6a;
+}
+
+.deleteBtn {
+  background-color: #ff5252;
+  color: #fff;
+}
+
+.deleteBtn:hover {
+  background-color: #e64545;
+}
+
+.saveBtn {
+  background-color: #007bff;
+  color: #fff;
+}
+.saveBtn:hover {
+  background-color: #0056b3;
+}
+.saveBtn:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
+.formGroup {
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(0, 0, 0, 0.2);
+  color: #fff;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.dropzone {
+  border: 2px dashed rgba(255, 255, 255, 0.4);
+  border-radius: 1rem;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dropzone p {
+  margin: 0;
+  font-weight: 500;
+  color: #ccc;
+}
+
+.dropzone:hover,
+.dropzoneActive {
+  background-color: rgba(0, 123, 255, 0.1);
+  border-color: #007bff;
+}
+
+.messageError {
+  color: #ff5252;
+  font-weight: 500;
+  margin-top: 1rem;
+}
+
+.messageSuccess {
+  color: #00ff88;
+  font-weight: 500;
+  margin-top: 1rem;
+}
+
+.loading {
+  font-size: 1.2rem;
+  color: #fff;
+  text-align: center;
+  padding: 2rem;
+}

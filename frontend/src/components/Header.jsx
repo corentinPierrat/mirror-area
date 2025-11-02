@@ -34,7 +34,12 @@ export default function Header() {
     navigate("/");
   };
   
-  const avatarUrl = user ? `https://api.dicebear.com/7.x/identicon/svg?seed=${user.username}` : '';
+  let avatarUrl = '';
+  if (user) {
+    avatarUrl = user.profile_image_url
+      ? `${API_URL}${user.profile_image_url}`
+      : `https://api.dicebear.com/7.x/identicon/svg?seed=${user.username}`; // Fallback
+  }
 
   return (
     <header className={styles.header}>
@@ -53,7 +58,6 @@ export default function Header() {
                 <img src={avatarUrl} alt="Avatar" className={styles.userAvatar} />
                 {user.username}
               </Link>
-
 
               <button onClick={handleDisconnect} className={styles.disconnectBtn}>
                 Disconnect
