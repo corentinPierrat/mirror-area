@@ -6,18 +6,18 @@ function WorkflowBuilder() {
   const [reaction, setReaction] = useState("");
 
   const handleCreate = () => {
-    console.log("Workflow créé:", { action, reaction });
-    alert("saved in console log");
+    console.log("Workflow created:", { action, reaction });
+    alert("Saved in console log");
   };
 
   return (
     <div className="page-container">
       <div className="card">
-        <h2>Créer un Workflow</h2>
+        <h2>Create a Workflow</h2>
 
-        <label>Choisir une Action</label>
+        <label>Select an Action</label>
         <select value={action} onChange={(e) => setAction(e.target.value)}>
-          <option value="">-- Sélectionner --</option>
+          <option value="">-- Select --</option>
           <option value="Faceit">Faceit</option>
           <option value="Steam">Steam</option>
           <option value="Discord">Discord</option>
@@ -26,17 +26,17 @@ function WorkflowBuilder() {
           <option value="Spotify">Spotify</option>
         </select>
 
-        <label>Choisir une Réaction</label>
+        <label>Select a Reaction</label>
         <select value={reaction} onChange={(e) => setReaction(e.target.value)}>
-          <option value="">-- Sélectionner --</option>
-          <option value="Email">envoyaer Email</option>
-          <option value="Discord">envoyer message Discord</option>
-          <option value="X">envoyer tweet</option>
-          <option value="Musique">lancer une playlist</option>
+          <option value="">-- Select --</option>
+          <option value="Email">Send email</option>
+          <option value="Discord">Send Discord message</option>
+          <option value="X">Send tweet</option>
+          <option value="Playlist">Start a playlist</option>
         </select>
 
         <button className="btn" onClick={handleCreate}>
-          Créer le Workflow
+          Create Workflow
         </button>
       </div>
     </div>

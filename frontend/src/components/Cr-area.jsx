@@ -108,7 +108,7 @@ function WorkflowNode({ data, onParamsChange, onTest }) {
   };
  
   const formatValue = (value) => {
-    if (value === null || value === undefined || value === "") return "Aucune valeur";
+    if (value === null || value === undefined || value === "") return "No value";
     if (typeof value === "string") return value;
     try {
       const serialized = JSON.stringify(value);
@@ -121,7 +121,7 @@ function WorkflowNode({ data, onParamsChange, onTest }) {
   const renderParamsForm = () => {
     if (!payload_schema || !editing) return null;
     if (isLoadingOptions) {
-        return <div style={{color: '#fff', padding: '10px'}}>Chargement...</div>;
+        return <div style={{color: '#fff', padding: '10px'}}>Loading...</div>;
     }
     return (
       <div className={styles.paramsFormContainer}>
@@ -133,12 +133,12 @@ function WorkflowNode({ data, onParamsChange, onTest }) {
               <label>{param.label}:</label>
               {linked && (
                 <div className={styles.linkedHint}>
-                  Relié à {links[key].sourceTitle || "une action"} — cette valeur sera utilisée comme secours.
+                  Linked to {links[key].sourceTitle || "an action"} — this value will be used as a fallback.
                 </div>
               )}
               {options ? (
                 <select value={localParams[key] || ""} onChange={(e) => handleChange(key, e.target.value)} className={styles.input}>
-                  <option value="">Sélectionne...</option>
+                  <option value="">Select...</option>
                   {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               ) : (
@@ -147,8 +147,8 @@ function WorkflowNode({ data, onParamsChange, onTest }) {
             </div>
           );
         })}
-        <button onClick={handleSave} className={styles.saveButton}>Enregistrer</button>
-        <button onClick={() => setEditing(false)} className={styles.cancelButton}>Annuler</button>
+        <button onClick={handleSave} className={styles.saveButton}>Save</button>
+        <button onClick={() => setEditing(false)} className={styles.cancelButton}>Cancel</button>
       </div>
     );
   };
@@ -157,7 +157,7 @@ function WorkflowNode({ data, onParamsChange, onTest }) {
     if (type !== "reaction" || !payload_schema || Object.keys(payload_schema).length === 0) return null;
     return (
       <div className={styles.handleSection}>
-        <div className={styles.handleSectionTitle}>Entrées</div>
+        <div className={styles.handleSectionTitle}>Inputs</div>
         {Object.entries(payload_schema).map(([key, param]) => {
           const linkInfo = links[key];
           const manualValue = params[key];
@@ -168,13 +168,13 @@ function WorkflowNode({ data, onParamsChange, onTest }) {
                 <span className={styles.handleLabel}>{param.label || key}</span>
                 {linkInfo ? (
                   <span className={styles.handleInfo}>
-                    Relié à {linkInfo.sourceTitle || "action"} · {linkInfo.label || linkInfo.field}
+                    Linked to {linkInfo.sourceTitle || "Action"} · {linkInfo.label || linkInfo.field}
                   </span>
                 ) : (
                   <span className={styles.handleInfo}>
                     {(manualValue !== undefined && manualValue !== null && manualValue !== "")
                       ? formatValue(manualValue)
-                      : "Valeur manuelle requise"}
+                      : "Manual value required"}
                   </span>
                 )}
               </div>
@@ -189,13 +189,13 @@ function WorkflowNode({ data, onParamsChange, onTest }) {
     if (type !== "action" || !output_schema || Object.keys(output_schema).length === 0) return null;
     return (
       <div className={styles.handleSection}>
-        <div className={styles.handleSectionTitle}>Sorties</div>
+        <div className={styles.handleSectionTitle}>Outputs</div>
         {Object.entries(output_schema).map(([key, meta]) => (
           <div key={key} className={styles.handleRow}>
             <div className={styles.handleContent}>
               <span className={styles.handleLabel}>{meta.label || key}</span>
               {meta?.path && meta.path !== key && (
-                <span className={styles.handleInfo}>chemin: {meta.path}</span>
+                <span className={styles.handleInfo}>path: {meta.path}</span>
               )}
             </div>
             <Handle type="source" position={Position.Right} id={`output-${key}`} />
@@ -247,7 +247,7 @@ function ParamEditorModal({ schema, initialParams, nodeId, onClose, onSave }) {
   const modalContent = (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
-        <h3>Éditer les Paramètres</h3>
+        <h3>Edit Parameters</h3>
         <div className={styles.modalScrollable}>
           {Object.entries(schema).map(([key, param]) => (
             <div key={key} style={{ marginTop: 15 }}>
@@ -256,7 +256,7 @@ function ParamEditorModal({ schema, initialParams, nodeId, onClose, onSave }) {
               </label>
               {param.options ? (
                 <select value={localParams[key] || ""} onChange={(e) => handleChange(key, e.target.value)} className={styles.input}>
-                  <option value="">Sélectionne...</option>
+                  <option value="">Select...</option>
                   {param.options.map((o) => (<option key={o.value} value={o.value}>{o.label}</option>))}
                 </select>
               ) : (
@@ -266,8 +266,8 @@ function ParamEditorModal({ schema, initialParams, nodeId, onClose, onSave }) {
           ))}
         </div>
         <div className={styles.modalActions}>
-          <button onClick={onClose} className={styles.cancelButton}>Annuler</button>
-          <button onClick={handleSave} className={styles.saveButton}>Enregistrer</button>
+          <button onClick={onClose} className={styles.cancelButton}>Cancel</button>
+          <button onClick={handleSave} className={styles.saveButton}>Save</button>
         </div>
       </div>
     </div>
@@ -311,7 +311,7 @@ export default function CrArea() {
  
   const handleTestNode = useCallback(async (nodeData) => {
     if (!token) {
-      alert("Veuillez vous connecter pour lancer un test.");
+      alert("Please sign in to run a test.");
       return;
     }
  
@@ -342,11 +342,11 @@ export default function CrArea() {
  
       if (nodeData.type === "action") {
         if (success) {
-          const message = formatValue(actionResult, "Test réussi (aucune donnée retournée)");
+          const message = formatValue(actionResult, "Test succeeded (no data returned)");
           alert(message);
         } else {
           const failure = infoMessage || error || actionResult;
-          alert(`Action échouée: ${formatValue(failure, "Erreur inconnue")}`);
+          alert(`Action failed: ${formatValue(failure, "Unknown error")}`);
         }
         console.log("Action test result:", response.data);
         return;
@@ -354,14 +354,14 @@ export default function CrArea() {
  
       const message = infoMessage || error;
       if (success) {
-        alert(message || "Réaction exécutée avec succès.");
+        alert(message || "Reaction executed successfully.");
       } else {
-        alert(message || "Erreur pendant la réaction.");
+        alert(message || "Error during the reaction.");
       }
       console.log("Reaction test result:", response.data);
     } catch (error) {
       const message = error?.response?.data?.detail || error?.response?.data?.error || error.message;
-      alert(`Erreur pendant le test: ${message}`);
+      alert(`Error during the test: ${message}`);
       console.error("Test error:", error);
     }
   }, [token]);
@@ -421,7 +421,7 @@ export default function CrArea() {
       return;
     }
   
-    console.log("Workflow chargé :", workflowData);
+    console.log("Workflow loaded:", workflowData);
   
     setIsEditing(true);
     setButtonLabel("Save");
@@ -443,7 +443,7 @@ export default function CrArea() {
         const catalogMeta = getCatalogMeta(step.type, step.service, step.event) || {};
       
         if (!catalogMeta.title) {
-          console.warn(`[Debug] Métadonnées introuvables pour l'étape (utilisation des données du step):`, step);
+          console.warn(`[Debug] Metadata not found for step (using step data):`, step);
         }
 
         const { cleanParams, links: linksFromParams } = extractLinksFromParams(step.params);
@@ -497,10 +497,10 @@ export default function CrArea() {
         const [actionService = "", actionEvent = ""] = (workflowData.Action || "").split(" - ");
         const actionMeta = getCatalogMeta("action", actionService, actionEvent) || {};
         
-        console.log(`[Debug Action] Métadonnées trouvées pour '${workflowData.Action}':`, actionMeta);
+        console.log(`[Debug Action] Metadata found for '${workflowData.Action}':`, actionMeta);
 
         if (!actionMeta.title) {
-          console.warn(`[Debug Legacy] Métadonnées introuvables pour Action:`, workflowData.Action);
+          console.warn(`[Debug Legacy] Metadata not found for action:`, workflowData.Action);
         }
 
         rebuiltNodes.push({
@@ -564,7 +564,7 @@ export default function CrArea() {
     setNodes(rebuiltNodes);
     setEdges(rebuiltEdges);
   
-    console.log("Blueprint visuel recréé :", { rebuiltNodes, rebuiltEdges });
+    console.log("Visual blueprint rebuilt:", { rebuiltNodes, rebuiltEdges });
 
   }, [location.state, actions, reactions, isLoading, setNodes, setEdges]);
 
@@ -591,7 +591,7 @@ export default function CrArea() {
       steps,
     };
 
-    console.log("Payload envoyé à l'API pour l'update :", JSON.stringify(payload, null, 2));
+    console.log("Payload sent to the API for the update:", JSON.stringify(payload, null, 2));
   
     try {
       await axios.put(
@@ -602,7 +602,7 @@ export default function CrArea() {
 
       alert("Workflow updated successfully!");
     } catch (err) {
-      console.error("ERREUR LORS DE L'UPDATE :", err.response?.data || err.message);
+      console.error("Error during update:", err.response?.data || err.message);
       alert(`Update failed: ${err.response?.data?.detail || err.message}`);
     }
   };
@@ -799,7 +799,7 @@ export default function CrArea() {
                     <div key={service} className={styles.serviceGroup}>
                       <strong className={styles.serviceHeader}>{service.charAt(0).toUpperCase() + service.slice(1)}</strong>
                       {items.map((item, i) => (
-                        <div key={`${item.event}-${i}`} onClick={() => isConnected ? addNode(menuType, item) : alert(`Veuillez vous connecter à ${service}`)}
+                        <div key={`${item.event}-${i}`} onClick={() => isConnected ? addNode(menuType, item) : alert(`Please connect to ${service}`)}
                           className={`${styles.menuItem} ${!isConnected && styles.menuItemDisabled}`}>
                           <strong>{item.title}</strong>
                           <div className={styles.menuItemDescription}>{item.description}</div>

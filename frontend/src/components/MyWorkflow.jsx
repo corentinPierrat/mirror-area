@@ -63,12 +63,12 @@ export default function MyWorkflow() {
     getWorkflows();
   };
 
-  if (loading) return <p className={styles.loading}>Chargement...</p>;
+  if (loading) return <p className={styles.loading}>Loading...</p>;
   if (error) return <p className={styles.error}>{error}</p>;
 
 return (
   <div className={styles.container}>
-    <h1 className={styles.title}>Mes Workflows</h1>
+    <h1 className={styles.title}>My Workflows</h1>
 
     {workflows.length > 0 ? (
       <div className={styles.workflowList}>
@@ -91,7 +91,7 @@ return (
         ))}
       </div>
     ) : (
-      <p className={styles.noWorkflows}>No workflow available.</p>
+      <p className={styles.noWorkflows}>No workflows available.</p>
     )}
 
     {editingWorkflowId && (
@@ -104,4 +104,3 @@ return (
   </div>
 );
 }
-

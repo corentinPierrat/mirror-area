@@ -46,7 +46,7 @@ export default function Account() {
   };
 
   const handleDeleteAccount = async () => {
-    if (!window.confirm("Are you sure you want to delete your account? ?")) return;
+    if (!window.confirm("Are you sure you want to delete your account?")) return;
     try {
       await axios.delete(`${API_URL}/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },

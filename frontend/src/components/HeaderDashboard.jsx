@@ -11,14 +11,13 @@ import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 export default function HeaderDashboard() {
   const menuMain = [
     { name: "Dashboard", icon: <DashboardIcon />, href: "/dashboard" },
-    { name: "Connexion", icon: <LoginIcon />, href: "/Services" },
-    { name: "Cr-rea", icon: <BuildIcon />, href: "/CreationPage" },
+    { name: "Connections", icon: <LoginIcon />, href: "/Services" },
+    { name: "Create area", icon: <BuildIcon />, href: "/CreationPage" },
   ];
 
   const menuAccount = [
     { name: "Profile", icon: <PersonIcon />, href: "/Account" },
     { name: "Feeds", icon: <RssFeedIcon />, href: "/Feeds" },
-    { name: "Abonments", icon: <GroupIcon />, href: "#" },
   ];
 
   return (

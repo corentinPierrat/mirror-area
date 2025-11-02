@@ -109,7 +109,7 @@ function Footer() {
                   <a className={styles.linkItem} href="/Feeds"> Feeds </a>
                 </li>
                 <li>
-                  <a className={styles.linkItem} href="/dashboard"> Abonments </a>
+                  <a className={styles.linkItem} href="/dashboard"> Subscriptions </a>
                 </li>
               </ul>
             </div>

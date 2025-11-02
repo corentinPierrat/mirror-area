@@ -7,11 +7,11 @@ export default function OAuthButton({ logo, apiRoute, onSuccess, connected }) {
   const handleClick = () => {
     const token = localStorage.getItem("userToken");
     if (!token) {
-      alert("Token manquant ! Connectez-vous d'abord.");
+      alert("Missing token! Please sign in first.");
       return;
     }
 
-    console.log("Token actuel :", token);
+    console.log("Current token:", token);
 
     setLoading(true);
 
@@ -30,7 +30,7 @@ export default function OAuthButton({ logo, apiRoute, onSuccess, connected }) {
       disabled={loading || connected}
     >
       <img src={logo} alt="logo" className={styles.logo} />
-      {loading ? "Connexion..." : connected ? "Connecté" : "S'authentifier"}
+      {loading ? "Connecting..." : connected ? "Connected" : "Authenticate"}
     </button>
   );
 }

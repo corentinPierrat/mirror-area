@@ -36,12 +36,12 @@ export default function Services() {
         headers: { Authorization: `Bearer ${token}` },
       });
       
-      console.log(`Réponse API pour ${provider}:`, res.data); 
-      console.log(`Statut HTTP pour ${provider}:`, res.status); 
+      console.log(`API response for ${provider}:`, res.data); 
+      console.log(`HTTP status for ${provider}:`, res.status); 
 
       setConnected((prev) => ({ ...prev, [provider]: res.data.logged_in }));
     } catch (err) {
-      console.warn(`Erreur vérif statut ${provider}:`, err.response ? err.response.data : err.message);
+      console.warn(`Error while checking status for ${provider}:`, err.response ? err.response.data : err.message);
       setConnected((prev) => ({ ...prev, [provider]: false }));
     }
   };
@@ -64,7 +64,7 @@ export default function Services() {
 
   useEffect(() => {
     if (!token) {
-      setError("Missing token. Please log in again..");
+      setError("Missing token. Please log in again.");
       setLoading(false);
       return;
     }

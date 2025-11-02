@@ -109,7 +109,7 @@ export default function Workflows({
   };
 
   const renderAction = () => {
-    if (!Action) return <span>Aucune action</span>;
+    if (!Action) return <span>No action</span>;
 
     if (typeof Action === "object" && Action.service && Action.event) {
       return (
@@ -226,4 +226,3 @@ export default function Workflows({
     </div>
   );
 }
-
