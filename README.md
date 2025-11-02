@@ -9,12 +9,11 @@
 1. [Overview](#overview)
 2. [System Architecture](#system-architecture)
 3. [Domain Model](#domain-model)
-4. [Key Runtime Sequence](#key-runtime-sequence)
-5. [Getting Started](#getting-started)
-6. [Server API Reference](#server-api-reference)
-7. [about.json Contract](#aboutjson-contract)
-8. [Additional Documentation](#additional-documentation)
-9. [Maintainers](#maintainers)
+4. [Getting Started](#getting-started)
+5. [Server API Reference](#server-api-reference)
+6. [about.json Contract](#aboutjson-contract)
+7. [Additional Documentation](#additional-documentation)
+8. [Maintainers](#maintainers)
 
 ---
 
@@ -25,6 +24,7 @@ The AREA platform lets users orchestrate **Actions** (event detectors) and **Rea
 - a React/Vite **web client** (port `8081`)
 - a React Native/Expo **mobile client** whose Android build artifacts are shared with the web app
 - background schedulers and bots that subscribe to external webhooks
+- a Python 3.12 **FastAPI** backend that exposes the REST surface and orchestrates business logic
 
 **Feature highlights**
 
@@ -41,14 +41,14 @@ The AREA platform lets users orchestrate **Actions** (event detectors) and **Rea
 ```mermaid
 flowchart LR
     subgraph Clients
-        Web[Web Client\nReact + Vite]
-        MobileDev[Mobile Dev Runner\nExpo CLI]
-        MobileBuild[Mobile Builder\nEAS CLI]
+        Web[Web Client React + Vite]
+        MobileDev[Mobile Dev Runner Expo CLI]
+        MobileBuild[Mobile Builder EAS CLI]
     end
 
     subgraph Infrastructure
         DB[(MariaDB)]
-        Scheduler[Timer Scheduler\nAPScheduler]
+        Scheduler[Timer Scheduler APScheduler]
         DiscordBot[Discord Bot Service]
     end
 
@@ -82,13 +82,16 @@ Application state is persisted in MariaDB via SQLAlchemy models. The following c
 classDiagram
     class User {
         +int id
-        +str email
         +str username
+        +str email
         +str password_hash
         +bool is_verified
         +str role
         +str profile_image_url
+        +str verification_token
+        +datetime verification_token_expires_at
         +datetime created_at
+        +datetime updated_at
     }
 
     class Workflow {
@@ -99,26 +102,30 @@ classDiagram
         +str visibility
         +bool active
         +datetime created_at
+        +datetime updated_at
     }
 
     class WorkflowStep {
         +int id
         +int workflow_id
         +int step_order
-        +str type  "action|reaction"
+        +str type  "action|reaction|transformation"
         +str service
         +str event
         +JSON params
+        +datetime created_at
     }
 
     class UserService {
         +int id
         +int user_id
         +str service_key
-        +bytes token_ciphertext
+        +str token_data
         +bytes token_iv
         +bytes token_tag
         +datetime token_expires_at
+        +datetime created_at
+        +datetime updated_at
     }
 
     class WorkflowFavorite {
@@ -135,30 +142,6 @@ classDiagram
 ```
 
 > For a full ER view (including friendship edges) refer to the `documentation/AREA_documentation.pdf`.
-
----
-
-## Key Runtime Sequence
-
-The hook engine coordinates incoming events, persistence and reaction execution. The diagram below illustrates a Twitch webhook triggering a Discord reaction:
-
-```mermaid
-sequenceDiagram
-    participant Twitch as Twitch EventSub
-    participant Backend as FastAPI /actions/twitch
-    participant Scheduler as Timer & Hook Engine
-    participant DB as MariaDB
-    participant Discord as Discord Bot
-
-    Twitch->>Backend: POST /actions/twitch\n(Event + HMAC headers)
-    Backend->>Backend: Validate signature with TWITCH_WEBHOOK_SECRET
-    Backend->>DB: Load workflows where\nstep.type="action" && service="twitch"
-    Backend->>Scheduler: trigger_workflows("twitch", event, payload)
-    Scheduler->>DB: Persist execution log\nand fetch matching reaction steps
-    Scheduler->>Discord: Execute reaction\n(e.g. send notification message)
-    Scheduler-->>Backend: {results: [...]} summary
-    Backend-->>Twitch: 200 OK {status:"processed"}
-```
 
 ---
 

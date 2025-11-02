@@ -41,6 +41,7 @@ All project-specific dependencies are installed through the steps below.
    - Mobile: run the relevant Cypress flow if you touch onboarding or services.
 6. **Commit & PR**
    - One logical change per commit.
+   - Prefix every commit message with `[ADD]`, `[FIX]` or `[DEL]` before pushing.
    - Reference related issues and describe the user-visible effect.
    - Keep documentation updated (`README.md`, this HOWTO, OpenAPI annotations).
 
