@@ -39,6 +39,18 @@ services:
     tty: true
     restart: unless-stopped
 
+  client_mobile:
+    build:
+      context: ./mobile
+      dockerfile: Dockerfile.build
+    volumes:
+      - shared-bundle:/shared
+    environment:
+      - EXPO_TOKEN=32byPGz6WVXbT2bDtjXlFx1oNWIfIaJIGNb1ItwY
+      - EAS_NO_VCS=1
+      - EAS_LOCAL_BUILD_SKIP_CLEANUP=1
+    restart: "no"
+
   frontend:
     build: ./frontend
     ports:
