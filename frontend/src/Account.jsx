@@ -115,8 +115,9 @@ export default function Account() {
           </div>
         </main>
       </div>
-
-      <Footer />
+      <div className={styles.footer}>
+        <Footer />
+      </div>
     </div>
   );
 }

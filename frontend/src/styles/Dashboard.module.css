@@ -39,7 +39,7 @@
 .mainContent {
   flex: 1;
   padding: 40px;
-  margin-top: 150px;
+  margin-top: 135px;
   overflow-y: auto;
 }
 
@@ -47,6 +47,10 @@
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 24px;
+}
+
+.footer {
+  margin-top: 15%;
 }
 
 @media (max-width: 900px) {

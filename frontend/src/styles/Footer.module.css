@@ -1,24 +1,21 @@
 .footer {
   background-color: #ffffff00;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  color: #111827;
-
-  margin-top: 15%;
+  color: #ffffff;
   position: relative;
   z-index: 2;
+  bottom: -1px;
 }
 
 .container {
-  background-color: #ffffff;
   max-width: 100%;
   margin-left: auto;
   margin-right: auto;
   padding: 4rem 1rem 2rem;
 
-  background: rgba(255, 255, 255, 0.13);
-  background: rgb(255, 255, 255);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(2.2px);
+  background: rgba(255, 255, 255, 0.01);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.034);
+  backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(4.2px);
   border-radius: 40px 40px 0px 0px;
 }
@@ -34,7 +31,7 @@
   text-align: center;
   font-size: 1.25rem;
   font-weight: 700;
-  color: #111827;
+  color: #ffffff;
 }
 
 .newsletterForm {
@@ -143,7 +140,7 @@
 
 .linkTitle {
   font-weight: 500;
-  color: #111827;
+  color: #ffffff;
 }
 
 .linkList {

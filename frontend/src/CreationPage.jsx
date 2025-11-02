@@ -29,7 +29,9 @@ export default function CreationPage() {
           </div>
         </main>
       </div>
-      <Footer />
+      <div className={styles.footer}>
+        <Footer />
+      </div>
 
     </div>
   );

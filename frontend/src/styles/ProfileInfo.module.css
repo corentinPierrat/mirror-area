@@ -53,42 +53,35 @@
 .editBtn,
 .deleteBtn,
 .saveBtn {
-  padding: 0.6rem 1.2rem;
-  border-radius: 10px;
+  padding: 10px 16px;
   border: none;
-  cursor: pointer;
+  border-radius: 30px;
+  font-size: 0.875rem;
   font-weight: 600;
-  transition: 0.2s;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background-color: #ffffff00;
 }
 
 .editBtn {
-  background-color: #00ff88;
-  color: #000;
+  color: white;
+  border: 1px solid rgb(5, 89, 247);
 }
 
 .editBtn:hover {
-  background-color: #00cc6a;
+  transform: translateY(-2px);
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.4);
 }
 
 .deleteBtn {
-  background-color: #ff5252;
+  background-color: #ffffff00;
   color: #fff;
+  border: 1px solid rgba(247, 9, 9, 0.973);
 }
 
 .deleteBtn:hover {
-  background-color: #e64545;
-}
-
-.saveBtn {
-  background-color: #007bff;
-  color: #fff;
-}
-.saveBtn:hover {
-  background-color: #0056b3;
-}
-.saveBtn:disabled {
-  background-color: #555;
-  cursor: not-allowed;
+  transform: translateY(-2px);
+  box-shadow: 0 0 12px rgba(185, 28, 28, 0.4);
 }
 
 .formGroup {
