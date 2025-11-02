@@ -36,7 +36,6 @@ function App() {
         <Route path="/Account" element={<Account />} />
         <Route path="/ThreeBackground" element={<ThreeBackground />} />
         <Route path="/edit/:id" element={<EditPage />} />
-        <Route path="/oauth/success" element={<OAuthSuccess />} />
         <Route path="/admindashboard" element={<AdminDashboard />} />
         <Route path="/Feeds" element={<Feeds />} />
       </Routes>
