@@ -220,9 +220,10 @@ function WorkflowNode({ data, onParamsChange, onTest }) {
           {editing ? "Close" : (Object.values(params).some(v => v) ? "Modify" : "Set settings")}
         </button>
       )}
-      <button onClick={handleTestClick} className={styles.editParamsBtn}>
+      {/* Test button for action and reaction */}
+      {/* <button onClick={handleTestClick} className={styles.editParamsBtn}>
         Test
-      </button>
+      </button> */}
       {renderParamsForm()}
       {renderReactionInputs()}
       {renderActionOutputs()}
@@ -782,7 +783,6 @@ export default function CrArea() {
         <div className={styles.headerRight} ref={menuRef}>
           <button onClick={() => setMenuType("action")} className={styles.btn}>Actions</button>
           <button onClick={() => setMenuType("reaction")} className={styles.btn}>Reactions</button>
-          <button onClick={() => alert("Verification function")} className={`${styles.btn} ${styles.btnCheck}`}>Verify</button>
           <button
             onClick={isEditing ? handleUpdateWorkflow : handleCreateWorkflow}
             className={`${styles.btn} ${styles.btnSubmit}`}
