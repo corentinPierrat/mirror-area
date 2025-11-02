@@ -82,14 +82,14 @@ export default function Login() {
           />
           <input
             type="password"
-            placeholder="Mot de passe"
+            placeholder="Passeword"
             className={styles.input}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
           {message && <p className={styles.message}>{message}</p>}
           <button type="submit" className={styles.buttons} disabled={loading}>
-            {loading ? "Connection..." : "Connection"}
+            {loading ? "Connexion..." : "Connexion"}
           </button>
         </form>
 
