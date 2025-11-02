@@ -4,7 +4,6 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  /* background: linear-gradient(135deg, #171542 0%, #2f339e 100%); */
   color: #fff;
   font-family: "Inter", sans-serif;
   padding: 40px 20px;
@@ -14,6 +13,19 @@
   backdrop-filter: blur(2.2px);
   -webkit-backdrop-filter: blur(4.2px);
   border: 1px solid rgba(255, 255, 255, 0.26);
+
+}
+
+.googleButton {
+  position: relative;
+  z-index: 2;
+  background-color: #fff;
+  color: #000;
+}
+
+.googleIcon {
+  height: 20px;
+  margin-right: 10px;
 }
 
 .videoBackground {

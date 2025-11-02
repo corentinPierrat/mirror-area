@@ -5,6 +5,7 @@ import HeaderDashboard from "./components/HeaderDashboard";
 import Footer from "./components/Footer";
 import ProfileInfo from "./components/ProfileInfo";
 import styles from "./styles/Account.module.css";
+import videoBg from "../public/bg-video.mp4";
 
 const API_URL = import.meta.env.VITE_API_URL;
 export default function Account() {
@@ -65,7 +66,14 @@ export default function Account() {
 
   return (
     <div className={styles.pageContainer}>
-
+      <video
+                    className={styles.videoBackground}
+                    src={videoBg}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                  />
       <div className={styles.contentWrapper}>
         <aside className={styles.sidebar}>
           <HeaderDashboard />

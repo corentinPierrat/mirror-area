@@ -1,4 +1,3 @@
-/* HomePage.module.css */
 body {
   margin: 0;
   background-color: #02061a;
@@ -51,10 +50,6 @@ body {
   top: 8px;
 }
 
-
-
-
-
-
-
-
+.container {
+  margin-top: 50%;
+}

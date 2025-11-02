@@ -21,7 +21,7 @@ export default function ProfileBubble() {
       }
     };
     fetchUser();
-  }, []);
+  }, [token]);
 
   if (error) {
     return <div className={styles.error}>{error}</div>;
@@ -31,7 +31,9 @@ export default function ProfileBubble() {
     return <div className={styles.loading}>Chargement...</div>;
   }
 
-  const avatarUrl = `https://api.dicebear.com/7.x/identicon/svg?seed=${user.username}`;
+  const avatarUrl = user.profile_image_url
+    ? `${API_URL}${user.profile_image_url}`
+    : `https://api.dicebear.com/7.x/identicon/svg?seed=${user.username}`;
 
   return (
     <div

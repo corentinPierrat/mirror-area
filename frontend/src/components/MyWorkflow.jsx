@@ -29,14 +29,15 @@ export default function MyWorkflow() {
         const reactionSteps = wf.steps?.filter((s) => s.type === "reaction") || [];
 
         return {
-          ...wf,
+          ...wf, 
           action: actionStep,
           reactions: reactionSteps,
         };
       });
 
       setWorkflows(data);
-    } catch (err) {
+    } catch (err)
+ {
       console.error("Error retrieving workflows:", err);
       setError(err.message || "Unable to load workflows.");
     } finally {
@@ -76,16 +77,16 @@ return (
             key={workflow.id}
             workflowId={workflow.id}
             Name={workflow.name}
-            Action={
-              workflow.action
-                ? `${workflow.action.service} - ${workflow.action.event}`
-                : "Action unknow"
-            }
+            Action={workflow.action || {}}
             Reactions={workflow.reactions || []} 
+            active={workflow.active} 
+            description={workflow.description}
+            visibility={workflow.visibility}
             onDelete={(id) =>
               setWorkflows((prev) => prev.filter((w) => w.id !== id))
             }
             onEdit={handleEdit} 
+            
           />
         ))}
       </div>
@@ -103,3 +104,4 @@ return (
   </div>
 );
 }
+

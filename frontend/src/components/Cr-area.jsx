@@ -285,6 +285,7 @@ export default function CrArea() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges] = useEdgesState([]);
   const [workflowName, setWorkflowName] = useState("");
+  const [workflowDescription, setWorkflowDescription] = useState("");
   const [menuType, setMenuType] = useState(null);
   const [editingNode, setEditingNode] = useState(null);
   const menuRef = useRef();
@@ -424,6 +425,7 @@ export default function CrArea() {
     setIsEditing(true);
     setButtonLabel("Save");
     if (workflowData.Name) setWorkflowName(workflowData.Name);
+    if (workflowData.description) setWorkflowDescription(workflowData.description);
   
     const rebuiltNodes = [];
     const rebuiltEdges = [];
@@ -584,7 +586,7 @@ export default function CrArea() {
   
     const payload = {
       name: workflowName,
-      description: "Updated from ReactFlow",
+      description: workflowDescription || "Updated from ReactFlow",
       steps,
     };
 
@@ -729,11 +731,17 @@ export default function CrArea() {
       params: n.data.params || {},
       links: Object.keys(n.data.links || {}).length > 0 ? n.data.links : undefined
     }));
-    const payload = { name: workflowName, description: "Workflow created from ReactFlow", visibility: "private", steps };
+    const payload = { 
+      name: workflowName, 
+      description: workflowDescription || "Workflow created from ReactFlow", 
+      visibility: "private", 
+      steps 
+    };
     try {
       await axios.post(`${API_URL}/workflows/`, payload, { headers: { Authorization: `Bearer ${token}` } });
       alert("Workflow created !");
       setEdges([]); setNodes([]); setWorkflowName("");
+      setWorkflowDescription("");
     } catch (err) {
       console.error(err);
       alert("Error creating workflow");
@@ -763,6 +771,13 @@ export default function CrArea() {
         <div className={styles.headerLeft}>
           <h2>Blueprint AREA</h2>
           <input type="text" placeholder="Workflow name" value={workflowName} onChange={(e) => setWorkflowName(e.target.value)} className={styles.workflowInput} />
+          <input 
+            type="text" 
+            placeholder="Description (optional)" 
+            value={workflowDescription} 
+            onChange={(e) => setWorkflowDescription(e.target.value)} 
+            className={styles.workflowInput} 
+          />
         </div>
         <div className={styles.headerRight} ref={menuRef}>
           <button onClick={() => setMenuType("action")} className={styles.btn}>Actions</button>

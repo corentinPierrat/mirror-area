@@ -1,4 +1,3 @@
-// src/components/FlowFieldBackground.jsx
 import React, { useRef, useEffect } from "react";
 
 const FlowFieldBackground = ({ width = 800, height = 600, color1 = "#6b5bff", color2 = "#4bd1ff" }) => {

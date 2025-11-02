@@ -8,6 +8,7 @@ import ProfileBubble from "./components/ProfileBubble";
 import styles from "./styles/Dashboard.module.css";
 
 export default function Dashboard() {
+  
   return (
     <div className={styles.dashboardContainer}>
       <video

@@ -34,7 +34,12 @@ export default function Header() {
     navigate("/");
   };
   
-  const avatarUrl = user ? `https://api.dicebear.com/7.x/identicon/svg?seed=${user.username}` : '';
+  let avatarUrl = '';
+  if (user) {
+    avatarUrl = user.profile_image_url
+      ? `${API_URL}${user.profile_image_url}`
+      : `https://api.dicebear.com/7.x/identicon/svg?seed=${user.username}`; // Fallback
+  }
 
   return (
     <header className={styles.header}>
@@ -42,19 +47,17 @@ export default function Header() {
         <div className={styles['nav-left']}>
           <Link to="/" className={styles.logo}>Triggers.</Link>
           <ul className={styles['nav-links']}>
-            <li><Link to="/dashboard">Features</Link></li>
-            <li><a href="#">Pricing</a></li>
-            <li><a href="#">Docs</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="https://trigger.ink/docs#/">Docs</a></li>
           </ul>
         </div>
         <div className={styles['nav-right']}>
           {user ? (
             <>
-              <Link to="/Account" className={styles.userProfileBtn}>
+              <Link to="/dashboard" className={styles.userProfileBtn}>
                 <img src={avatarUrl} alt="Avatar" className={styles.userAvatar} />
                 {user.username}
               </Link>
-
 
               <button onClick={handleDisconnect} className={styles.disconnectBtn}>
                 Disconnect
