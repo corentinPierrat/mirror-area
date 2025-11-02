@@ -5,11 +5,11 @@
     "slug": "mobile",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/Trigger.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/Trigger.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -25,18 +25,18 @@
       "package": "com.theotime6272.mobile"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/Trigger.png"
     },
     "plugins": [
       "expo-localization",
       "expo-web-browser",
-        "expo-font",
-        [
-          "expo-image-picker",
-          {
-            "photosPermission": "L'application a besoin d'accéder à vos photos pour mettre à jour votre image de profil."
-          }
-        ]
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "L'application a besoin d'accéder à vos photos pour mettre à jour votre image de profil."
+        }
+      ]
     ],
     "extra": {
       "eas": {

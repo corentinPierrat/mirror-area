@@ -54,5 +54,11 @@
   "EnterCode": "이메일로 전송된 코드를 입력하세요",
   "BtnResend": "코드 다시 보내기",
   "Verif": "인증",
-  "Created by": "작성자"
+  "Created by": "작성자",
+  "Feed": "피드",
+  "Loading...": "로딩 중...",
+  "No workflows in feed": "피드에 워크플로우가 없습니다",
+  "Search workflows...": "워크플로우 검색...",
+  "All": "모두",
+  "No workflows match your filters": "필터와 일치하는 워크플로우가 없습니다"
 }

@@ -54,5 +54,11 @@
   "EnterCode": "กรอกรหัสที่ส่งไปยังอีเมลของคุณ",
   "BtnResend": "ส่งรหัสอีกครั้ง",
   "Verif": "การยืนยัน",
-  "Created by": "สร้างโดย"
+  "Created by": "สร้างโดย",
+  "Feed": "ฟีด",
+  "Loading...": "กำลังโหลด...",
+  "No workflows in feed": "ไม่มีเวิร์กโฟลว์ในฟีด",
+  "Search workflows...": "ค้นหาเวิร์กโฟลว์...",
+  "All": "ทั้งหมด",
+  "No workflows match your filters": "ไม่มีเวิร์กโฟลว์ที่ตรงกับตัวกรองของคุณ"
 }

@@ -54,5 +54,11 @@
   "EnterCode": "Geben Sie den an Ihre E-Mail gesendeten Code ein",
   "BtnResend": "Code erneut senden",
   "Verif": "Überprüfung",
-  "Created by": "Erstellt von"
+  "Created by": "Erstellt von",
+  "Feed": "Feed",
+  "Loading...": "Laden...",
+  "No workflows in feed": "Keine Workflows im Feed",
+  "Search workflows...": "Workflows suchen...",
+  "All": "Alle",
+  "No workflows match your filters": "Keine Workflows entsprechen Ihren Filtern"
 }

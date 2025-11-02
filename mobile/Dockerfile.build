@@ -1,0 +1,33 @@
+FROM node:20
+
+RUN apt-get update && \
+    apt-get install -y openjdk-17-jdk && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+ENV PATH=$JAVA_HOME/bin:$PATH
+
+RUN npm install -g eas-cli
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+ENV EAS_NO_VCS=1
+ENV EAS_LOCAL_BUILD_SKIP_CLEANUP=1
+
+CMD ["sh", "-c", "\
+  if [ -z \"$EXPO_TOKEN\" ] && [ -z \"$EAS_TOKEN\" ]; then \
+    echo 'Error: missing EXPO_TOKEN or EAS_TOKEN'; \
+    exit 1; \
+  fi && \
+  eas build --platform android --profile preview --non-interactive --wait && \
+  eas build:download --platform android --output /app/build-output.apk && \
+  mkdir -p /shared && \
+  cp /app/build-output.apk /shared/client.apk \
+"]

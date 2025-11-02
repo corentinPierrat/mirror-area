@@ -55,5 +55,11 @@
   "BtnResend": "Renvoyer le code",
   "Verif": "Vérification",
   "Created by": "Créé par",
-  "CreateAccount": "Créer un compte"
+  "CreateAccount": "Créer un compte",
+  "Feed": "Fil d'actualité",
+  "Loading...": "Chargement...",
+  "No workflows in feed": "Aucun workflow dans le fil",
+  "Search workflows...": "Rechercher des workflows...",
+  "All": "Tous",
+  "No workflows match your filters": "Aucun workflow ne correspond à vos filtres"
 }
