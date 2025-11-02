@@ -158,8 +158,9 @@ export default function Services() {
           </div>
         </div>
       </div>
-
-      <Footer />
+      <div className={styles.footer}>
+        <Footer />
+      </div>
     </div>
   );
 }

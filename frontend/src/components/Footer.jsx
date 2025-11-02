@@ -7,7 +7,7 @@ function Footer() {
       <div className={styles.container}>
         <div className={styles.newsletterSection}>
           <strong className={styles.newsletterTitle}>
-            Want to create a new area ?
+            Want to join newletter ?
           </strong>
 
           <form className={styles.newsletterForm}>

@@ -34,8 +34,9 @@ export default function Dashboard() {
           <MyWorkflow />
         </main>
       </div>
-
-      <Footer />
+      <div className={styles.footer}>
+        <Footer />
+      </div>
     </div>
   );
 }
