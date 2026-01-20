@@ -57,7 +57,7 @@ export default function Login() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = `${API_URL}/oauth/google/login?redirect_uri=${window.location.href}`;
+    window.location.href = `${API_URL}/oauth/google/login?redirect_uri=${window.location.origin}/dashboard`;
   };
 
   return (
