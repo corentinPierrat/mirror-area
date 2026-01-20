@@ -35,9 +35,9 @@ export default function Services() {
       const res = await axios.get(`${API_URL}/oauth/${provider}/status`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      
-      console.log(`API response for ${provider}:`, res.data); 
-      console.log(`HTTP status for ${provider}:`, res.status); 
+
+      console.log(`API response for ${provider}:`, res.data);
+      console.log(`HTTP status for ${provider}:`, res.status);
 
       setConnected((prev) => ({ ...prev, [provider]: res.data.logged_in }));
     } catch (err) {
@@ -59,7 +59,7 @@ export default function Services() {
   };
 
   const handleLogin = (provider) => {
-    window.location.href = `${API_URL}/oauth/${provider}/login?token=${token}`;
+    window.location.href = `${API_URL}/oauth/${provider}/login?token=${token}&redirect_uri=${window.location.href}`;
   };
 
   useEffect(() => {
