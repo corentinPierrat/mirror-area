@@ -43,19 +43,15 @@ flowchart LR
     subgraph Clients
         Web[Web Client React + Vite]
         MobileDev[Mobile Dev Runner Expo CLI]
-        MobileBuild[Mobile Builder EAS CLI]
     end
 
     subgraph Infrastructure
         DB[(MariaDB)]
-        Scheduler[Timer Scheduler APScheduler]
         DiscordBot[Discord Bot Service]
     end
 
     Web <-- REST --> Backend
     MobileDev <-- REST --> Backend
-    MobileBuild --> SharedVolume[(shared-bundle)]
-    Web --> SharedVolume
 
     Backend((FastAPI Backend)) --> DB
     Backend --> Scheduler
